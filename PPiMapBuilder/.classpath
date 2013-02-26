@@ -22,5 +22,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/opt/Cytoscape_v2.8.3/cytoscape.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
