@@ -1,27 +1,21 @@
 package PPiMapBuilder;
 
-import java.awt.event.ActionEvent;
-
-import javax.swing.JOptionPane;
-
 import cytoscape.Cytoscape;
 import cytoscape.plugin.CytoscapePlugin;
-import cytoscape.util.CytoscapeAction;
 
+/**
+ * 
+ * @author pidupuis
+ *
+ */
 public class PPiMapBuilderPlugin extends CytoscapePlugin {
 	
+	/**
+	 * Default constructor
+	 * 		Add a launcher to the "Plugins" menu
+	 */
 	public PPiMapBuilderPlugin() {
-		CytoscapeAction myAction = new CytoscapeAction("test") {
-			
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Hello World");
-			}
-		};
-		myAction.setPreferredMenu("Plugins");
-		Cytoscape.getDesktop().getCyMenus().addAction(myAction);
+		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(PPiMapBuilderMenu.Instance());
 	}
 
 }
