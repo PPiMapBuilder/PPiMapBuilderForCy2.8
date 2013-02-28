@@ -42,7 +42,7 @@ public class PPiMapBuilderPanel extends JPanel {
 			
 			if (selectedNodes.size() != 0) { // If nodes are selected
 				
-				// We update the panel label
+				// We update the panel with a label
 				String str = new String("");
 				Iterator<CyNode> it = selectedNodes.iterator();
 				while (it.hasNext()) {
@@ -50,6 +50,8 @@ public class PPiMapBuilderPanel extends JPanel {
 					str+=aNode.getIdentifier()+" ";
 				}
 				selectedNode.setText(str);
+				// End of the label construction
+				
 			}
 		}
 	}

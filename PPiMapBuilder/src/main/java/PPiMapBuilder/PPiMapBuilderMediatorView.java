@@ -8,13 +8,11 @@ import cytoscape.layout.CyLayouts;
 import cytoscape.view.CyNetworkView;
 import ding.view.DGraphView;
 
-public class PPiMapBuilderMediator {
+public class PPiMapBuilderMediatorView {
 
-	private PPiMapBuilderPanel myPanel;
 	private CyNetworkView myView;
 	
-	public PPiMapBuilderMediator(CyNetwork myNetwork) {
-		this.myPanel = PPiMapBuilderPanel.Instance();
+	public PPiMapBuilderMediatorView(CyNetwork myNetwork) {
 		
 		this.myView = Cytoscape.createNetworkView(myNetwork);
 		((DGraphView) this.myView).getCanvas().addMouseListener(new MouseListener() {
@@ -29,23 +27,20 @@ public class PPiMapBuilderMediator {
 
 			public void mouseClicked(MouseEvent e) {
 				CyNetworkView view=Cytoscape.getCurrentNetworkView();	
-				   NodeView nv =((DGraphView) view).getPickedNodeView(e.getPoint ()); 
-				   if(nv != null) {
-					   update("CyNode");
-				   }
+				NodeView nv =((DGraphView) view).getPickedNodeView(e.getPoint ());
+				if(nv != null) {
+					updatePanel(); // We update the panel
+				}
 			}
 		});
 		this.myView.setZoom(3); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
 		this.myView.applyLayout(CyLayouts.getLayout("force-directed")); // Use the "Force directed" layout
-
 	}
 	
-	public void update(String str) {
-		if (str.equals("CyNode")) {
-			PPiMapBuilderPanel.Instance().update();
-		}
-
+	public void updatePanel() {
+		// For now there is one action, but we can extend this method with different conditions according that we click on node or edge for example
+		PPiMapBuilderPanel.Instance().update();
 	}
 
 }

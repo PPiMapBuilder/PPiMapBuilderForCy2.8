@@ -11,15 +11,17 @@ public class PPiMapBuilderCredits extends JFrame {
 	
 	public PPiMapBuilderCredits() {
 		
+		// Frame contents
 		copyright = new JLabel("Copyright 2013");
 		this.getContentPane().add(copyright);
 		
+		// Frame parameters
+		// [!] Do not put the 'exit on close' option !
 		this.setTitle("About PPiMapBuilder");
 		this.setPreferredSize(new Dimension(400,250));
 		this.setMinimumSize(new Dimension(400,250));
 		this.setMaximumSize(new Dimension(400,250));
 		this.setResizable(false);
-
 		this.setLocationRelativeTo(null);
 	}
 }
