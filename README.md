@@ -1,4 +1,4 @@
 PPiMapBuilder
 =============
 
-PPiMapBuilder maven project
+Cytoscape plug-in development (using maven)
