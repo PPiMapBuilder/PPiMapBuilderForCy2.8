@@ -38,6 +38,7 @@ public class PPiMapBuilderPanel extends JPanel {
 		CyNetwork current_network = Cytoscape.getCurrentNetwork(); // Retrieve the currentNetwork
 		if (current_network != null) { // If exists
 			
+			@SuppressWarnings("unchecked")
 			Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
 			
 			if (selectedNodes.size() != 0) { // If nodes are selected
