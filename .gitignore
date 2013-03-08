@@ -1,6 +1,4 @@
-.DS_Store
-.classpath
-
+# Compiled Files #
 *.class
 
 # Package Files #
@@ -8,8 +6,5 @@
 *.war
 *.ear
 
-#Authorize lib
-!miglayout15-swing.jar
-
-#Other unecessary files
+# Other unecessary files #
 .DS_Store
