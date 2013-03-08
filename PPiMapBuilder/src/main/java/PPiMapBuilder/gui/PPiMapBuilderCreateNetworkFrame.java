@@ -60,9 +60,9 @@ public class PPiMapBuilderCreateNetworkFrame extends JFrame{
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		new PPiMapBuilderCreateNetworkFrame();
-	}
+//	public static void main(String[] args) {
+//		new PPiMapBuilderCreateNetworkFrame();
+//	}
 
 	/**
 	 * Create the application.
@@ -107,7 +107,6 @@ public class PPiMapBuilderCreateNetworkFrame extends JFrame{
 		
 		this.setMinimumSize(new Dimension(500, 300));
 		this.setBounds(100, 100, 507, 445);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JSplitPane splitPane = new JSplitPane();
 		splitPane.setBorder(null);
@@ -158,6 +157,9 @@ public class PPiMapBuilderCreateNetworkFrame extends JFrame{
 		getContentPane().add(panBottomForm, BorderLayout.SOUTH);
 		
 		this.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{txaIndentifiers, panOtherOrganims, panSourceDatabases, panBottomForm.getComponent(0), panBottomForm.getComponent(1)}));
+		
+		this.setLocationRelativeTo(null);
+		this.setVisible(true);
 	}
 	
 	/**
