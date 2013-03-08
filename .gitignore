@@ -4,3 +4,10 @@
 *.jar
 *.war
 *.ear
+
+#Authorize lib
+!forms-1.3.0.jar
+!miglayout15-swing.jar
+
+#Other unecessary files
+.DS_Store
