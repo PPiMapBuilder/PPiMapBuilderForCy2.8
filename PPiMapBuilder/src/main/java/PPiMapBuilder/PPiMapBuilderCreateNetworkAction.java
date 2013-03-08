@@ -15,6 +15,10 @@ import javax.swing.*;
 public class PPiMapBuilderCreateNetworkAction extends CytoscapeAction {
 
 	private static final long serialVersionUID = 1L;
+	
+	private PPiMapBuilderPanel myPanel = PPiMapBuilderPanel.Instance(); // Instance of the PPiMapBuilder panel to prevent several instances 
+	
+	private String poiName; // Name of the protein of interest
 
 	/**
 	 * Default constructor
@@ -24,24 +28,22 @@ public class PPiMapBuilderCreateNetworkAction extends CytoscapeAction {
 	}
 	
 	/**
-	 * ActionPerformed which contains the actions which are triggered when you click on your launcher
+	 * ActionPerformed which create the network and add the PPiMapBuilder panel
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
 
-		// Creation of the panel
-		CytoPanelImp ctrlPanel = (CytoPanelImp) Cytoscape.getDesktop().getCytoPanel(SwingConstants.WEST); // Retrieve the Cytoscape control panel
-		ctrlPanel.add(PPiMapBuilderPanel.Instance(), 1); // Add the new panel at the index 1 (so at the second position in the control panel)
-		ctrlPanel.setSelectedIndex(ctrlPanel.indexOfComponent(PPiMapBuilderPanel.Instance())); // Specify that the panel selected by default is our panel
+		/* NETWORK CREATION */
+		// [!] This part creates a example network so this will change to call the creation frame...
 		
 		//Creation of the protein of interest
-		String poiName = "PPID";
+		poiName = "PPID";
 		
 		// Creation of the network
 		CyNetwork myNetwork = Cytoscape.createNetwork(poiName+"_interactom", false); // Creation of a network (with the name of the poi)
 		
 		// Creation of the network components
-		PPiMapBuilderNode poiNode = new PPiMapBuilderNode(Cytoscape.getCyNode(poiName, true));
+		PPiMapBuilderNode poiNode = new PPiMapBuilderNode(Cytoscape.getCyNode(poiName, true)); // Create the PPiMapBuilder nodes
 		PPiMapBuilderNode myNode1 = new PPiMapBuilderNode(Cytoscape.getCyNode("HSP90", true));
 		myNetwork.addNode(poiNode); // Add the first node to the current network
 		myNetwork.addNode(myNode1); // Add the second node to the current network
@@ -50,6 +52,15 @@ public class PPiMapBuilderCreateNetworkAction extends CytoscapeAction {
 		
 		// Add to the mediator
 		PPiMapBuilderMediator.Instance().addNetwork(myNetwork);
+		
+		
+		/* PANEL */
+		
+		// Creation of the panel
+		CytoPanelImp ctrlPanel = (CytoPanelImp) Cytoscape.getDesktop().getCytoPanel(SwingConstants.WEST); // Retrieve the Cytoscape control panel
+		ctrlPanel.add(myPanel, 1); // Add the new panel at the index 1 (so at the second position in the control panel)
+		ctrlPanel.setSelectedIndex(ctrlPanel.indexOfComponent(myPanel)); // Specify that the panel selected by default is our panel
+		
 	}
 	
 }

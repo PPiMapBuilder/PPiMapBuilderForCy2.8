@@ -5,12 +5,14 @@ import java.awt.event.ActionEvent;
 
 /**
  * 
- * @author pidupuis
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
 public class PPiMapBuilderCreditsAction extends CytoscapeAction {
 
 	private static final long serialVersionUID = 1L;
+	
+	private PPiMapBuilderCredits myFrame = PPiMapBuilderCredits.Instance(); // Frame for the credits
 
 	/**
 	 * Default constructor
@@ -20,11 +22,10 @@ public class PPiMapBuilderCreditsAction extends CytoscapeAction {
 	}
 	
 	/**
-	 * ActionPerformed which contains the actions which are triggered when you click on your launcher
+	 * ActionPerformed which creates the credits frame
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		PPiMapBuilderCredits myFrame = new PPiMapBuilderCredits();
-		myFrame.setVisible(true);
+		myFrame.setVisible(true); // Set the frame visible
 	}
 }

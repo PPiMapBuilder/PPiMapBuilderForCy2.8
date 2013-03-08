@@ -5,17 +5,19 @@ import cytoscape.plugin.CytoscapePlugin;
 
 /**
  * 
- * @author pidupuis
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
 public class PPiMapBuilderPlugin extends CytoscapePlugin {
 	
+	private PPiMapBuilderMenu myMenu = PPiMapBuilderMenu.Instance(); // Main menu for the plugin
+	
 	/**
 	 * Default constructor
-	 * 		Add a launcher to the "Plugins" menu
+	 * Add a launcher to the "Plugins" menu
 	 */
 	public PPiMapBuilderPlugin() {
-		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(PPiMapBuilderMenu.Instance());
+		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(myMenu); // Add the menu to the plugins menu
 	}
 
 }
