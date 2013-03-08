@@ -6,3 +6,9 @@
 *.jar
 *.war
 *.ear
+
+#Authorize lib
+!miglayout15-swing.jar
+
+#Other unecessary files
+.DS_Store

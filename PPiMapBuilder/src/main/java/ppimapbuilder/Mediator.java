@@ -3,6 +3,8 @@ package ppimapbuilder;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+
+import ppimapbuilder.gui.PMBPanel;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.view.CyNetworkView;

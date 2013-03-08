@@ -1,6 +1,9 @@
-package ppimapbuilder;
+package ppimapbuilder.gui;
 
 import javax.swing.*;
+
+import ppimapbuilder.CreateNetworkAction;
+import ppimapbuilder.CreditsAction;
 
 /**
  * 

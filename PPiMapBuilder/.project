@@ -20,4 +20,10 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
+	<variableList>
+		<variable>
+			<name>images</name>
+			<value>file:/Users/guillaume/Developper/Java/PPiMapBuilder/PPiMapBuilder/images</value>
+		</variable>
+	</variableList>
 </projectDescription>

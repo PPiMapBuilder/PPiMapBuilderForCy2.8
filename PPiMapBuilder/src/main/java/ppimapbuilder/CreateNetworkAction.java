@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent;
 import cytoscape.*;
 import javax.swing.*;
 
+import ppimapbuilder.gui.PMBPanel;
+
 /**
  * 
  * @author pidupuis

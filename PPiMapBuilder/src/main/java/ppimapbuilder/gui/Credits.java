@@ -1,8 +1,14 @@
-package ppimapbuilder;
+package ppimapbuilder.gui;
 
 import java.awt.Dimension;
+
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import net.miginfocom.swing.MigLayout;
+import javax.swing.SwingConstants;
 
 /**
  * 
@@ -25,10 +31,15 @@ public class Credits extends JFrame {
 	 * Create the entire credits frame
 	 */
 	private Credits() {
+		getContentPane().setLayout(new MigLayout("", "[grow][grow][grow]", "[grow][grow][grow]"));
+		
+		JLabel lblNewLabel = new JLabel(new ImageIcon(getClass().getResource("logo.jpeg")));
+		getContentPane().add(lblNewLabel, "cell 1 0");
 		
 		// Frame contents
 		copyright = new JLabel("Copyright 2013");
-		this.getContentPane().add(copyright);
+		copyright.setHorizontalAlignment(SwingConstants.CENTER);
+		getContentPane().add(copyright, "cell 1 1,grow");
 		
 		// Frame parameters : [!] Do not put the 'exit on close' option !
 		this.setTitle("About ppimapbuilder"); // Change the frame title

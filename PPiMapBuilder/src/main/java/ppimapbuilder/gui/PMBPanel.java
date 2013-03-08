@@ -1,4 +1,4 @@
-package ppimapbuilder;
+package ppimapbuilder.gui;
 
 import java.util.Iterator;
 import java.util.Set;

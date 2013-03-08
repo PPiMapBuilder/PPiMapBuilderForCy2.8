@@ -1,5 +1,6 @@
 package ppimapbuilder;
 
+import ppimapbuilder.gui.PMBMenu;
 import cytoscape.Cytoscape;
 import cytoscape.plugin.CytoscapePlugin;
 

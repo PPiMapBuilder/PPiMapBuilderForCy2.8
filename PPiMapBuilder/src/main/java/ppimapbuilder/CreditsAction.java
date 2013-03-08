@@ -3,6 +3,8 @@ package ppimapbuilder;
 import cytoscape.util.CytoscapeAction;
 import java.awt.event.ActionEvent;
 
+import ppimapbuilder.gui.Credits;
+
 /**
  * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
