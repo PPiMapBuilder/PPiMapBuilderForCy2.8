@@ -1,4 +1,4 @@
-package PPiMapBuilder;
+package ppimapbuilder;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -14,11 +14,11 @@ import cytoscape.Cytoscape;
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class PPiMapBuilderPanel extends JPanel {
+public class PMBPanel extends JPanel {
 
 	private static final long serialVersionUID = 1;
 	
-	private static PPiMapBuilderPanel _instance = null; // Instance of the PPiMapBuilder panel to prevent several instances 
+	private static PMBPanel _instance = null; // Instance of the ppimapbuilder panel to prevent several instances 
 	
 	/* Panel components  */
 	private JLabel selectedNode;
@@ -29,21 +29,21 @@ public class PPiMapBuilderPanel extends JPanel {
 	 * Default constructor which is private to prevent several instances
 	 * Creates a panel and add the different components
 	 */
-	private PPiMapBuilderPanel() {
+	private PMBPanel() {
 		super();
-		this.setName("PPiMapBuilder"); // Change the name of the panel
+		this.setName("ppimapbuilder"); // Change the name of the panel
 		
 		selectedNode = new JLabel(); // Creation of a label
 		this.add(selectedNode); // Add the label into the panel
 	}
 	
 	/**
-	 * Method to access the unique instance of PPiMapBuilderPanel
+	 * Method to access the unique instance of PMBPanel
 	 * @return _instance
 	 */
-	public static PPiMapBuilderPanel Instance() {
+	public static PMBPanel Instance() {
 		if (_instance == null)
-			_instance = new PPiMapBuilderPanel();
+			_instance = new PMBPanel();
 		return _instance;
 	}
 	

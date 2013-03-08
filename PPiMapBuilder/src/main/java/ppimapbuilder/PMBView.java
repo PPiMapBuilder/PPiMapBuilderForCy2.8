@@ -1,4 +1,4 @@
-package PPiMapBuilder;
+package ppimapbuilder;
 
 import giny.model.Edge;
 import giny.model.GraphPerspective;
@@ -33,20 +33,20 @@ import ding.view.NodeContextMenuListener;
 /**
  * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
- * PPiMapBuilderView works as a inherited class (using the decorator pattern)
+ * PMBView works as a inherited class (using the decorator pattern)
  *
  */
-public class PPiMapBuilderView implements CyNetworkView {
+public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
-	private PPiMapBuilderMediator myMediator = PPiMapBuilderMediator.Instance();
+	private Mediator myMediator = Mediator.Instance();
 	
 	/**
 	 * Constructor
 	 * Create the CyNetworkView into the myView attributes and decorates it with specific methods
 	 * @param myNetwork
 	 */
-	public PPiMapBuilderView(CyNetwork myNetwork) {
+	public PMBView(CyNetwork myNetwork) {
 		
 		this.myView = Cytoscape.createNetworkView(myNetwork); // Create the view as usual
 		

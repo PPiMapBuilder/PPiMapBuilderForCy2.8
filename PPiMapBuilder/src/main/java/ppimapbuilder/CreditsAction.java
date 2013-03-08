@@ -1,4 +1,4 @@
-package PPiMapBuilder;
+package ppimapbuilder;
 
 import cytoscape.util.CytoscapeAction;
 import java.awt.event.ActionEvent;
@@ -8,16 +8,16 @@ import java.awt.event.ActionEvent;
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class PPiMapBuilderCreditsAction extends CytoscapeAction {
+public class CreditsAction extends CytoscapeAction {
 
 	private static final long serialVersionUID = 1L;
 	
-	private PPiMapBuilderCredits myFrame = PPiMapBuilderCredits.Instance(); // Frame for the credits
+	private Credits myFrame = Credits.Instance(); // Frame for the credits
 
 	/**
 	 * Default constructor
 	 */
-	public PPiMapBuilderCreditsAction() {
+	public CreditsAction() {
 		super();
 	}
 	

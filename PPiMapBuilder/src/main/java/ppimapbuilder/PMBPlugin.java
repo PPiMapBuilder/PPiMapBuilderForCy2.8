@@ -1,4 +1,4 @@
-package PPiMapBuilder;
+package ppimapbuilder;
 
 import cytoscape.Cytoscape;
 import cytoscape.plugin.CytoscapePlugin;
@@ -8,15 +8,15 @@ import cytoscape.plugin.CytoscapePlugin;
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class PPiMapBuilderPlugin extends CytoscapePlugin {
+public class PMBPlugin extends CytoscapePlugin {
 	
-	private PPiMapBuilderMenu myMenu = PPiMapBuilderMenu.Instance(); // Main menu for the plugin
+	private PMBMenu myMenu = PMBMenu.Instance(); // Main menu for the plugin
 	
 	/**
 	 * Default constructor
 	 * Add a launcher to the "Plugins" menu
 	 */
-	public PPiMapBuilderPlugin() {
+	public PMBPlugin() {
 		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(myMenu); // Add the menu to the plugins menu
 	}
 
