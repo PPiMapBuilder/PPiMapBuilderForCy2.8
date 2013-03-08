@@ -39,7 +39,7 @@ import ding.view.NodeContextMenuListener;
 public class PPiMapBuilderView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
-	private PPiMapBuilderPanel myPanel = PPiMapBuilderPanel.Instance();
+	private PPiMapBuilderMediator myMediator = PPiMapBuilderMediator.Instance();
 	
 	/**
 	 * Constructor
@@ -62,21 +62,13 @@ public class PPiMapBuilderView implements CyNetworkView {
 
 			public void mouseClicked(MouseEvent e) { // When there is a click on this view
 				if ( ((DGraphView) Cytoscape.getCurrentNetworkView()).getPickedNodeView(e.getPoint ()) != null) { // If the click is on a node
-					updatePanel(); // We update the panel
+					myMediator.updatePanel(); // We update the panel
 				}
 			}
 		});
 		this.myView.setZoom(3); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
 		this.myView.applyLayout(CyLayouts.getLayout("force-directed")); // Use the "Force directed" layout
-	}
-	
-	/**
-	 * Method which call the update() method from the PPiMapBuilder panel
-	 */
-	public void updatePanel() {
-		// For now there is one action, but we can extend this method with different conditions according that we click on node or edge for example
-		myPanel.update();
 	}
 
 	/* OVERRIDE OF EVERY IMPLEMENTABLE METHOD TO RUN IT THROUGH THE CYNETWORKVIEW ATTRIBUTE */

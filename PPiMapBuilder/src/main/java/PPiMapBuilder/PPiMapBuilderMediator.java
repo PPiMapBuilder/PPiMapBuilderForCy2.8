@@ -18,7 +18,7 @@ public class PPiMapBuilderMediator implements PropertyChangeListener {
 	private static PPiMapBuilderMediator _instance = null; // Instance for singleton pattern
 	
 	private ArrayList<CyNetwork> myNetworks = new ArrayList<CyNetwork>(); // List of networks created by the plugin
-	
+	private PPiMapBuilderPanel myPanel = PPiMapBuilderPanel.Instance();
 	@SuppressWarnings("unused")
 	private PPiMapBuilderView myView; // View for a network (for creation or update)
 	
@@ -63,4 +63,14 @@ public class PPiMapBuilderMediator implements PropertyChangeListener {
 		this.myNetworks.add(myNetwork); // We stock the network
 		myView = new PPiMapBuilderView(myNetwork); // We create a view for this network
 	}
+	
+	/**
+	 * Method which call the update() method from the PPiMapBuilder panel
+	 */
+	public void updatePanel() {
+		// For now there is one action, but we can extend this method with different conditions according that we click on node or edge for example
+		myPanel.update();
+	}
+	
+
 }
