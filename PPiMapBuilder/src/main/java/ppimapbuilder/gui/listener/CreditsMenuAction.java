@@ -1,4 +1,4 @@
-package ppimapbuilder;
+package ppimapbuilder.gui.listener;
 
 import cytoscape.util.CytoscapeAction;
 import java.awt.event.ActionEvent;
@@ -10,7 +10,7 @@ import ppimapbuilder.gui.Credits;
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class CreditsAction extends CytoscapeAction {
+public class CreditsMenuAction extends CytoscapeAction {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -19,7 +19,7 @@ public class CreditsAction extends CytoscapeAction {
 	/**
 	 * Default constructor
 	 */
-	public CreditsAction() {
+	public CreditsMenuAction() {
 		super();
 	}
 	

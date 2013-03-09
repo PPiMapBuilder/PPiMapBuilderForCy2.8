@@ -20,7 +20,7 @@ public class Credits extends JFrame {
 
 	private static final long serialVersionUID = 1L; // Instance of the ppimapbuilder menu to prevent several instances 
 	
-	private static Credits _instance = null; // Instance of the PPiMapBUilder menu to prevent several instances 
+	private static Credits _instance = null; // Instance of the PPiMapBuilder menu to prevent several instances 
 	// Need to be completed...
 	/* ---------------- */
 	

@@ -7,20 +7,18 @@ import giny.model.RootGraph;
 import giny.view.EdgeView;
 import giny.view.GraphViewChangeListener;
 import giny.view.NodeView;
-
 import java.awt.Component;
 import java.awt.Paint;
 import java.awt.event.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.layout.CyLayoutAlgorithm;
-import cytoscape.layout.CyLayouts;
+//import cytoscape.layout.CyLayouts;
 import cytoscape.view.CyEdgeView;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CyNodeView;
@@ -68,7 +66,7 @@ public class PMBView implements CyNetworkView {
 		});
 		this.myView.setZoom(3); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
-		this.myView.applyLayout(CyLayouts.getLayout("force-directed")); // Use the "Force directed" layout
+		//this.myView.applyLayout(CyLayouts.getLayout("force-directed")); // Use the "Force directed" layout
 	}
 
 	/* OVERRIDE OF EVERY IMPLEMENTABLE METHOD TO RUN IT THROUGH THE CYNETWORKVIEW ATTRIBUTE */
