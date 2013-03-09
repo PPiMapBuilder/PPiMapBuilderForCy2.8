@@ -15,6 +15,9 @@
 	</properties>
 
 	<build>
+		<resources>
+			<resource><directory>resources</directory></resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
