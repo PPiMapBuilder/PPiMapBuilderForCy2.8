@@ -12,6 +12,11 @@ import ppimapbuilder.Mediator;
 import ppimapbuilder.PMBNode;
 import ppimapbuilder.gui.CreateNetworkFrame;
 
+/**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
+ *
+ */
 public class CreateNetworkFrameSubmitListener implements ActionListener{
 	
 	private CreateNetworkFrame myFrame; // Frame which is contains the submit

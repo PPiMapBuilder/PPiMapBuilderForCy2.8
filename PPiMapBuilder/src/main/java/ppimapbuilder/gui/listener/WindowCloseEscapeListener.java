@@ -4,6 +4,11 @@ import java.awt.KeyEventDispatcher;
 import java.awt.event.KeyEvent;
 import javax.swing.JFrame;
 
+/**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
+ *
+ */
 public class WindowCloseEscapeListener implements KeyEventDispatcher {
 	
 	private JFrame window;
