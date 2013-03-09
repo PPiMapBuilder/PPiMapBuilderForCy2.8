@@ -33,8 +33,8 @@ public class Credits extends JFrame {
 	private Credits() {
 		getContentPane().setLayout(new MigLayout("", "[grow][grow][grow]", "[grow][grow][grow]"));
 		
-		JLabel lblNewLabel = new JLabel(new ImageIcon(getClass().getResource("logo.jpeg")));
-		getContentPane().add(lblNewLabel, "cell 1 0");
+		//JLabel lblNewLabel = new JLabel(new ImageIcon(getClass().getResource("logo.jpeg")));
+		//getContentPane().add(lblNewLabel, "cell 1 0");
 		
 		// Frame contents
 		copyright = new JLabel("Copyright 2013");
