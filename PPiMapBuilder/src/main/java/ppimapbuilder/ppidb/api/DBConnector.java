@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import ppimapbuilder.gui.PMBMenu;
+
 /**
  * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
@@ -15,14 +17,19 @@ import java.util.LinkedHashMap;
  */
 public class DBConnector {
 
+	private static DBConnector _instance = null; // Instance of the dbconnnector to prevent several instances 
+	
     private Connection con = null;
     private Statement st = null;
     private ResultSet rs = null;
-    private String url = "jdbc:postgresql://jesuisunegrossepatateetjetediszutfacedepot";
+    private String url = "jdbc:postgresql://";
     private String user = "ppimapbuilder";
     private String password = "ppimapbuilder";
 
-    public DBConnector() {
+    /**
+     * Default constructor
+     */
+    private DBConnector() {
         try {
             con = DriverManager.getConnection(this.url, this.user, this.password);
             st = con.createStatement();
@@ -31,6 +38,16 @@ public class DBConnector {
             System.err.println("Error while connecting : " + ex.getLocalizedMessage());
         }
     }
+    
+	/**
+	 * Method to access the unique instance of DBconnector
+	 * @return _instance
+	 */
+	public static DBConnector Instance() {
+		if (_instance == null)
+			_instance = new DBConnector();
+		return _instance;
+	}
 
     /**
      * Give a HashMap of available organisms in the PPiMapBuilder database.
