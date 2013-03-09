@@ -5,8 +5,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
- * @author keuv
  */
 public class SQLResult {
 

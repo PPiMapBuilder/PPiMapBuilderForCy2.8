@@ -8,6 +8,11 @@ import javax.swing.JComboBox;
 
 import ppimapbuilder.gui.CreateNetworkFrame;
 
+/**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
+ *
+ */
 public class CreateNetworkFrameReferenceOrganismListener implements ActionListener{
 	private CreateNetworkFrame window;
 	private JCheckBox previous = null;

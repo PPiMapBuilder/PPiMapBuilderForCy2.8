@@ -9,8 +9,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 /**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
- * @author keuv
  */
 public class DBConnector {
 
@@ -37,8 +38,8 @@ public class DBConnector {
      * @return HashMap<OrganismName, TaxID>
      * @throws SQLExeception
      */
-    public LinkedHashMap getOrganisms() throws SQLException {
-        LinkedHashMap<String, Integer> orga = new LinkedHashMap();
+    public LinkedHashMap<String, Integer> getOrganisms() throws SQLException {
+        LinkedHashMap<String, Integer> orga = new LinkedHashMap<String, Integer>();
         rs = st.executeQuery("SELECT tax_id AS \"id\", name AS \"organism\" FROM organism");
 
         while (rs.next()) {
@@ -55,8 +56,8 @@ public class DBConnector {
      * @return ArrayList<String>
      * @throws SQLExeception
      */
-    public ArrayList getDatabases() throws SQLException {
-        ArrayList<String> db = new ArrayList();
+    public ArrayList<String> getDatabases() throws SQLException {
+        ArrayList<String> db = new ArrayList<String>();
         rs = st.executeQuery("SELECT initcap(name) as \"db\" FROM source_database");
 
         while (rs.next()) {
