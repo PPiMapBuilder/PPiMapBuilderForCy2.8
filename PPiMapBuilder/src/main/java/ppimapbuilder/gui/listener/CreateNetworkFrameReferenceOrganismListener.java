@@ -17,16 +17,28 @@ public class CreateNetworkFrameReferenceOrganismListener implements ActionListen
 	private CreateNetworkFrame window;
 	private JCheckBox previous = null;
 	
+	/**
+	 * Create a reference organism combobox listener with reference to its parent window
+	 * @param window
+	 */
 	public CreateNetworkFrameReferenceOrganismListener(CreateNetworkFrame window) {
 		this.window = window;
 	}
 	
+	/**
+	 * Select and disable checkbox corresponding to the selected element in combobox
+	 */
 	public void actionPerformed(ActionEvent e) {
-		JComboBox select = (JComboBox)e.getSource();
+		@SuppressWarnings("unchecked")
+		JComboBox<String> select = (JComboBox<String>)e.getSource();
+		
 		JCheckBox check = null;
+		
+		// Get the checkbox corresponding to the selected element in combobox
 		for(JCheckBox c : window.getOrganisms().values())
 			if(c.getText().equals(select.getSelectedItem()))
 				check = c;
+		
 		if(check != null)  {
 			if(previous == null)
 				previous = (JCheckBox)window.getOrganisms().values().toArray()[0];

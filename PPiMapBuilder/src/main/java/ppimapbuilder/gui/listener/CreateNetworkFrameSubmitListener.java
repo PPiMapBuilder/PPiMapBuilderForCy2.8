@@ -37,7 +37,7 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 			poiList = myFrame.getIdentifiers(); // Retrieve the identifier list
 		}
 		catch (ArrayStoreException e2) {
-			JOptionPane.showMessageDialog(myFrame, "The identifier list is empty.");
+			JOptionPane.showMessageDialog(myFrame, "The identifier list is empty.", "", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		

@@ -21,8 +21,8 @@ public class Credits extends JFrame {
 	private static final long serialVersionUID = 1L; // Instance of the ppimapbuilder menu to prevent several instances 
 	
 	private static Credits _instance = null; // Instance of the PPiMapBuilder menu to prevent several instances 
-	// Need to be completed...
-	/* ---------------- */
+
+	private WindowCloseEscapeListener escapeListener;
 	
 	/**
 	 * Default constructor which is private to prevent several instances
@@ -64,7 +64,8 @@ public class Credits extends JFrame {
 		
 		//this.setF
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		manager.addKeyEventDispatcher(new WindowCloseEscapeListener(this));
+		escapeListener = new WindowCloseEscapeListener(this);
+		manager.addKeyEventDispatcher(escapeListener);
 	}
 	
 	/**
