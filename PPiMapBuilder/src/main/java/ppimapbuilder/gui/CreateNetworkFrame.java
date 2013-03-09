@@ -37,6 +37,8 @@ import javax.swing.BoxLayout;
 import javax.swing.ScrollPaneConstants;
 import java.awt.Font;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
 /**
@@ -199,6 +201,11 @@ public class CreateNetworkFrame extends JFrame {
 		btnClear.setAlignmentX(Component.RIGHT_ALIGNMENT);
 		panClear.add(btnClear);
 		btnClear.setPreferredSize(new Dimension(90, 27));
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				txaIdentifiers.setText("");
+			}
+		});
 		
 		return panIndentifiers;
 	}
@@ -286,6 +293,11 @@ public class CreateNetworkFrame extends JFrame {
 		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnCancel, 5, SpringLayout.NORTH, panBottomForm);
 		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnCancel, -180, SpringLayout.EAST, panBottomForm);
 		panBottomForm.add(btnCancel);
+		btnCancel.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				close();
+			}
+		});
 		
 		JButton btnSubmit = new JButton("Submit");
 		btnSubmit.setPreferredSize(new Dimension(100, 29));
