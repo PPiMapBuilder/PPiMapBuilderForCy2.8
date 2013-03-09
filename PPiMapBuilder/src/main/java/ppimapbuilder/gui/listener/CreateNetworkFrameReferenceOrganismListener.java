@@ -23,16 +23,20 @@ public class CreateNetworkFrameReferenceOrganismListener implements ActionListen
 	
 	public void actionPerformed(ActionEvent e) {
 		JComboBox select = (JComboBox)e.getSource();
-		JCheckBox check = window.getOrganisms().get((String)select.getSelectedItem());
-		
-		if(previous == null)
-			previous = (JCheckBox)window.getOrganisms().values().toArray()[0];
+		JCheckBox check = null;
+		for(JCheckBox c : window.getOrganisms().values())
+			if(c.getText().equals(select.getSelectedItem()))
+				check = c;
+		if(check != null)  {
+			if(previous == null)
+				previous = (JCheckBox)window.getOrganisms().values().toArray()[0];
 
-		previous.setEnabled(true);
-		
-		check.setSelected(true);
-		check.setEnabled(false);
-		
-		previous = check;
+			previous.setEnabled(true);
+			
+			check.setSelected(true);
+			check.setEnabled(false);
+			
+			previous = check;
+		}
 	}
 }
