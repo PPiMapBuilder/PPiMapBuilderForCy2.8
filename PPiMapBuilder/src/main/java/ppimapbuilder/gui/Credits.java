@@ -1,14 +1,15 @@
 package ppimapbuilder.gui;
 
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.KeyboardFocusManager;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import net.miginfocom.swing.MigLayout;
 import javax.swing.SwingConstants;
+
+import ppimapbuilder.gui.listener.WindowCloseEscapeListener;
 
 /**
  * 
@@ -20,9 +21,6 @@ public class Credits extends JFrame {
 	private static final long serialVersionUID = 1L; // Instance of the ppimapbuilder menu to prevent several instances 
 	
 	private static Credits _instance = null; // Instance of the PPiMapBuilder menu to prevent several instances 
-	
-	/* Frame components */
-	private JLabel copyright; // Label to display the copyright
 	// Need to be completed...
 	/* ---------------- */
 	
@@ -31,23 +29,42 @@ public class Credits extends JFrame {
 	 * Create the entire credits frame
 	 */
 	private Credits() {
-		getContentPane().setLayout(new MigLayout("", "[grow][grow][grow]", "[grow][grow][grow]"));
+		setMaximumSize(new Dimension(266, 250));
+		setMinimumSize(new Dimension(266, 250));
+		setPreferredSize(new Dimension(266, 250));
+		setResizable(false);
+		setTitle("About PPiMapBuilder\n");
 		
-		//JLabel lblNewLabel = new JLabel(new ImageIcon(getClass().getResource("logo.jpeg")));
-		//getContentPane().add(lblNewLabel, "cell 1 0");
+		getContentPane().setLayout(null);
+		JLabel lblLogo = new JLabel();
+		lblLogo.setHorizontalTextPosition(SwingConstants.CENTER);
+		lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogo.setMaximumSize(new Dimension(105, 136));
+		lblLogo.setBounds(65, 6, 136, 134);
+		getContentPane().add(lblLogo);
 		
-		// Frame contents
-		copyright = new JLabel("Copyright 2013");
-		copyright.setHorizontalAlignment(SwingConstants.CENTER);
-		getContentPane().add(copyright, "cell 1 1,grow");
+		JLabel lblCopyright = new JLabel("Copyright © 2013");
+		lblCopyright.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCopyright.setBounds(12, 193, 242, 16);
+		getContentPane().add(lblCopyright);
 		
-		// Frame parameters : [!] Do not put the 'exit on close' option !
-		this.setTitle("About ppimapbuilder"); // Change the frame title
-		this.setPreferredSize(new Dimension(400,250)); // Change the dimensions
-		this.setMinimumSize(new Dimension(400,250));
-		this.setMaximumSize(new Dimension(400,250));
-		this.setResizable(false); // The dimensions are fixed
+		JLabel lblPpimapbuilder = new JLabel("PPiMapBuilder");
+		lblPpimapbuilder.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPpimapbuilder.setFont(new Font("Lucida Grande", Font.BOLD, 14));
+		lblPpimapbuilder.setBounds(74, 152, 117, 28);
+		getContentPane().add(lblPpimapbuilder);
+		
+		try {
+			lblLogo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
+		} catch(Exception e) {
+			lblLogo.setText("LOGO");
+			e.printStackTrace();
+		}
 		this.setLocationRelativeTo(null); // The frame is now at the center
+		
+		//this.setF
+		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+		manager.addKeyEventDispatcher(new WindowCloseEscapeListener(this));
 	}
 	
 	/**
