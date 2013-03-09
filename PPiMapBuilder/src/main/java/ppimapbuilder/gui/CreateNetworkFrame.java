@@ -67,19 +67,6 @@ public class CreateNetworkFrame extends JFrame {
 	private CreateNetworkFrame() {
 		super("PPiMapBuilder - Create a network");
 		
-		organisms = new LinkedHashMap<String, JCheckBox>();
-		for (int i = 1; i <= 3; i++) {
-			JCheckBox j = new JCheckBox("Orga " + i, true);
-			j.setBackground(Color.white);
-			organisms.put("Orga " + i, j);
-		}
-
-		databases = new LinkedHashMap<String, JCheckBox>();
-		for (int i = 1; i <= 3; i++) {
-			JCheckBox j = new JCheckBox("DB " + i, true);
-			j.setBackground(Color.white);
-			databases.put("DB " + i, j);
-		}
 		
 		initialize();
 
@@ -100,13 +87,6 @@ public class CreateNetworkFrame extends JFrame {
 	 * Initialize the contents of the frame
 	 */
 	private void initialize() {
-		// Look and feel adapted to each system
-		try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
-		
 		//Slightely darker color than window background color
 		darkForeground = UIManager.getColor("Panel.background");
 		float hsbVals[] = Color.RGBtoHSB(darkForeground.getRed(), darkForeground.getGreen(), darkForeground.getBlue(), null );
@@ -247,7 +227,7 @@ public class CreateNetworkFrame extends JFrame {
 		javax.swing.JLabel lblReferenceOrganism = new javax.swing.JLabel("Reference organism:");
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 		
-		comboBox = new JComboBox<String>(organisms.keySet().toArray(new String[organisms.size()]));
+		comboBox = new JComboBox<String>();
 		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(this));
 		panMainForm.add(comboBox, "cell 0 1,growx");
 		
@@ -267,15 +247,6 @@ public class CreateNetworkFrame extends JFrame {
 		scrollPaneOtherOrganisms.setViewportView(panOtherOrganims);
 		panOtherOrganims.setLayout(new BoxLayout(panOtherOrganims, BoxLayout.Y_AXIS));
 		
-		for(int i=0;i<organisms.size();i++) {
-			JCheckBox j = organisms.get(organisms.keySet().toArray()[i]);
-			if(i==0) {
-				j.setEnabled(false); 
-				j.setSelected(true); 
-			}
-			panOtherOrganims.add(j);
-		}
-		
 		javax.swing.JLabel lblSourceDatabases = new javax.swing.JLabel("Source databases:");
 		panMainForm.add(lblSourceDatabases, "cell 0 4");
 		
@@ -292,9 +263,7 @@ public class CreateNetworkFrame extends JFrame {
 		panSourceDatabases.setLayout(new BoxLayout(panSourceDatabases, BoxLayout.Y_AXIS));
 		panMainForm.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{comboBox, panOtherOrganims, panSourceDatabases}));
 		
-		for(int i=0;i<databases.size();i++) {
-			panSourceDatabases.add(databases.get(databases.keySet().toArray()[i]));
-		}
+		
 		
 		return panMainForm;
 	}
@@ -394,6 +363,51 @@ public class CreateNetworkFrame extends JFrame {
 	public void close() {
 		this.setVisible(false);
 		//window.dispose();
+	}
+	
+	@Override
+	public void setVisible(boolean b) {
+		//Updating window
+		if(b) {
+			//Emptying form fields
+			txaIdentifiers.setText("");
+			comboBox.removeAll();
+			panOtherOrganims.removeAll();
+			panSourceDatabases.removeAll();
+			
+			//Fetch DBConnector
+			organisms = new LinkedHashMap<String, JCheckBox>();
+			for (int i = 1; i <= 3; i++) {
+				JCheckBox j = new JCheckBox("Orga " + i, true);
+				j.setBackground(Color.white);
+				organisms.put("Orga " + i, j);
+			}
+			databases = new LinkedHashMap<String, JCheckBox>();
+			for (int i = 1; i <= 3; i++) {
+				JCheckBox j = new JCheckBox("DB " + i, true);
+				j.setBackground(Color.white);
+				databases.put("DB " + i, j);
+			}
+			
+			//Filling Combobox and checkboxes
+			for(String str: organisms.keySet().toArray(new String[organisms.size()]))
+				comboBox.addItem(str);
+			
+			for(int i=0;i<organisms.size();i++) {
+				JCheckBox j = organisms.get(organisms.keySet().toArray()[i]);
+				if(i==0) {
+					j.setEnabled(false); 
+					j.setSelected(true); 
+				}
+				panOtherOrganims.add(j);
+			}
+			
+			for(int i=0;i<databases.size();i++) {
+				panSourceDatabases.add(databases.get(databases.keySet().toArray()[i]));
+			}
+		}
+		
+		super.setVisible(b);
 	}
 	
 

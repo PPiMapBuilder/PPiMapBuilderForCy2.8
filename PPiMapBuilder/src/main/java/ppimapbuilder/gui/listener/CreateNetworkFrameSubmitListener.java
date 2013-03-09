@@ -28,12 +28,11 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		
-		
 		try {
 			poiList = myFrame.getIdentifiers(); // Retrieve the identifier list
 		}
 		catch (ArrayStoreException e2) {
-			JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "The identifier list is empty.");
+			JOptionPane.showMessageDialog(myFrame, "The identifier list is empty.");
 			return;
 		}
 		
