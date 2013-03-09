@@ -17,7 +17,7 @@ public class DBConnector {
     private Connection con = null;
     private Statement st = null;
     private ResultSet rs = null;
-    private String url = "jdbc:postgresql://kgravouil.no-ip.org/ppimapbuilder";
+    private String url = "jdbc:postgresql://jesuisunegrossepatateetjetediszutfacedepot";
     private String user = "ppimapbuilder";
     private String password = "ppimapbuilder";
 
