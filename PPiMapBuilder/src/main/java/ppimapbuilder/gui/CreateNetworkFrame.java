@@ -6,7 +6,6 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -14,23 +13,23 @@ import javax.swing.JTextArea;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.UIManager;
-
 import net.miginfocom.swing.MigLayout;
 import javax.swing.SpringLayout;
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 import org.eclipse.wb.swing.FocusTraversalOnArray;
-
 import ppimapbuilder.gui.listener.CreateNetworkFrameReferenceOrganismListener;
+import ppimapbuilder.gui.listener.CreateNetworkFrameSubmitListener;
 
 import javax.swing.JCheckBox;
 import java.awt.Color;
-
 import javax.swing.border.Border;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.LineBorder;
 import java.awt.Dimension;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map.Entry;
 import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
@@ -43,51 +42,59 @@ import java.awt.event.KeyEvent;
 /**
  * Network creation window
  */
-public class CreateNetworkFrame extends JFrame{
+public class CreateNetworkFrame extends JFrame {
+	
+	private static final long serialVersionUID = 1L; // Instance of the ppimapbuilder menu to prevent several instances 
 
-	private static final long serialVersionUID = 1L;
+	private static CreateNetworkFrame _instance = null; // Instance of the PPiMapBuilder frame to prevent several instances 
+
 	private LinkedHashMap<String, JCheckBox> organisms;
 	private LinkedHashMap<String, JCheckBox> databases;
 	
-	private JTextArea txaIndentifiers;
-	private JComboBox comboBox;
+	private JTextArea txaIdentifiers;
+	private JComboBox<String> comboBox;
 	
 	private JPanel panSourceDatabases;
 	private JPanel panOtherOrganims;
 	
 	private Color darkForeground;
 	
-	/**
-	 * Launch the application.
-	 */
-//	public static void main(String[] args) {
-//		new PPiMapBuilderCreateNetworkFrame();
-//	}
-
+	//private static Object lock = new Object();
+	
 	/**
 	 * Create the application.
 	 */
-	public CreateNetworkFrame() {
+	private CreateNetworkFrame() {
 		super("PPiMapBuilder - Create a network");
 		
-		
 		organisms = new LinkedHashMap<String, JCheckBox>();
-		for(int i = 1; i<=3; i++) {
-			JCheckBox j = new JCheckBox("Orga "+i, true);
+		for (int i = 1; i <= 3; i++) {
+			JCheckBox j = new JCheckBox("Orga " + i, true);
 			j.setBackground(Color.white);
-			organisms.put("Orga "+i, j);
+			organisms.put("Orga " + i, j);
 		}
-		
+
 		databases = new LinkedHashMap<String, JCheckBox>();
-		for(int i = 1; i<=3; i++) {
-			JCheckBox j = new JCheckBox("DB "+i, true);
+		for (int i = 1; i <= 3; i++) {
+			JCheckBox j = new JCheckBox("DB " + i, true);
 			j.setBackground(Color.white);
-			databases.put("DB "+i, j);
+			databases.put("DB " + i, j);
 		}
 		
 		initialize();
-		this.setVisible(true);
+
 	}
+	
+	/**
+	 * Method to access the unique instance of CreateNetworkFrame
+	 * @return _instance
+	 */
+	public static CreateNetworkFrame Instance() {
+		if (_instance == null)
+			_instance = new CreateNetworkFrame();
+		return _instance;
+	}
+	
 
 	/**
 	 * Initialize the contents of the frame
@@ -113,14 +120,16 @@ public class CreateNetworkFrame extends JFrame{
 		splitPane.setDividerSize(5);
 		splitPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		splitPane.setContinuousLayout(true);
-		getContentPane().add(splitPane, BorderLayout.CENTER);
+		this.getContentPane().add(splitPane, BorderLayout.CENTER);
 
-		BasicSplitPaneDivider divider = (BasicSplitPaneDivider) splitPane.getComponent(2);
+		//BasicSplitPaneDivider divider = (BasicSplitPaneDivider) splitPane.getComponent(2);
 		
 		try {
 			splitPane.setUI(new BasicSplitPaneUI() {
 				public BasicSplitPaneDivider createDefaultDivider() {
 					return new BasicSplitPaneDivider(this) {
+						private static final long serialVersionUID = 1L;
+
 						public void setBorder(Border b) {}
 	 
 						@Override
@@ -132,8 +141,8 @@ public class CreateNetworkFrame extends JFrame{
 							Graphics2D g2d = (Graphics2D) g;
 							int h = 12;
 							int w = 2;
-	    					int x = (this.getWidth() - w) / 2;
-	    					int y = (this.getHeight() - h) / 2;
+	    					int x = (getWidth() - w) / 2;
+	    					int y = (getHeight() - h) / 2;
 	    					g2d.setColor(new Color(154, 154, 154));
 	    					g2d.drawOval(x, y, w, h);
 						}
@@ -154,12 +163,12 @@ public class CreateNetworkFrame extends JFrame{
 		
 		//Bottom part
 		JPanel panBottomForm = initBottomPanel();
-		getContentPane().add(panBottomForm, BorderLayout.SOUTH);
+		this.getContentPane().add(panBottomForm, BorderLayout.SOUTH);
 		
-		this.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{txaIndentifiers, panOtherOrganims, panSourceDatabases, panBottomForm.getComponent(0), panBottomForm.getComponent(1)}));
+		this.getContentPane().setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{txaIdentifiers, panOtherOrganims, panSourceDatabases, panBottomForm.getComponent(0), panBottomForm.getComponent(1)}));
 		
 		this.setLocationRelativeTo(null);
-		this.setVisible(true);
+		//this.setVisible(true);
 	}
 	
 	/**
@@ -167,7 +176,6 @@ public class CreateNetworkFrame extends JFrame{
 	 * @return the generated JPanel
 	 */
 	private JPanel initIndentifiersPanel() {
-		JFrame f = this;
 		JPanel panIndentifiers = new JPanel();
 		panIndentifiers.setBorder(
 		new CompoundBorder(
@@ -188,12 +196,12 @@ public class CreateNetworkFrame extends JFrame{
 		panIndentifiers.add(lblIdentifiers, BorderLayout.NORTH);
 		lblIdentifiers.setBorder(new EmptyBorder(2, 5, 2, 5));
 		
-		txaIndentifiers = new JTextArea();
-		txaIndentifiers.setFont(new Font("Monospaced", Font.PLAIN, 13));
-		txaIndentifiers.setBorder(new EmptyBorder(5, 5, 5, 5));
-		txaIndentifiers.setMargin(new Insets(10,10,10,10));
+		txaIdentifiers = new JTextArea();
+		txaIdentifiers.setFont(new Font("Monospaced", Font.PLAIN, 13));
+		txaIdentifiers.setBorder(new EmptyBorder(5, 5, 5, 5));
+		txaIdentifiers.setMargin(new Insets(10,10,10,10));
 		
-		JScrollPane scrollPane = new JScrollPane(txaIndentifiers);
+		JScrollPane scrollPane = new JScrollPane(txaIdentifiers);
 		scrollPane.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
 		scrollPane.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0, (Color) new Color(255, 255, 255)), new LineBorder(new Color(192, 192, 192), 1)));
 		panIndentifiers.add(scrollPane, BorderLayout.CENTER);
@@ -239,7 +247,7 @@ public class CreateNetworkFrame extends JFrame{
 		javax.swing.JLabel lblReferenceOrganism = new javax.swing.JLabel("Reference organism:");
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 		
-		comboBox = new JComboBox(organisms.keySet().toArray());
+		comboBox = new JComboBox<String>(organisms.keySet().toArray(new String[organisms.size()]));
 		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(this));
 		panMainForm.add(comboBox, "cell 0 1,growx");
 		
@@ -314,6 +322,7 @@ public class CreateNetworkFrame extends JFrame{
 		btnSubmit.setPreferredSize(new Dimension(100, 29));
 		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnSubmit, 5, SpringLayout.NORTH, panBottomForm);
 		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnSubmit, -50, SpringLayout.EAST, panBottomForm);
+		btnSubmit.addActionListener(new CreateNetworkFrameSubmitListener(this)); // Add the submit listener
 		panBottomForm.add(btnSubmit);
 		panBottomForm.setFocusTraversalPolicy(new FocusTraversalOnArray(new Component[]{btnCancel, btnSubmit}));
 		
@@ -331,10 +340,61 @@ public class CreateNetworkFrame extends JFrame{
 	}
 	
 	/**
+	 * 
+	 * @return list of database values
+	 */
+	public ArrayList<String> getDatabaseValues() {
+		
+		ArrayList<String> databaseList = new ArrayList<String>();
+		for (Entry<String, JCheckBox> entry : this.getDatabases().entrySet()) // For each entry of the database linkedHashmap
+			if (entry.getValue().isSelected()) // If the checkbox is selected
+				databaseList.add(entry.getKey()); // The database name is add into the list to be returned
+		return databaseList;
+		
+	}
+	
+	/**
 	 * Organism hash accessor
 	 * @return the organism hash
 	 */
 	public LinkedHashMap<String, JCheckBox> getOrganisms() {
 		return organisms;
 	}
+	
+	/**
+	 * 
+	 * @return list of organism values
+	 */
+	public ArrayList<String> getOrganismValues() {
+		
+		ArrayList<String> organismList = new ArrayList<String>();
+		for (Entry<String, JCheckBox> entry : this.getOrganisms().entrySet()) // For each entry of the organism linkedHashmap
+			if (entry.getValue().isSelected()) // If the checkbox is selected
+				organismList.add(entry.getKey()); // The organism name is add into the list to be returned
+		return organismList;
+		
+	}
+	
+	/**
+	 * 
+	 * @return list of protein identifiers
+	 */
+	public ArrayList<String> getIdentifiers() throws ArrayStoreException {
+		
+		if (txaIdentifiers.getText().trim().equals(""))
+			throw new ArrayStoreException();
+		
+		ArrayList<String> identifierList = new ArrayList<String>();
+		for (String str : txaIdentifiers.getText().split("\n")) {
+			identifierList.add(str);
+		}
+		return identifierList;
+	}
+	
+	public void close() {
+		this.setVisible(false);
+		//window.dispose();
+	}
+	
+
 }
