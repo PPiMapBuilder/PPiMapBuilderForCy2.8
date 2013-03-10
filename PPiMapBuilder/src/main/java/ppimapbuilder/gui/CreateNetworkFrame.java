@@ -66,7 +66,6 @@ public class CreateNetworkFrame extends JFrame {
 
 	private DBConnector myDBConnector = DBConnector.Instance();
 
-
 	/**
 	 * Create the application.
 	 */
