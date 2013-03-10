@@ -43,6 +43,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 
 /**
  * Network creation window
@@ -75,7 +76,10 @@ public class CreateNetworkFrame extends JFrame {
 		try {
 			myDBConnector = DBConnector.Instance();
 		} catch (SQLException e) {
-			showConnectionError();
+			showError("Connection to database failed", "Connection error!");
+			e.printStackTrace();
+		} catch (IOException e) {
+			showError("Server config missing!", "Server config");
 			e.printStackTrace();
 		}
 		
@@ -321,7 +325,7 @@ public class CreateNetworkFrame extends JFrame {
 		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnSubmit, 5, SpringLayout.NORTH, panBottomForm);
 		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnSubmit, -50, SpringLayout.EAST, panBottomForm);
 		//Submit action listener
-		btnSubmit.addActionListener(new CreateNetworkFrameSubmitListener(this));
+		btnSubmit.addActionListener(new CreateNetworkFrameSubmitListener(this, myDBConnector));
 		//Add submit to panel
 		panBottomForm.add(btnSubmit);
 
@@ -385,7 +389,7 @@ public class CreateNetworkFrame extends JFrame {
 		//If text area is empty (excluding spaces, tabulation and new line)
 		if (txaIdentifiers.getText().trim().equals(""))
 			throw new ArrayStoreException();
-
+		
 		//Load each line in an ArrayList
 		ArrayList<String> identifierList = new ArrayList<String>();
 		for (String str : txaIdentifiers.getText().split("\n")) {
@@ -425,7 +429,7 @@ public class CreateNetworkFrame extends JFrame {
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-				showConnectionError();
+				showError("Connection to database failed", "Connection error");
 				b = false; // We do not display the frame
 			}
 
@@ -440,7 +444,7 @@ public class CreateNetworkFrame extends JFrame {
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-				showConnectionError();
+				showError("Connection to database failed", "Connection error");
 				b = false;
 			}
 
@@ -462,8 +466,8 @@ public class CreateNetworkFrame extends JFrame {
 		super.setVisible(b);
 	}
 	
-	private void showConnectionError() {
-		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Connection to database failed", "Connection error", JOptionPane.ERROR_MESSAGE);
+	private void showError(String message, String title) {
+		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), title, message, JOptionPane.ERROR_MESSAGE);
 	}
 
 }
