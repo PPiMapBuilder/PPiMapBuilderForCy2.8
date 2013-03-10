@@ -6,6 +6,9 @@
 *.war
 *.ear
 
+# Maven target
+target
+
 # Other unecessary files #
 .DS_Store
 server.cfg
