@@ -64,8 +64,7 @@ public class CreateNetworkFrame extends JFrame {
 
 	private Color darkForeground;
 
-	private DBConnector myDBConnector = DBConnector.Instance();
-
+	private DBConnector myDBConnector;
 
 	/**
 	 * Create the application.
@@ -73,6 +72,13 @@ public class CreateNetworkFrame extends JFrame {
 	private CreateNetworkFrame() {
 		super("PPiMapBuilder - Create a network");
 
+		try {
+			myDBConnector = DBConnector.Instance();
+		} catch (SQLException e) {
+			showConnectionError();
+			e.printStackTrace();
+		}
+		
 		// Create all component in the window
 		initialize();
 	}
@@ -411,28 +417,30 @@ public class CreateNetworkFrame extends JFrame {
 			// Creation of the organism list
 			organisms = new LinkedHashMap<Integer, JCheckBox>();
 			try {
-				for (Entry<String, Integer> entry : myDBConnector.getOrganisms().entrySet()) {
+				LinkedHashMap<String, Integer> orga =  myDBConnector.getOrganisms();
+				for (Entry<String, Integer> entry : orga.entrySet()) {
 					JCheckBox j = new JCheckBox(entry.getKey(), true);
 					j.setBackground(Color.white);
 					organisms.put(entry.getValue(), j);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Connection to database failed", "Connection error", JOptionPane.ERROR_MESSAGE);
+				showConnectionError();
 				b = false; // We do not display the frame
 			}
 
 			// Creation of the database list
 			databases = new LinkedHashMap<String, JCheckBox>();
 			try {
-				for (String str : myDBConnector.getDatabases()) {
+				ArrayList<String> dbs = myDBConnector.getDatabases();
+				for (String str : dbs) {
 					JCheckBox j = new JCheckBox(str, true);
 					j.setBackground(Color.white);
 					databases.put(str, j);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Connection to database failed", "Connection error", JOptionPane.ERROR_MESSAGE);
+				showConnectionError();
 				b = false;
 			}
 
@@ -452,6 +460,10 @@ public class CreateNetworkFrame extends JFrame {
 		}
 
 		super.setVisible(b);
+	}
+	
+	private void showConnectionError() {
+		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Connection to database failed", "Connection error", JOptionPane.ERROR_MESSAGE);
 	}
 
 }
