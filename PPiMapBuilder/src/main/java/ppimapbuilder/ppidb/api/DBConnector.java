@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -13,6 +14,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
+import javax.sql.rowset.serial.SerialArray;
+import javax.swing.JOptionPane;
+
+import org.postgresql.jdbc4.Jdbc4Array;
 
 /**
  *
@@ -36,7 +42,7 @@ public class DBConnector {
     private DBConnector() throws SQLException, IOException {
         this.getServerConfig();
         con = DriverManager.getConnection(this.url, this.user, this.password);
-        this.query = "select distinct"
+        this.query = "select distinct "
                 + "    interaction.id as \"id\","
                 + "    p1.uniprot_id as \"uniprotidA\","
                 + "    p1.gene_name as \"interactorA\","
@@ -45,7 +51,7 @@ public class DBConnector {
                 + "    db.name as \"srcdb\","
                 + "    org.name as \"orga\","
                 + "    expsys.name as \"expsys\","
-                + "    pub.pubmed_id as \"pubmed\""
+                + "    pub.pubmed_id as \"pubmed\" "
                 + "from interaction"
                 + "    join protein as \"p1\" on interaction.protein_id1 = p1.id"
                 + "    join protein as \"p2\" on interaction.protein_id2 = p2.id"
@@ -54,11 +60,11 @@ public class DBConnector {
                 + "    join source_database as \"db\" on intdata.db_source_name = db.name"
                 + "    join organism as \"org\" on intdata.organism_tax_id = org.tax_id"
                 + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system"
-                + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id"
-                + "where"
+                + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id "
+                + "where "
                 + "    ( p1.uniprot_id = ? or p2.uniprot_id = ? )"
-                + "    and db.name in ?"
-                + "    and org.tax_id and ?";
+                + "    and db.name in (?)"
+                + "    and org.tax_id in (?)";
 
 
         pst = con.prepareStatement(this.query);
@@ -138,12 +144,15 @@ public class DBConnector {
     private String formatInClause(ArrayList<String> val) {
         StringBuilder strb = new StringBuilder();
 
+        //strb.append('(');
+        
         for (String v : val) {
-            strb.append("\'").append(v).append("\'").append(',');
+            strb.append(v.toLowerCase()).append(',');
         }
         strb.deleteCharAt(strb.length() - 1);
 
-        strb.append(')');
+        //strb.append(')');
+        
         return strb.toString();
     }
 
@@ -155,13 +164,17 @@ public class DBConnector {
      * @return SQLResult
      * @throws SQLExeception
      */
-    public SQLResult getAllData(String uniprot, ArrayList<String> db, ArrayList<String> orgs) throws SQLException {
-
+    public SQLResult getAllData(String uniprot, ArrayList<String> db, ArrayList<Integer> orgs) throws SQLException {
+    	Array dba = con.createArrayOf("varchar", (String[]) db.toArray(new String[db.size()]));
+    	Array orgsa = con.createArrayOf("int", (Integer[]) orgs.toArray(new Integer[orgs.size()]));
+    	
         pst.setString(1, uniprot);
         pst.setString(2, uniprot);
-        pst.setString(3, this.formatInClause(db));
-        pst.setString(4, this.formatInClause(orgs));
-
+        pst.setArray(3, dba);
+        pst.setArray(4, orgsa);
+        
+        System.out.println(pst.toString());
+        
         rs = pst.executeQuery();
         return new SQLResult(rs);
     }
