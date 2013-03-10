@@ -12,6 +12,11 @@ import ppimapbuilder.Mediator;
 import ppimapbuilder.PMBNode;
 import ppimapbuilder.gui.CreateNetworkFrame;
 
+/**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
+ *
+ */
 public class CreateNetworkFrameSubmitListener implements ActionListener{
 	
 	private CreateNetworkFrame myFrame; // Frame which is contains the submit
@@ -28,12 +33,11 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		
-		
 		try {
 			poiList = myFrame.getIdentifiers(); // Retrieve the identifier list
 		}
 		catch (ArrayStoreException e2) {
-			JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "The identifier list is empty.");
+			JOptionPane.showMessageDialog(myFrame, "The identifier list is empty.", "", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		

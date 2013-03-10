@@ -31,7 +31,7 @@ public class PMBPanel extends JPanel {
 	 */
 	private PMBPanel() {
 		super();
-		this.setName("ppimapbuilder"); // Change the name of the panel
+		this.setName("PPiMapBuilder"); // Change the name of the panel
 		
 		selectedNode = new JLabel(); // Creation of a label
 		this.add(selectedNode); // Add the label into the panel

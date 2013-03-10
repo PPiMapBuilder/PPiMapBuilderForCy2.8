@@ -10,7 +10,7 @@ import ppimapbuilder.gui.PMBPanel;
 
 /**
  * 
- * @author pidupuis
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
 public class CreateNetworkMenuAction extends CytoscapeAction {
