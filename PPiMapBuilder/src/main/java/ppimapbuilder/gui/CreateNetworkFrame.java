@@ -58,7 +58,7 @@ public class CreateNetworkFrame extends JFrame {
 	private LinkedHashMap<String, JCheckBox> databases;
 
 	private JTextArea txaIdentifiers;
-	private JComboBox<String> comboBox;
+	private JComboBox comboBox;
 
 	private JPanel panSourceDatabases;
 	private JPanel panOtherOrganims;
@@ -241,7 +241,7 @@ public class CreateNetworkFrame extends JFrame {
 				"Reference organism:");
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 
-		comboBox = new JComboBox<String>();
+		comboBox = new JComboBox();
 		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(
 				this));
 		panMainForm.add(comboBox, "cell 0 1,growx");
@@ -393,7 +393,7 @@ public class CreateNetworkFrame extends JFrame {
 		//Load each line in an ArrayList
 		ArrayList<String> identifierList = new ArrayList<String>();
 		for (String str : txaIdentifiers.getText().split("\n")) {
-			identifierList.add(str);
+			if(!str.equals("")) identifierList.add(str.trim());
 		}
 		return identifierList;
 	}

@@ -29,8 +29,7 @@ public class CreateNetworkFrameReferenceOrganismListener implements ActionListen
 	 * Select and disable checkbox corresponding to the selected element in combobox
 	 */
 	public void actionPerformed(ActionEvent e) {
-		@SuppressWarnings("unchecked")
-		JComboBox<String> select = (JComboBox<String>)e.getSource();
+		JComboBox select = (JComboBox)e.getSource();
 		
 		JCheckBox check = null;
 		

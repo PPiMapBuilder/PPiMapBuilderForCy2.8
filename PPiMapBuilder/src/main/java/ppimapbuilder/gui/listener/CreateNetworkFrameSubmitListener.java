@@ -15,7 +15,6 @@ import cytoscape.data.Semantics;
 import ppimapbuilder.Mediator;
 import ppimapbuilder.PMBNode;
 import ppimapbuilder.gui.CreateNetworkFrame;
-import ppimapbuilder.gui.ProgressBarFrame;
 import ppimapbuilder.ppidb.api.DBConnector;
 import ppimapbuilder.ppidb.api.SQLResult;
 
@@ -70,7 +69,6 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 				if(res.isEmpty()) throw new SQLException("empty "+id);
 			} catch (SQLException e1) {
 				JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getMessage());
-				e1.printStackTrace();
 				return;
 			}
 			
@@ -82,7 +80,6 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 			for(String row: res.keySet()) {
 				//Get fields
 				fields = res.getData(row);
-				System.out.println(fields);
 				
 				//Create Nodes
 				try {

@@ -22,8 +22,8 @@
 	</natures>
 	<variableList>
 		<variable>
-			<name>images</name>
-			<value>file:/Users/guillaume/Developper/Java/PPiMapBuilder/PPiMapBuilder/images</value>
+			<name>ressources</name>
+			<value>$%7BPROJECT_LOC%7D/resources</value>
 		</variable>
 	</variableList>
 </projectDescription>

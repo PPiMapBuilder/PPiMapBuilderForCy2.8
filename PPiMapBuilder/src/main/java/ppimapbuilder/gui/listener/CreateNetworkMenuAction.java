@@ -6,8 +6,8 @@ import java.awt.event.ActionEvent;
 import cytoscape.*;
 import javax.swing.*;
 import ppimapbuilder.gui.CreateNetworkFrame;
+import ppimapbuilder.gui.LoadingWindow;
 import ppimapbuilder.gui.PMBPanel;
-import ppimapbuilder.gui.ProgressBarFrame;
 
 /**
  * 
@@ -34,8 +34,7 @@ public class CreateNetworkMenuAction extends CytoscapeAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
-		ProgressBarFrame myPBF = new ProgressBarFrame();
-		myPBF.setVisible(true);
+		LoadingWindow myPBF = new LoadingWindow("Connecting to server database...");
 		myFrame = CreateNetworkFrame.Instance();
 		myFrame.setVisible(true);
 		myPBF.setVisible(false);
