@@ -321,7 +321,7 @@ public class CreateNetworkFrame extends JFrame {
 		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnSubmit, 5, SpringLayout.NORTH, panBottomForm);
 		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnSubmit, -50, SpringLayout.EAST, panBottomForm);
 		//Submit action listener
-		btnSubmit.addActionListener(new CreateNetworkFrameSubmitListener(this));
+		btnSubmit.addActionListener(new CreateNetworkFrameSubmitListener(this, myDBConnector));
 		//Add submit to panel
 		panBottomForm.add(btnSubmit);
 
@@ -385,7 +385,7 @@ public class CreateNetworkFrame extends JFrame {
 		//If text area is empty (excluding spaces, tabulation and new line)
 		if (txaIdentifiers.getText().trim().equals(""))
 			throw new ArrayStoreException();
-
+		
 		//Load each line in an ArrayList
 		ArrayList<String> identifierList = new ArrayList<String>();
 		for (String str : txaIdentifiers.getText().split("\n")) {
