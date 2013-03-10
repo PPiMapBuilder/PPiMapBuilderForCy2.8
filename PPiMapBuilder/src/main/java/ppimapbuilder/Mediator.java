@@ -4,6 +4,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
+
 import ppimapbuilder.gui.PMBPanel;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
@@ -20,7 +22,9 @@ public class Mediator implements PropertyChangeListener {
 	private static Mediator _instance = null; // Instance for singleton pattern
 	
 	private ArrayList<CyNetwork> myNetworks = new ArrayList<CyNetwork>(); // List of networks created by the plugin
-	private PMBPanel myPanel = PMBPanel.Instance();
+	private ArrayList<PMBNode> myNodes = new ArrayList<PMBNode>();
+	
+	private PMBPanel myPanel;
 	@SuppressWarnings("unused")
 	private PMBView myView; // View for a network (for creation or update)
 	
@@ -30,6 +34,7 @@ public class Mediator implements PropertyChangeListener {
 	 */
 	private Mediator() {
 		Cytoscape.getDesktop().getSwingPropertyChangeSupport().addPropertyChangeListener(CytoscapeDesktop.NETWORK_VIEW_CREATED, this); // We add the property to handle the view creation
+		myPanel = PMBPanel.Instance();
 	}
 	
 	/**
@@ -67,11 +72,33 @@ public class Mediator implements PropertyChangeListener {
 	}
 	
 	/**
+	 * Method which add a node to the network list
+	 * @param myNode
+	 */
+	public void addNode(PMBNode myNode) {
+		this.myNodes.add(myNode); // We stock the node
+	}
+	
+	/**
 	 * Method which call the update() method from the ppimapbuilder panel
 	 */
 	public void updatePanel() {
 		// For now there is one action, but we can extend this method with different conditions according that we click on node or edge for example
 		myPanel.update();
+	}
+	
+	public ArrayList<PMBNode> getMyNodes() {
+		return myNodes;
+	}
+	
+	public PMBNode getNode(String identifier) {
+				
+		for (PMBNode n : this.getMyNodes()) {
+			if (n.getGeneName().equals(identifier)) {
+				return n;
+			}
+		}
+		return null;
 	}
 	
 

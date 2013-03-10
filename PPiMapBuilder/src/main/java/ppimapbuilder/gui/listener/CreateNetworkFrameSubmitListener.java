@@ -33,6 +33,7 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 	private PMBNode poiNode, node2; // nodes
 	
 	private DBConnector myDBConnector;
+	private Mediator myMediator = Mediator.Instance();
 	
 	public CreateNetworkFrameSubmitListener(CreateNetworkFrame myFrame, DBConnector myDBConnector) {
 		this.myFrame = myFrame;
@@ -88,6 +89,8 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 					B = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameB"), true), fields.get("uniprotB"));
 					myNetwork.addNode(A);
 					myNetwork.addNode(B);
+					myMediator.addNode(A);
+					myMediator.addNode(B);
 					
 					//Create Edges
 					interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);

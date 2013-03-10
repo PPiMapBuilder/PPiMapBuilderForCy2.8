@@ -2,12 +2,16 @@ package ppimapbuilder;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.interfaces.uniprot.dbx.go.Go;
 import uk.ac.ebi.kraken.uuw.services.remoting.EntryRetrievalService;
 import uk.ac.ebi.kraken.uuw.services.remoting.UniProtJAPI;
 import giny.model.RootGraph;
 import cytoscape.CyNode;
+import cytoscape.Cytoscape;
 
 /**
  * 
@@ -41,7 +45,7 @@ public class PMBNode extends CyNode {
 	public PMBNode(CyNode myNode, String uniprotId) throws UnknownHostException {
 		this(myNode.getRootGraph(), myNode.getRootGraphIndex());
 		
-		this.geneName = this.getIdentifier(); // The identifier and the gene name are the same information
+		this.geneName = myNode.getIdentifier(); // The identifier and the gene name are the same information
 		this.uniprotId = uniprotId; // Uniprot Id which is used to retrieve the uniprot entry
 		
 		EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); //Create entry retrival service
@@ -50,7 +54,7 @@ public class PMBNode extends CyNode {
 		
 		if (entry != null) { // If there is an entry
 		    this.proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
-		    
+
 		    // Instantiates every gene ontology list
 		    this.componentList = new ArrayList<String>();
 		    this.processList = new ArrayList<String>();
