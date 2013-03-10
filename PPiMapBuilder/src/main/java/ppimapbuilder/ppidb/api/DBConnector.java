@@ -1,5 +1,10 @@
 package ppimapbuilder.ppidb.api;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -8,7 +13,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
-
 
 /**
  *
@@ -21,14 +25,15 @@ public class DBConnector {
     private Connection con = null;
     private PreparedStatement pst = null;
     private ResultSet rs = null;
-    private String url = "jdbc:postgresql://kgravouil.no-ip.org/ppimapbuilder";
-    private String user = "ppimapbuilder";
-    private String password = "ppimapbuilder";
+    private String url;
+    private String user;
+    private String password;
 
     /**
      * Default constructor
      */
-    private DBConnector() throws SQLException {
+    private DBConnector() throws SQLException, IOException {
+        this.getServerConfig();
         con = DriverManager.getConnection(this.url, this.user, this.password);
         pst = con.prepareStatement(
                 " SELECT DISTINCT"
@@ -53,12 +58,25 @@ public class DBConnector {
                 + " WHERE p1.uniprot_id = ?");
     }
 
+    private void getServerConfig() throws IOException {
+        // Open the file that is the first command line parameter
+        // & Get the object of DataInputStream
+        BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream("server.cfg"))));
+        
+        this.url = br.readLine();
+        this.user = br.readLine();
+        this.password = br.readLine();
+
+        //Close the input stream
+        br.close();
+    }
+
     /**
      * Method to access the unique instance of DBconnector
      *
      * @return _instance
      */
-    public static DBConnector Instance() throws SQLException {
+    public static DBConnector Instance() throws SQLException, IOException {
         if (_instance == null) {
             _instance = new DBConnector();
         }
