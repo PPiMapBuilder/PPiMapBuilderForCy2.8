@@ -61,7 +61,7 @@ public class DBConnector {
     private void getServerConfig() throws IOException {
         // Open the file that is the first command line parameter
         // & Get the object of DataInputStream
-        BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream("server.cfg"))));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream("resources/server.cfg"))));
         
         this.url = br.readLine();
         this.user = br.readLine();

@@ -15,6 +15,7 @@ import cytoscape.data.Semantics;
 import ppimapbuilder.Mediator;
 import ppimapbuilder.PMBNode;
 import ppimapbuilder.gui.CreateNetworkFrame;
+import ppimapbuilder.gui.ProgressBarFrame;
 import ppimapbuilder.ppidb.api.DBConnector;
 import ppimapbuilder.ppidb.api.SQLResult;
 
@@ -49,6 +50,10 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 			return;
 		}
 		myFrame.close();
+		
+		//ProgressBarFrame myPBF = new ProgressBarFrame();
+		//myPBF.setVisible(true);
+		
 		
 		//dbList = myFrame.getDatabaseValues(); // Retrieve the database list
 		//orgaList = myFrame.getOrganismValues(); // Retrieve the organism list
@@ -101,6 +106,9 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 		
 		// Add the network to the mediator
 		Mediator.Instance().addNetwork(myNetwork);
+		
+		//myPBF.setVisible(false);
+
 	}
 		
 }

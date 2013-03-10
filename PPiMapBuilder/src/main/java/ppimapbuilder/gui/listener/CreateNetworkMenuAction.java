@@ -7,6 +7,7 @@ import cytoscape.*;
 import javax.swing.*;
 import ppimapbuilder.gui.CreateNetworkFrame;
 import ppimapbuilder.gui.PMBPanel;
+import ppimapbuilder.gui.ProgressBarFrame;
 
 /**
  * 
@@ -18,7 +19,8 @@ public class CreateNetworkMenuAction extends CytoscapeAction {
 	private static final long serialVersionUID = 1L;
 	
 	private PMBPanel myPanel = PMBPanel.Instance(); // Instance of the ppimapbuilder panel to prevent several instances 
-	private CreateNetworkFrame myFrame; // Creation of the thread 
+	private CreateNetworkFrame myFrame; // Creation of the thread
+
 	/**
 	 * Default constructor
 	 */
@@ -32,8 +34,11 @@ public class CreateNetworkMenuAction extends CytoscapeAction {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
+		ProgressBarFrame myPBF = new ProgressBarFrame();
+		myPBF.setVisible(true);
 		myFrame = CreateNetworkFrame.Instance();
 		myFrame.setVisible(true);
+		myPBF.setVisible(false);
 
 		/* PANEL */
 		
