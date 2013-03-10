@@ -28,6 +28,7 @@ public class DBConnector {
     private String url;
     private String user;
     private String password;
+    private String query;
 
     /**
      * Default constructor
@@ -35,34 +36,35 @@ public class DBConnector {
     private DBConnector() throws SQLException, IOException {
         this.getServerConfig();
         con = DriverManager.getConnection(this.url, this.user, this.password);
-        pst = con.prepareStatement(
-                " SELECT DISTINCT"
-                + "     interaction.id AS \"id\","
-                + "     p1.gene_name AS \"interactor_nameA\","
-                + "     p1.uniprot_id AS \"uniprotA\","
-                + "     p2.gene_name AS \"interactor_nameB\","
-                + "     p2.uniprot_id AS \"uniprotB\","
-                + "     org.tax_id AS \"taxID\","
-                + "     db.name AS \"db_source\","
-                + "     expsys.name AS \"exp_system\","
-                + "     pub.pubmed_id as \"pubmed_id\""
-                + " FROM link_data_interaction"
-                + "     JOIN interaction_data ON link_data_interaction.interaction_id = interaction_data.id"
-                + "     JOIN source_database AS \"db\" ON interaction_data.db_source_name = db.name"
-                + "     JOIN organism AS \"org\" ON interaction_data.organism_tax_id = org.tax_id"
-                + "     JOIN experimental_system AS \"expsys\" ON interaction_data.experimental_system = expsys.name"
-                + "     JOIN publication AS \"pub\" ON interaction_data.pubmed_id = pub.pubmed_id"
-                + "     JOIN interaction ON link_data_interaction.interaction_id = interaction.id"
-                + "     JOIN protein AS \"p1\" ON interaction.protein_id1 = p1.id"
-                + "     JOIN protein AS \"p2\" ON interaction.protein_id2 = p2.id"
-                + " WHERE p1.uniprot_id = ?");
+        this.query = "select distinct"
+                + "    interaction.id as \"id\","
+                + "    p1.uniprot_id as \"uniprotidA\","
+                + "    p1.gene_name as \"interactorA\","
+                + "    p2.uniprot_id as \"uniprotidB\","
+                + "    p2.gene_name as \"interactorB\","
+                + "    db.name as \"srcdb\","
+                + "    org.name as \"orga\","
+                + "    expsys.name as \"expsys\","
+                + "    pub.pubmed_id as \"pubmed\""
+                + "from interaction"
+                + "    join protein as \"p1\" on interaction.protein_id1 = p1.id"
+                + "    join protein as \"p2\" on interaction.protein_id2 = p2.id"
+                + "    join link_data_interaction as \"lnk\" on lnk.interaction_id = interaction.id"
+                + "    join interaction_data as \"intdata\" on lnk.interaction_data_id = intdata.id"
+                + "    join source_database as \"db\" on intdata.db_source_name = db.name"
+                + "    join organism as \"org\" on intdata.organism_tax_id = org.tax_id"
+                + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system"
+                + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id"
+                + "where p1.uniprot_id = ?"
+                + "or p2.uniprot_id = ?";
+        pst = con.prepareStatement(this.query);
     }
 
     private void getServerConfig() throws IOException {
         // Open the file that is the first command line parameter
         // & Get the object of DataInputStream
         BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream("resources/server.cfg"))));
-        
+
         this.url = br.readLine();
         this.user = br.readLine();
         this.password = br.readLine();
@@ -124,23 +126,13 @@ public class DBConnector {
      */
     public SQLResult getAllData(String uniprot) throws SQLException {
         pst.setString(1, uniprot);
+        pst.setString(2, uniprot);
         rs = pst.executeQuery();
         return new SQLResult(rs);
     }
 
     public Set<String> getKeys(SQLResult sqlr) {
         return sqlr.keySet();
-    }
-
-    /**
-     * Get data about a list of proteins identified by their UniprotID.
-     *
-     * @param uniprot UniprotID
-     * @return SQLResult
-     * @throws SQLExeception
-     */
-    public SQLResult getAllData(ArrayList<String> uniprotList) throws SQLException {
-        throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     @Override
@@ -158,7 +150,11 @@ public class DBConnector {
             }
 
         } catch (SQLException ex) {
-            System.err.println("Error while disconnecting : " + ex.getLocalizedMessage());
+            System.err.println("<html>Error while disconnecting : " + ex.getLocalizedMessage());
         }
+    }
+
+    public String getQuery() {
+        return query;
     }
 }
