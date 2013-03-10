@@ -73,7 +73,7 @@ public class CreateNetworkFrame extends JFrame {
 	private CreateNetworkFrame() {
 		super("PPiMapBuilder - Create a network");
 
-		// Create all component
+		// Create all component in the window
 		initialize();
 	}
 
@@ -142,12 +142,13 @@ public class CreateNetworkFrame extends JFrame {
 		// Bottom part
 		JPanel panBottomForm = initBottomPanel();
 		this.getContentPane().add(panBottomForm, BorderLayout.SOUTH);
-
-		// Center window
-		this.setLocationRelativeTo(null);
+		
 		// Resize window
 		this.setMinimumSize(new Dimension(500, 300));
-
+		this.setSize(new Dimension(550, 500));
+		
+		// Center window
+		this.setLocationRelativeTo(null);
 	}
 
 	/**
@@ -157,6 +158,7 @@ public class CreateNetworkFrame extends JFrame {
 	 * @return the generated JPanel
 	 */
 	private JPanel initIndentifiersPanel() {
+		// Left panel
 		JPanel panIndentifiers = new JPanel();
 		panIndentifiers.setBorder(new CompoundBorder(new MatteBorder(5, 5, 0,
 				0, (Color) darkForeground), new CompoundBorder(new MatteBorder(
@@ -165,17 +167,19 @@ public class CreateNetworkFrame extends JFrame {
 						new EmptyBorder(5, 5, 5, 5)))));
 		panIndentifiers.setLayout(new BorderLayout(0, 0));
 
+		// Label "Uniprot identifiers"
 		JLabel lblIdentifiers = new JLabel("Uniprot Identifiers\n");
-		lblIdentifiers
-				.setToolTipText("Please enter here uniprot protein indentifier(s) (one per line)");
+		lblIdentifiers.setToolTipText("Please enter here uniprot protein indentifier(s) (one per line)");
 		panIndentifiers.add(lblIdentifiers, BorderLayout.NORTH);
 		lblIdentifiers.setBorder(new EmptyBorder(2, 5, 2, 5));
 
+		// Text area uniprot identifiers
 		txaIdentifiers = new JTextArea();
 		txaIdentifiers.setFont(new Font("Monospaced", Font.PLAIN, 13));
 		txaIdentifiers.setBorder(new EmptyBorder(5, 5, 5, 5));
 		txaIdentifiers.setMargin(new Insets(10, 10, 10, 10));
 
+		// Scroll pane around the text area
 		JScrollPane scrollPane = new JScrollPane(txaIdentifiers);
 		scrollPane.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
 		scrollPane.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0,
@@ -183,6 +187,7 @@ public class CreateNetworkFrame extends JFrame {
 				192, 192, 192), 1)));
 		panIndentifiers.add(scrollPane, BorderLayout.CENTER);
 
+		// Panel with clear button
 		JPanel panClear = new JPanel();
 		panClear.setPreferredSize(new Dimension(0, 35));
 		FlowLayout fl_panClear = (FlowLayout) panClear.getLayout();
@@ -191,6 +196,7 @@ public class CreateNetworkFrame extends JFrame {
 		panClear.setBorder(new EmptyBorder(0, 0, 0, 0));
 		panIndentifiers.add(panClear, BorderLayout.SOUTH);
 
+		// Clear button
 		JButton btnClear = new JButton("Clear");
 		btnClear.setMnemonic(KeyEvent.VK_CLEAR);
 		btnClear.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -398,7 +404,7 @@ public class CreateNetworkFrame extends JFrame {
 		if (b) {
 			// Emptying form fields
 			txaIdentifiers.setText("");
-			comboBox.removeAll();
+			comboBox.removeAllItems();
 			panOtherOrganims.removeAll();
 			panSourceDatabases.removeAll();
 
