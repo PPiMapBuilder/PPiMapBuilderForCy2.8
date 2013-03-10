@@ -2,6 +2,7 @@ package ppimapbuilder.gui.listener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -79,14 +80,21 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 				System.out.println(fields);
 				
 				//Create Nodes
-				A = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameA"), true), fields.get("interactor_nameA"), fields.get("uniprotA"));
-				B = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameB"), true), fields.get("interactor_nameB"), fields.get("uniprotB"));
-				myNetwork.addNode(A);
-				myNetwork.addNode(B);
+				try {
+					
+					A = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameA"), true), fields.get("uniprotA"));
+					B = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameB"), true), fields.get("uniprotB"));
+					myNetwork.addNode(A);
+					myNetwork.addNode(B);
+					
+					//Create Edges
+					interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
+					myNetwork.addEdge(interaction);
 				
-				//Create Edges
-				interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
-				myNetwork.addEdge(interaction);
+				} catch (UnknownHostException e1) {
+					e1.printStackTrace();
+				}
+				
 			}
 			
 		}

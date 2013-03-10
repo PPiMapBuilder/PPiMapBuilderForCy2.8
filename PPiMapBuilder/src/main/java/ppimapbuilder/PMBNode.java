@@ -38,29 +38,30 @@ public class PMBNode extends CyNode {
 	 * Constructor which creates a ppimapbuilder node directly from a CyNode
 	 * @param myNode
 	 */
-	public PMBNode(CyNode myNode, String geneName, String uniprotId) throws UnknownHostException {
+	public PMBNode(CyNode myNode, String uniprotId) throws UnknownHostException {
 		this(myNode.getRootGraph(), myNode.getRootGraphIndex());
 		
-		this.geneName = geneName;
-		this.uniprotId = uniprotId;
+		this.geneName = this.getIdentifier(); // The identifier and the gene name are the same information
+		this.uniprotId = uniprotId; // Uniprot Id which is used to retrieve the uniprot entry
 		
 		EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); //Create entry retrival service
 		
-		UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry("Q96AZ6"); //Retrieve UniProt entry by its accession number
+		UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(this.uniprotId); //Retrieve UniProt entry by its accession number
 		
 		if (entry != null) { // If there is an entry
 		    this.proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
 		    
+		    // Instantiates every gene ontology list
 		    this.componentList = new ArrayList<String>();
 		    this.processList = new ArrayList<String>();
 		    this.functionList = new ArrayList<String>();
 		    
-		    for (Go myGo : entry.getGoTerms()) {
-		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C"))
+		    for (Go myGo : entry.getGoTerms()) { // For each gene ontology
+		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
 		    		this.componentList.add(""+myGo.getGoTerm().getValue());
-		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P"))
+		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
 		    		this.processList.add(""+myGo.getGoTerm().getValue());
-		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F"))
+		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
 		    		this.functionList.add(""+myGo.getGoTerm().getValue());
 		    }
 		}
