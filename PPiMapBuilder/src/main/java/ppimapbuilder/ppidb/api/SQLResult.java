@@ -7,8 +7,9 @@ import java.util.LinkedHashMap;
 import java.util.Set;
 
 /**
+ * 
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
- * @author keuv
  */
 public class SQLResult {
 

@@ -10,10 +10,12 @@ import java.util.LinkedHashMap;
 
 /**
  *
- * @author keuv
+ * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
+ *
  */
 public class DBConnector {
 
+    private static DBConnector _instance = null; // Instance of the dbconnnector to prevent several instances 
     private Connection con = null;
     private PreparedStatement pst = null;
     private ResultSet rs = null;
@@ -21,10 +23,10 @@ public class DBConnector {
     private String user = "ppimapbuilder";
     private String password = "ppimapbuilder";
 
-    
-    
-    public DBConnector() throws SQLException {
-
+    /**
+     * Default constructor
+     */
+    private DBConnector() throws SQLException {
         con = DriverManager.getConnection(this.url, this.user, this.password);
         pst = con.prepareStatement(
                 " SELECT DISTINCT"
@@ -51,6 +53,18 @@ public class DBConnector {
     }
 
     /**
+     * Method to access the unique instance of DBconnector
+     *
+     * @return _instance
+     */
+    public static DBConnector Instance() throws SQLException {
+        if (_instance == null) {
+            _instance = new DBConnector();
+        }
+        return _instance;
+    }
+
+    /**
      * Give a HashMap of available organisms in the PPiMapBuilder database.
      *
      * @return HashMap<OrganismName, TaxID>
@@ -59,7 +73,6 @@ public class DBConnector {
     public LinkedHashMap getOrganisms() throws SQLException {
         LinkedHashMap<String, Integer> orga = new LinkedHashMap();
         rs = pst.executeQuery("SELECT tax_id AS \"id\", name AS \"organism\" FROM organism");
-
         while (rs.next()) {
             orga.put(rs.getString("organism"), rs.getInt("id"));
         }
@@ -95,9 +108,9 @@ public class DBConnector {
         rs = pst.executeQuery();
         return new SQLResult(rs);
     }
-    
+
     public ArrayList getKeys(SQLResult sqlr) {
-        return ((ArrayList)sqlr.keySet());
+        return ((ArrayList) sqlr.keySet());
     }
 
     /**
