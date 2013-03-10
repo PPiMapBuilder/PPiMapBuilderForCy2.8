@@ -55,8 +55,12 @@ public class DBConnector {
                 + "    join organism as \"org\" on intdata.organism_tax_id = org.tax_id"
                 + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system"
                 + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id"
-                + "where p1.uniprot_id = ?"
-                + "or p2.uniprot_id = ?";
+                + "where"
+                + "    ( p1.uniprot_id = ? or p2.uniprot_id = ? )"
+                + "    and db.name in ?"
+                + "    and org.tax_id and ?";
+
+
         pst = con.prepareStatement(this.query);
     }
 
@@ -127,6 +131,37 @@ public class DBConnector {
     public SQLResult getAllData(String uniprot) throws SQLException {
         pst.setString(1, uniprot);
         pst.setString(2, uniprot);
+        rs = pst.executeQuery();
+        return new SQLResult(rs);
+    }
+
+    private String formatInClause(ArrayList<String> val) {
+        StringBuilder strb = new StringBuilder();
+
+        for (String v : val) {
+            strb.append("\'").append(v).append("\'").append(',');
+        }
+        strb.deleteCharAt(strb.length() - 1);
+
+        strb.append(')');
+        return strb.toString();
+    }
+
+    /**
+     * Get data about a protein identified by its UniprotID from a list of
+     * source databases and a list of organisms
+     *
+     * @param uniprot UniprotID
+     * @return SQLResult
+     * @throws SQLExeception
+     */
+    public SQLResult getAllData(String uniprot, ArrayList<String> db, ArrayList<String> orgs) throws SQLException {
+
+        pst.setString(1, uniprot);
+        pst.setString(2, uniprot);
+        pst.setString(3, this.formatInClause(db));
+        pst.setString(4, this.formatInClause(orgs));
+
         rs = pst.executeQuery();
         return new SQLResult(rs);
     }
