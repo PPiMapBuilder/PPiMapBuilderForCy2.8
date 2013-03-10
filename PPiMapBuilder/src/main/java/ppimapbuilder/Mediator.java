@@ -10,7 +10,7 @@ import cytoscape.view.CyNetworkView;
 import cytoscape.view.CytoscapeDesktop;
 
 /**
- * 
+ *  
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
