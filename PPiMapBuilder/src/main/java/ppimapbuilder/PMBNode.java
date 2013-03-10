@@ -10,6 +10,9 @@ import cytoscape.CyNode;
  */
 public class PMBNode extends CyNode {
 	
+	private String geneName;
+	private String uniprotId;
+	
 	/**
 	 * Constructor which inherits from the CyNode class
 	 * This class is necessary and is used by the other ppimapbuilder node constructor
@@ -24,8 +27,11 @@ public class PMBNode extends CyNode {
 	 * Constructor which creates a ppimapbuilder node directly from a CyNode
 	 * @param myNode
 	 */
-	public PMBNode(CyNode myNode) {
+	public PMBNode(CyNode myNode, String geneName, String uniprotId) {
 		this(myNode.getRootGraph(), myNode.getRootGraphIndex());
+		
+		this.geneName = geneName;
+		this.uniprotId = uniprotId;
 	}
 		
 
