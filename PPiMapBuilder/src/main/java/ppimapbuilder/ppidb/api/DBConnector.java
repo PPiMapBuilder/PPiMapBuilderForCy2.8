@@ -8,8 +8,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import ppimapbuilder.gui.PMBMenu;
+
 /**
- *
+ * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
@@ -63,6 +65,16 @@ public class DBConnector {
         }
         return _instance;
     }
+    
+	/**
+	 * Method to access the unique instance of DBconnector
+	 * @return _instance
+	 */
+	public static DBConnector Instance() {
+		if (_instance == null)
+			_instance = new DBConnector();
+		return _instance;
+	}
 
     /**
      * Give a HashMap of available organisms in the PPiMapBuilder database.
