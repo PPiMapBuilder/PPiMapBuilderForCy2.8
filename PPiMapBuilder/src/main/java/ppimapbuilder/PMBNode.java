@@ -1,7 +1,9 @@
 package ppimapbuilder;
 
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
-import uk.ac.ebi.kraken.interfaces.uniref.UniRefEntry;
+import uk.ac.ebi.kraken.interfaces.uniprot.dbx.go.Go;
 import uk.ac.ebi.kraken.uuw.services.remoting.EntryRetrievalService;
 import uk.ac.ebi.kraken.uuw.services.remoting.UniProtJAPI;
 import giny.model.RootGraph;
@@ -17,6 +19,11 @@ public class PMBNode extends CyNode {
 	private String geneName;
 	private String uniprotId;
 	
+	private String proteinDescription;
+	private ArrayList<String> componentList;
+	private ArrayList<String> processList;
+	private ArrayList<String> functionList;
+	
 	/**
 	 * Constructor which inherits from the CyNode class
 	 * This class is necessary and is used by the other ppimapbuilder node constructor
@@ -31,31 +38,131 @@ public class PMBNode extends CyNode {
 	 * Constructor which creates a ppimapbuilder node directly from a CyNode
 	 * @param myNode
 	 */
-	public PMBNode(CyNode myNode, String geneName, String uniprotId) {
+	public PMBNode(CyNode myNode, String geneName, String uniprotId) throws UnknownHostException {
 		this(myNode.getRootGraph(), myNode.getRootGraphIndex());
 		
 		this.geneName = geneName;
 		this.uniprotId = uniprotId;
 		
-		//Create entry retrival service
-	    EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService();
-	    
-	    //Retrieve UniProt entry by its accession number
-	    UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry("Q96AZ6");
-	    
-	    //If entry with a given accession number is not found, entry will be equal null
-	    if (entry != null) {
-	        System.out.println("entry = " + entry.getUniProtId().getValue());
-	    }
-	    
-	    //Retrieve UniRef entry by its ID
-	    UniRefEntry uniRefEntry = entryRetrievalService.getUniRefEntry("UniRef90_Q12979-2");
-	    
-	    if (uniRefEntry != null) {
-	        System.out.println("Representative Member Organism = " +
-	          uniRefEntry.getRepresentativeMember().getSourceOrganism().getValue());
-	    }
-	}
+		EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); //Create entry retrival service
 		
+		UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry("Q96AZ6"); //Retrieve UniProt entry by its accession number
+		
+		if (entry != null) { // If there is an entry
+		    this.proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
+		    
+		    this.componentList = new ArrayList<String>();
+		    this.processList = new ArrayList<String>();
+		    this.functionList = new ArrayList<String>();
+		    
+		    for (Go myGo : entry.getGoTerms()) {
+		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C"))
+		    		this.componentList.add(""+myGo.getGoTerm().getValue());
+		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P"))
+		    		this.processList.add(""+myGo.getGoTerm().getValue());
+		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F"))
+		    		this.functionList.add(""+myGo.getGoTerm().getValue());
+		    }
+		}
+	    
+	}
+
+	/**
+	 * 
+	 * @return gene name
+	 */
+	public String getGeneName() {
+		return geneName;
+	}
+	
+	/**
+	 * 
+	 * @return uniprot id
+	 */
+	public String getUniprotId() {
+		return uniprotId;
+	}
+	
+	/**
+	 * 
+	 * @return protein description
+	 */
+	public String getProteinDescription() {
+		return proteinDescription;
+	}
+	
+	/**
+	 * 
+	 * @return cellular components
+	 */
+	public ArrayList<String> getComponentList() {
+		return componentList;
+	}
+	
+	/**
+	 * 
+	 * @return biological processes
+	 */
+	public ArrayList<String> getProcessList() {
+		return processList;
+	}
+	
+	/**
+	 * 
+	 * @return molecular functions
+	 */
+	public ArrayList<String> getFunctionList() {
+		return functionList;
+	}
+
+	/**
+	 * 
+	 * @param geneName
+	 */
+	public void setGeneName(String geneName) {
+		this.geneName = geneName;
+	}
+
+	/**
+	 * 
+	 * @param uniprotId
+	 */
+	public void setUniprotId(String uniprotId) {
+		this.uniprotId = uniprotId;
+	}
+
+	/**
+	 * 
+	 * @param proteinDescription
+	 */
+	public void setProteinDescription(String proteinDescription) {
+		this.proteinDescription = proteinDescription;
+	}
+
+	/**
+	 * 
+	 * @param componentList
+	 */
+	public void setComponentList(ArrayList<String> componentList) {
+		this.componentList = componentList;
+	}
+
+	/**
+	 * 
+	 * @param processList
+	 */
+	public void setProcessList(ArrayList<String> processList) {
+		this.processList = processList;
+	}
+
+	/**
+	 * 
+	 * @param functionList
+	 */
+	public void setFunctionList(ArrayList<String> functionList) {
+		this.functionList = functionList;
+	}
+	
+	
 
 }

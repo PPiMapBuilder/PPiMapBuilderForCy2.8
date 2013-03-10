@@ -59,6 +59,7 @@ public class PMBPanel extends JPanel {
 			
 			if (selectedNodes.size() == 1) { // If one node is selected
 				
+				
 				/* Example of the panel update */
 				String str = new String(selectedNodes.iterator().next().getIdentifier()+"");
 				selectedNode.setText(str); // change the label according to the string to print the node names
