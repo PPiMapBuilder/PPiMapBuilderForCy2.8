@@ -6,6 +6,8 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -37,7 +39,7 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.BoxLayout;
-import javax.swing.ScrollPaneConstants;
+
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -49,21 +51,27 @@ import java.io.IOException;
  * Network creation window
  */
 public class CreateNetworkFrame extends JFrame {
-
 	private static final long serialVersionUID = 1L;
 
-	private static CreateNetworkFrame _instance = null; // Instance of the PPiMapBuilder frame to prevent several instances
+	// Instance of the PPiMapBuilder frame to prevent several instances
+	private static CreateNetworkFrame _instance = null; 
 
+	// Hash map of databases and organisms loaded from the database
 	private LinkedHashMap<Integer, JCheckBox> organisms;
 	private LinkedHashMap<String, JCheckBox> databases;
 
+	// Uniprot identifiers text area and reference organism combobox
 	private JTextArea txaIdentifiers;
 	private JComboBox comboBox;
 
+	// Databases and organism panels containing all checkbox
 	private JPanel panSourceDatabases;
 	private JPanel panOtherOrganims;
 
+	// Fancy design element
 	private Color darkForeground;
+	private CompoundBorder panelBorder;
+	private CompoundBorder fancyBorder;
 
 	private DBConnector myDBConnector;
 
@@ -106,6 +114,22 @@ public class CreateNetworkFrame extends JFrame {
 		darkForeground = UIManager.getColor("Panel.background");
 		float hsbVals[] = Color.RGBtoHSB(darkForeground.getRed(), darkForeground.getGreen(), darkForeground.getBlue(), null);
 		darkForeground = Color.getHSBColor(hsbVals[0], hsbVals[1], 0.9f * hsbVals[2]);
+		
+		// Simple border around panel and text area
+		fancyBorder = new CompoundBorder(
+			// Outside border 1px bottom light color
+			new MatteBorder(0, 0, 1, 0, (Color) new Color(255, 255, 255)),
+			// Border all around panel 1px dark grey 
+			new LineBorder(new Color(154, 154, 154), 1)
+		);
+		// Border for left and right panel
+		panelBorder = new CompoundBorder(
+			// Dark margin around panel
+			new MatteBorder(5, 0, 0, 0, (Color) darkForeground), 	
+			new CompoundBorder(
+				fancyBorder,
+				new EmptyBorder(5, 5, 5, 5)
+		));
 		
 		// Split panel
 		JSplitPane splitPane = new JSplitPane();
@@ -168,13 +192,9 @@ public class CreateNetworkFrame extends JFrame {
 	 * @return the generated JPanel
 	 */
 	private JPanel initIndentifiersPanel() {
-		// Left panel
+		// Uniprot identifiers left panel
 		JPanel panIndentifiers = new JPanel();
-		panIndentifiers.setBorder(new CompoundBorder(new MatteBorder(5, 5, 0,
-				0, (Color) darkForeground), new CompoundBorder(new MatteBorder(
-				0, 0, 1, 0, (Color) new Color(238, 238, 238)),
-				new CompoundBorder(new LineBorder(new Color(154, 154, 154), 1),
-						new EmptyBorder(5, 5, 5, 5)))));
+		panIndentifiers.setBorder(new CompoundBorder(new MatteBorder(0, 5, 0, 0, (Color) darkForeground), panelBorder));
 		panIndentifiers.setLayout(new BorderLayout(0, 0));
 
 		// Label "Uniprot identifiers"
@@ -192,9 +212,7 @@ public class CreateNetworkFrame extends JFrame {
 		// Scroll pane around the text area
 		JScrollPane scrollPane = new JScrollPane(txaIdentifiers);
 		scrollPane.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
-		scrollPane.setBorder(new CompoundBorder(new MatteBorder(0, 0, 1, 0,
-				(Color) new Color(255, 255, 255)), new LineBorder(new Color(
-				192, 192, 192), 1)));
+		scrollPane.setBorder(fancyBorder);
 		panIndentifiers.add(scrollPane, BorderLayout.CENTER);
 
 		// Panel with clear button
@@ -227,60 +245,49 @@ public class CreateNetworkFrame extends JFrame {
 	 * @return the generated JPanel
 	 */
 	private JPanel initMainFormPanel() {
+		// Main form panel
 		JPanel panMainForm = new JPanel();
-		panMainForm.setMinimumSize(new Dimension(200, 10));
-		panMainForm.setBorder(new CompoundBorder(new MatteBorder(5, 0, 0, 5,
-				(Color) darkForeground), new CompoundBorder(new MatteBorder(0,
-				0, 1, 0, (Color) new Color(238, 238, 238)), new CompoundBorder(
-				new LineBorder(new Color(154, 154, 154), 1), new EmptyBorder(5,
-						5, 5, 5)))));
-		panMainForm.setLayout(new MigLayout("", "[49.00,grow]",
-				"[][][][grow][][grow]"));
+		panMainForm.setMinimumSize(new Dimension(290, 10));
+		panMainForm.setBorder(new CompoundBorder(new MatteBorder(0, 0, 0, 5, (Color) darkForeground), panelBorder));
+		panMainForm.setLayout(new MigLayout("", "[49.00,grow]", "[][][][grow][][grow]"));
 
-		javax.swing.JLabel lblReferenceOrganism = new javax.swing.JLabel(
-				"Reference organism:");
+		// Reference organism label
+		JLabel lblReferenceOrganism = new JLabel("Reference organism:");
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 
+		// Reference organism combobox
 		comboBox = new JComboBox();
-		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(
-				this));
+		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(this));
 		panMainForm.add(comboBox, "cell 0 1,growx");
 
-		javax.swing.JLabel lblHomologOrganism = new javax.swing.JLabel(
-				"Other organisms:");
+		// Other organisms label
+		JLabel lblHomologOrganism = new JLabel("Other organisms:");
 		panMainForm.add(lblHomologOrganism, "cell 0 2");
 
+		// Other organisms scrollpane containing a panel that will contain checkbox at display
 		JScrollPane scrollPaneOtherOrganisms = new JScrollPane();
-		scrollPaneOtherOrganisms
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		scrollPaneOtherOrganisms.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
-		scrollPaneOtherOrganisms.setBorder(new CompoundBorder(new MatteBorder(
-				0, 0, 1, 0, (Color) new Color(255, 255, 255)), new LineBorder(
-				new Color(192, 192, 192), 1)));
-
+		scrollPaneOtherOrganisms.setBorder(fancyBorder);
 		panMainForm.add(scrollPaneOtherOrganisms, "cell 0 3,grow");
 
+		// Other organisms panel that will contain checkbox at display
 		panOtherOrganims = new JPanel();
 		panOtherOrganims.setBorder(new EmptyBorder(0, 0, 0, 0));
 		panOtherOrganims.setBackground(Color.WHITE);
 		scrollPaneOtherOrganisms.setViewportView(panOtherOrganims);
-		panOtherOrganims.setLayout(new BoxLayout(panOtherOrganims,
-				BoxLayout.Y_AXIS));
+		panOtherOrganims.setLayout(new BoxLayout(panOtherOrganims,BoxLayout.Y_AXIS));
 
-		javax.swing.JLabel lblSourceDatabases = new javax.swing.JLabel(
-				"Source databases:");
+		// Source databases label
+		javax.swing.JLabel lblSourceDatabases = new javax.swing.JLabel("Source databases:");
 		panMainForm.add(lblSourceDatabases, "cell 0 4");
 
+		// Source databases scrollpane containing a panel that will contain checkbox at display
 		JScrollPane scrollPaneSourceDatabases = new JScrollPane();
-		scrollPaneSourceDatabases
-				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPaneSourceDatabases.setBorder(new CompoundBorder(new MatteBorder(
-				0, 0, 1, 0, (Color) new Color(255, 255, 255)), new LineBorder(
-				new Color(192, 192, 192), 1)));
-		scrollPaneSourceDatabases
-				.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
+		scrollPaneSourceDatabases.setBorder(fancyBorder);
+		scrollPaneSourceDatabases.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
 		panMainForm.add(scrollPaneSourceDatabases, "cell 0 5,grow");
 
+		// Source databases panel that will contain checkbox at display
 		panSourceDatabases = new JPanel();
 		panSourceDatabases.setBackground(Color.white);
 		panSourceDatabases.setBorder(new EmptyBorder(0, 0, 0, 0));

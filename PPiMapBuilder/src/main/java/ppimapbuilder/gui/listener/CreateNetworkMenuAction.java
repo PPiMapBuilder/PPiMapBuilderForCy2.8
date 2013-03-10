@@ -33,20 +33,19 @@ public class CreateNetworkMenuAction extends CytoscapeAction {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-		LoadingWindow myPBF = new LoadingWindow("Connecting to server database...");
-		myFrame = CreateNetworkFrame.Instance();
-		myFrame.setVisible(true);
-		myPBF.setVisible(false);
-
-		/* PANEL */
-		
-		// Creation of the panel
-		CytoPanelImp ctrlPanel = (CytoPanelImp) Cytoscape.getDesktop().getCytoPanel(SwingConstants.WEST); // Retrieve the Cytoscape control panel
-		ctrlPanel.add(myPanel, 1); // Add the new panel at the index 1 (so at the second position in the control panel)
-		ctrlPanel.setSelectedIndex(ctrlPanel.indexOfComponent(myPanel)); // Specify that the panel selected by default is our panel
-		
-		
+		new LoadingWindow("Connecting to server database...") {
+			public void process() {
+				myFrame = CreateNetworkFrame.Instance();
+				
+				myFrame.setVisible(true);
+				/* PANEL */
+				
+				// Creation of the panel
+				CytoPanelImp ctrlPanel = (CytoPanelImp) Cytoscape.getDesktop().getCytoPanel(SwingConstants.WEST); // Retrieve the Cytoscape control panel
+				ctrlPanel.add(myPanel, 1); // Add the new panel at the index 1 (so at the second position in the control panel)
+				ctrlPanel.setSelectedIndex(ctrlPanel.indexOfComponent(myPanel)); // Specify that the panel selected by default is our panel
+			}
+		};
 	}
 	
 }
