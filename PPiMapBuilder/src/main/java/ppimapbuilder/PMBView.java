@@ -7,6 +7,7 @@ import giny.model.RootGraph;
 import giny.view.EdgeView;
 import giny.view.GraphViewChangeListener;
 import giny.view.NodeView;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Paint;
 import java.awt.event.*;
@@ -18,7 +19,6 @@ import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.layout.CyLayoutAlgorithm;
-//import cytoscape.layout.CyLayouts;
 import cytoscape.view.CyEdgeView;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CyNodeView;
@@ -52,21 +52,22 @@ public class PMBView implements CyNetworkView {
 			
 			public void mouseReleased(MouseEvent arg0) {}
 
-			public void mousePressed(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent e) { // When there is a click on this view
+				if ( ((DGraphView) Cytoscape.getCurrentNetworkView()).getPickedNodeView(e.getPoint ()) != null) { // If the click is on a node
+					myMediator.updatePanel(); // We update the panel
+				}
+			}
 
 			public void mouseExited(MouseEvent arg0) {}
 
 			public void mouseEntered(MouseEvent arg0) {}
 
-			public void mouseClicked(MouseEvent e) { // When there is a click on this view
-				if ( ((DGraphView) Cytoscape.getCurrentNetworkView()).getPickedNodeView(e.getPoint ()) != null) { // If the click is on a node
-					myMediator.updatePanel(); // We update the panel
-				}
-			}
+			public void mouseClicked(MouseEvent arg0) {}
 		});
+		
+		((DGraphView) this.myView).getCanvas(DGraphView.Canvas.BACKGROUND_CANVAS).setBackground(Color.white);
 		this.myView.setZoom(3); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
-		//this.myView.applyLayout(CyLayouts.getLayout("force-directed")); // Use the "Force directed" layout
 	}
 
 	/* OVERRIDE OF EVERY IMPLEMENTABLE METHOD TO RUN IT THROUGH THE CYNETWORKVIEW ATTRIBUTE */

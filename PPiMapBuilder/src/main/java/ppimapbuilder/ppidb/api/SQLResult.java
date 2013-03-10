@@ -20,7 +20,7 @@ public class SQLResult {
     /**
      * Store the SQL result as <id, <field, value>>
      */
-    private LinkedHashMap<String, LinkedHashMap<String, String>> ret = new LinkedHashMap();
+    private LinkedHashMap<String, LinkedHashMap<String, String>> ret = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
     public SQLResult(ResultSet rs) throws SQLException {
         this(rs, "id");
@@ -48,7 +48,7 @@ public class SQLResult {
      * @param id protein ID
      * @return HashMap<String,String>
      */
-    public LinkedHashMap getAllData() {
+    public LinkedHashMap<String, LinkedHashMap<String, String>> getAllData() {
         return this.ret;
     }
 
@@ -59,7 +59,7 @@ public class SQLResult {
      * @param id protein ID
      * @return HashMap<String,String>
      */
-    public LinkedHashMap getData(String id) {
+    public LinkedHashMap<String, String> getData(String id) {
         return this.ret.get(id);
     }
 

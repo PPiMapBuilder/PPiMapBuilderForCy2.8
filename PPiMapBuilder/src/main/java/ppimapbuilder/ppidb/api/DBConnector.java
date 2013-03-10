@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 
 /**
@@ -50,7 +51,6 @@ public class DBConnector {
                 + "     JOIN protein AS \"p1\" ON interaction.protein_id1 = p1.id"
                 + "     JOIN protein AS \"p2\" ON interaction.protein_id2 = p2.id"
                 + " WHERE p1.uniprot_id = ?");
-
     }
 
     /**
@@ -71,9 +71,9 @@ public class DBConnector {
      * @return HashMap<OrganismName, TaxID>
      * @throws SQLExeception
      */
-    public LinkedHashMap getOrganisms() throws SQLException {
-        LinkedHashMap<String, Integer> orga = new LinkedHashMap();
-        rs = pst.executeQuery("SELECT tax_id AS \"id\", name AS \"organism\" FROM organism");
+    public LinkedHashMap<String, Integer> getOrganisms() throws SQLException {
+        LinkedHashMap<String, Integer> orga = new LinkedHashMap<String, Integer>();
+        ResultSet rs = this.con.createStatement().executeQuery("SELECT tax_id AS \"id\", name AS \"organism\" FROM organism");
         while (rs.next()) {
             orga.put(rs.getString("organism"), rs.getInt("id"));
         }
@@ -88,9 +88,9 @@ public class DBConnector {
      * @return ArrayList<String>
      * @throws SQLExeception
      */
-    public ArrayList getDatabases() throws SQLException {
-        ArrayList<String> db = new ArrayList();
-        rs = pst.executeQuery("SELECT initcap(name) as \"db\" FROM source_database");
+    public ArrayList<String> getDatabases() throws SQLException {
+        ArrayList<String> db = new ArrayList<String>();
+        ResultSet rs = this.con.createStatement().executeQuery("SELECT initcap(name) as \"db\" FROM source_database");
         while (rs.next()) {
             db.add(rs.getString("db"));
         }
@@ -110,8 +110,8 @@ public class DBConnector {
         return new SQLResult(rs);
     }
 
-    public ArrayList getKeys(SQLResult sqlr) {
-        return ((ArrayList) sqlr.keySet());
+    public Set<String> getKeys(SQLResult sqlr) {
+        return sqlr.keySet();
     }
 
     /**

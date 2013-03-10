@@ -56,17 +56,17 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 		// Creation of the network components
 		for (String id : poiList) { // For each protein of interest
 			
-				poiNode = new PMBNode(Cytoscape.getCyNode(id, true));
+				poiNode = new PMBNode(Cytoscape.getCyNode(id, true), id, "12345");
 				myNetwork.addNode(poiNode);
 				
 				// Call the database connector
 				// For each interaction, we create another node and one edge between them
 				
 				// [TEST]
-				poiNode = new PMBNode(Cytoscape.getCyNode(id, true)); // Same node to test if there are redundancies
+				poiNode = new PMBNode(Cytoscape.getCyNode(id, true), id, "12345"); // Same node to test if there are redundancies
 				myNetwork.addNode(poiNode);
 				
-				node2 = new PMBNode(Cytoscape.getCyNode("plop", true)); // Another node to have interactions
+				node2 = new PMBNode(Cytoscape.getCyNode("plop", true), "plop", "12345"); // Another node to have interactions
 				myNetwork.addNode(poiNode);
 				CyEdge myEdge = Cytoscape.getCyEdge(poiNode, node2, Semantics.INTERACTION, "pp", true); // Create a link between the two nodes and indicates that it is an interaction between two proteins (pp)
 				myNetwork.addEdge(myEdge); // Add the link in the network

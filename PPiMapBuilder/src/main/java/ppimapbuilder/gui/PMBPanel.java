@@ -57,19 +57,18 @@ public class PMBPanel extends JPanel {
 			@SuppressWarnings("unchecked") // Delete the warnings for the getSelectedNodes() method
 			Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
 			
-			if (selectedNodes.size() != 0) { // If nodes are selected
+			if (selectedNodes.size() == 1) { // If one node is selected
 				
 				/* Example of the panel update */
-				String str = new String("");
-				Iterator<CyNode> it = selectedNodes.iterator(); // Put the selected nodes in a list
-				while (it.hasNext()) { // For each node
-					CyNode aNode = it.next();
-					str+=aNode.getIdentifier()+" "; // Add its name to the string
-				}
+				String str = new String(selectedNodes.iterator().next().getIdentifier()+"");
 				selectedNode.setText(str); // change the label according to the string to print the node names
 				/* ---------------------------- */
 				
 			}
+			else {
+				selectedNode.setText("");
+			}
+				
 		}
 	}
 }

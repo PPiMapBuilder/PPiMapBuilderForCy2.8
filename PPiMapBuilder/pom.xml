@@ -95,6 +95,13 @@
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901.jdbc4</version>
 		</dependency>
+		
+		<dependency>
+        <groupId>uk.ac.ebi.uniprot.kraken</groupId>
+        <artifactId>uniprotjapi</artifactId>
+        <version>2013.03</version>
+    </dependency>
+    
 	</dependencies>
 
 	<repositories>
@@ -109,6 +116,12 @@
 			<name>Cytoscape Releases</name>
 			<url>http://code.cytoscape.org/nexus/content/repositories/releases/</url>
 		</repository>
+		
+		<repository>
+        <id>ebi-repo</id>
+        <name>ebi-repo</name>
+        <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+    	</repository>
 	</repositories>
 
 </project>
