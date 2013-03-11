@@ -1,15 +1,32 @@
 package ppimapbuilder.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import ppimapbuilder.gui.listener.WindowCloseEscapeListener;
+import javax.swing.BoxLayout;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+
+import cytoscape.generated.Desktop;
+
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 /**
  * 
@@ -40,22 +57,61 @@ public class Credits extends JFrame {
 		lblLogo.setHorizontalTextPosition(SwingConstants.CENTER);
 		lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
 		lblLogo.setMaximumSize(new Dimension(105, 136));
-		lblLogo.setBounds(65, 6, 136, 134);
+		lblLogo.setBounds(89, 6, 136, 134);
 		getContentPane().add(lblLogo);
 		
-		JLabel lblCopyright = new JLabel("Copyright © 2013");
-		lblCopyright.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCopyright.setBounds(12, 193, 242, 16);
-		getContentPane().add(lblCopyright);
 		
 		JLabel lblPpimapbuilder = new JLabel("PPiMapBuilder");
 		lblPpimapbuilder.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPpimapbuilder.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		lblPpimapbuilder.setBounds(74, 152, 117, 28);
+		lblPpimapbuilder.setBounds(99, 143, 117, 28);
 		getContentPane().add(lblPpimapbuilder);
 		
 		try {
 			lblLogo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
+			
+			JLabel lblAuthors = new JLabel("Authors:");
+			lblAuthors.setHorizontalAlignment(SwingConstants.CENTER);
+			lblAuthors.setBounds(127, 193, 61, 16);
+			getContentPane().add(lblAuthors);
+			
+			JLabel lblGuillaumeCornutPierre = new JLabel("Guillaume CORNUT");
+			lblGuillaumeCornutPierre.setToolTipText("Gcornut");
+			lblGuillaumeCornutPierre.setHorizontalAlignment(SwingConstants.CENTER);
+			lblGuillaumeCornutPierre.setBounds(20, 220, 127, 16);
+			getContentPane().add(lblGuillaumeCornutPierre);
+			
+			JLabel lblPierreCressant = new JLabel("Pierre CRESSANT");
+			lblPierreCressant.setToolTipText("Piotr");
+			lblPierreCressant.setHorizontalAlignment(SwingConstants.CENTER);
+			lblPierreCressant.setBounds(167, 221, 127, 16);
+			getContentPane().add(lblPierreCressant);
+			
+			JLabel lblPierreDupuis = new JLabel("Pierre DUPUIS");
+			lblPierreDupuis.setToolTipText("Boss");
+			lblPierreDupuis.setHorizontalAlignment(SwingConstants.CENTER);
+			lblPierreDupuis.setBounds(20, 249, 127, 16);
+			getContentPane().add(lblPierreDupuis);
+			
+			JLabel lblKvinGravouil = new JLabel("Kévin GRAVOUIL");
+			lblKvinGravouil.setToolTipText("Keuv");
+			lblKvinGravouil.setHorizontalAlignment(SwingConstants.CENTER);
+			lblKvinGravouil.setBounds(167, 249, 127, 16);
+			getContentPane().add(lblKvinGravouil);
+			
+			JButton label = new JButton("<ppimapbuilder@gmail.com>");
+			label.setBorder(new EmptyBorder(0, 0, 0, 0));
+			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
+			label.setForeground(Color.GRAY);
+			label.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+			label.setBounds(49, 168, 216, 16);
+			label.setOpaque(false);
+			label.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+				}
+			});
+			getContentPane().add(label);
 		} catch(Exception e) {
 			lblLogo.setText("LOGO");
 			e.printStackTrace();
