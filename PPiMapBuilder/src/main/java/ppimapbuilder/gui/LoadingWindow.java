@@ -39,7 +39,7 @@ public abstract class LoadingWindow implements Runnable{
 	private void initialize() {
 		loadingwindow = new JDialog();
 		loadingwindow.setUndecorated(true);
-		loadingwindow.setModalityType(ModalityType.APPLICATION_MODAL);
+		//loadingwindow.setModalityType(ModalityType.DOCUMENT_MODAL);
 		
 		JPanel center_panel = new JPanel(); // New panel
 		center_panel.setLayout(new BorderLayout(0, 0));
@@ -81,6 +81,7 @@ public abstract class LoadingWindow implements Runnable{
 			
 			@Override
 			public void focusGained(FocusEvent arg0) {
+				System.out.println("OK");
 				loadingwindow.setVisible(true);
 				loadingwindow.setAlwaysOnTop(true);
 				loadingwindow.toFront();

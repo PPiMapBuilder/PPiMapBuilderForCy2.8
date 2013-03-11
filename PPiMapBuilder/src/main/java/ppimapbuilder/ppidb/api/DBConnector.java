@@ -91,13 +91,15 @@ public class DBConnector {
 
     /**
      * Retrieve server configuration from "server.cfg" file. This file must be
-     * located in the resource forlder.
+     * located in the resource folder.
      *
      * @throws IOException
      */
     private void getServerConfig() throws IOException {
-        // TODO: open server.cfg using the .getResources() method
-        BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream("resources/server.cfg"))));
+    	BufferedReader br = null;
+    	try{
+            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/server.cfg")));
+    	} catch(Exception e) {throw new IOException();}
 
         this.url = br.readLine();
         this.user = br.readLine();
