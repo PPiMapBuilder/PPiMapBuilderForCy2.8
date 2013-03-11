@@ -20,6 +20,8 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 
+import org.apache.lucene.store.Lock.With;
+
 import cytoscape.generated.Desktop;
 
 import java.awt.Color;
@@ -46,7 +48,7 @@ public class Credits extends JFrame {
 	 * Create the entire credits frame
 	 */
 	private Credits() {
-		Dimension size = new Dimension(315, 297);
+		Dimension size = new Dimension(309, 372);
 		setMaximumSize(size);
 		setMinimumSize(size);
 		setPreferredSize(size);
@@ -72,33 +74,33 @@ public class Credits extends JFrame {
 		try {
 			lblLogo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
 			
-			JLabel lblAuthors = new JLabel("Authors:");
+			JLabel lblAuthors = new JLabel("Developpers:");
 			lblAuthors.setHorizontalAlignment(SwingConstants.CENTER);
-			lblAuthors.setBounds(127, 193, 61, 16);
+			lblAuthors.setBounds(93, 255, 127, 16);
 			getContentPane().add(lblAuthors);
 			
 			JLabel lblGuillaumeCornutPierre = new JLabel("Guillaume CORNUT");
-			lblGuillaumeCornutPierre.setToolTipText("Gcornut");
+			lblGuillaumeCornutPierre.setToolTipText("Wonderful Gui");
 			lblGuillaumeCornutPierre.setHorizontalAlignment(SwingConstants.CENTER);
-			lblGuillaumeCornutPierre.setBounds(20, 220, 127, 16);
+			lblGuillaumeCornutPierre.setBounds(19, 282, 127, 16);
 			getContentPane().add(lblGuillaumeCornutPierre);
 			
 			JLabel lblPierreCressant = new JLabel("Pierre CRESSANT");
-			lblPierreCressant.setToolTipText("Piotr");
+			lblPierreCressant.setToolTipText("Amazing Piotr");
 			lblPierreCressant.setHorizontalAlignment(SwingConstants.CENTER);
-			lblPierreCressant.setBounds(167, 221, 127, 16);
+			lblPierreCressant.setBounds(168, 283, 127, 16);
 			getContentPane().add(lblPierreCressant);
 			
 			JLabel lblPierreDupuis = new JLabel("Pierre DUPUIS");
-			lblPierreDupuis.setToolTipText("Boss");
+			lblPierreDupuis.setToolTipText("Tremendous Boss");
 			lblPierreDupuis.setHorizontalAlignment(SwingConstants.CENTER);
-			lblPierreDupuis.setBounds(20, 249, 127, 16);
+			lblPierreDupuis.setBounds(19, 311, 127, 16);
 			getContentPane().add(lblPierreDupuis);
 			
 			JLabel lblKvinGravouil = new JLabel("Kévin GRAVOUIL");
-			lblKvinGravouil.setToolTipText("Keuv");
+			lblKvinGravouil.setToolTipText("Marvelous Keuv");
 			lblKvinGravouil.setHorizontalAlignment(SwingConstants.CENTER);
-			lblKvinGravouil.setBounds(167, 249, 127, 16);
+			lblKvinGravouil.setBounds(168, 311, 127, 16);
 			getContentPane().add(lblKvinGravouil);
 			
 			JLabel label = new JLabel("<ppimapbuilder@gmail.com>");
@@ -110,6 +112,25 @@ public class Credits extends JFrame {
 			label.setBounds(49, 168, 216, 16);
 			label.setOpaque(false);
 			getContentPane().add(label);
+			
+			JLabel lblInitiatedBy = new JLabel("Initiated by:");
+			lblInitiatedBy.setHorizontalAlignment(SwingConstants.CENTER);
+			lblInitiatedBy.setBounds(94, 193, 127, 16);
+			getContentPane().add(lblInitiatedBy);
+			
+			JLabel lblPabloEcheverria = new JLabel("Pablo ECHEVERRÍA");
+			lblPabloEcheverria.setHorizontalAlignment(SwingConstants.CENTER);
+			lblPabloEcheverria.setBounds(19, 223, 127, 16);
+			getContentPane().add(lblPabloEcheverria);
+			
+			JLabel lblPicardLabLogo = new JLabel(new ImageIcon(getClass().getResource("/picard_lab.png")));
+			lblPicardLabLogo.setLocation(185, 221);
+			size = new Dimension(93, 20);
+			lblPicardLabLogo.setPreferredSize(size);
+			lblPicardLabLogo.setMaximumSize(size);
+			lblPicardLabLogo.setMinimumSize(size);
+			lblPicardLabLogo.setSize(size);
+			getContentPane().add(lblPicardLabLogo);
 		} catch(Exception e) {
 			lblLogo.setText("LOGO");
 			e.printStackTrace();
