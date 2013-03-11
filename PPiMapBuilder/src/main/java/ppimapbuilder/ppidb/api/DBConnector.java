@@ -5,20 +5,14 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
-
-import javax.sql.rowset.serial.SerialArray;
-import javax.swing.JOptionPane;
-
-import org.postgresql.jdbc4.Jdbc4Array;
 
 /**
  *
@@ -27,13 +21,42 @@ import org.postgresql.jdbc4.Jdbc4Array;
  */
 public class DBConnector {
 
-    private static DBConnector _instance = null; // Instance of the dbconnnector to prevent several instances 
+    /**
+     * Instance of the dbconnnector to prevent several instances
+     */
+    private static DBConnector _instance = null;
+    /**
+     * Connection to the PPiDB
+     */
     private Connection con = null;
-    private PreparedStatement pst = null;
+    /**
+     * Main SELECT query
+     */
+    private Statement st = null;
+    /**
+     * ResultSet of getOrganims() and getDatabases() methods
+     */
     private ResultSet rs = null;
+    /**
+     * URL used by JDBC. Must me stored in a "server.cfg" at the first line,
+     * located in the resources folder. It looks like
+     * "jdbc:postgresql://<localhost>/<dbname>"
+     */
     private String url;
+    /**
+     * Database user used by JDBC. Must me stored in a "server.cfg" at the
+     * second line,located in the resources folder.
+     */
     private String user;
+    /**
+     * Database password used by JDBC. Must me stored in a "server.cfg",at the
+     * third line , located in the resources folder.
+     */
     private String password;
+    /**
+     * SQL query for selecting every data. .getAllData() methodes add WHERE
+     * clause to this String and execute the query.
+     */
     private String query;
 
     /**
@@ -41,46 +64,65 @@ public class DBConnector {
      */
     private DBConnector() throws SQLException, IOException {
         this.getServerConfig();
+
         con = DriverManager.getConnection(this.url, this.user, this.password);
         this.query = "select distinct "
-                + "    interaction.id as \"id\","
-                + "    p1.uniprot_id as \"uniprotidA\","
-                + "    p1.gene_name as \"interactorA\","
-                + "    p2.uniprot_id as \"uniprotidB\","
-                + "    p2.gene_name as \"interactorB\","
-                + "    db.name as \"srcdb\","
-                + "    org.name as \"orga\","
-                + "    expsys.name as \"expsys\","
+                + "    interaction.id as \"id\", "
+                + "    p1.uniprot_id as \"uniprotidA\", "
+                + "    p1.gene_name as \"interactorA\", "
+                + "    p2.uniprot_id as \"uniprotidB\", "
+                + "    p2.gene_name as \"interactorB\", "
+                + "    db.name as \"srcdb\", "
+                + "    org.name as \"orga\", "
+                + "    expsys.name as \"expsys\", "
                 + "    pub.pubmed_id as \"pubmed\" "
-                + "from interaction"
-                + "    join protein as \"p1\" on interaction.protein_id1 = p1.id"
-                + "    join protein as \"p2\" on interaction.protein_id2 = p2.id"
-                + "    join link_data_interaction as \"lnk\" on lnk.interaction_id = interaction.id"
-                + "    join interaction_data as \"intdata\" on lnk.interaction_data_id = intdata.id"
-                + "    join source_database as \"db\" on intdata.db_source_name = db.name"
-                + "    join organism as \"org\" on intdata.organism_tax_id = org.tax_id"
-                + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system"
-                + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id "
-                + "where "
-                + "    ( p1.uniprot_id = ? or p2.uniprot_id = ? )"
-                + "    and db.name in (?)"
-                + "    and org.tax_id in (?)";
+                + "from interaction "
+                + "    join protein as \"p1\" on interaction.protein_id1 = p1.id "
+                + "    join protein as \"p2\" on interaction.protein_id2 = p2.id "
+                + "    join link_data_interaction as \"lnk\" on lnk.interaction_id = interaction.id "
+                + "    join interaction_data as \"intdata\" on lnk.interaction_data_id = intdata.id "
+                + "    join source_database as \"db\" on intdata.db_source_name = db.name "
+                + "    join organism as \"org\" on intdata.organism_tax_id = org.tax_id "
+                + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system "
+                + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id ";
 
-
-        pst = con.prepareStatement(this.query);
+        st = con.createStatement();
     }
 
+    /**
+     * Retrieve server configuration from "server.cfg" file. This file must be
+     * located in the resource forlder.
+     *
+     * @throws IOException
+     */
     private void getServerConfig() throws IOException {
-        // Open the file that is the first command line parameter
-        // & Get the object of DataInputStream
+        // TODO: open server.cfg using the .getResources() method
         BufferedReader br = new BufferedReader(new InputStreamReader(new DataInputStream(new FileInputStream("resources/server.cfg"))));
 
         this.url = br.readLine();
         this.user = br.readLine();
         this.password = br.readLine();
 
-        //Close the input stream
         br.close();
+    }
+
+    /**
+     * DOCUMENTE ME!
+     *
+     * @param val
+     * @return
+     */
+    private String formatInClause(ArrayList<?> val) {
+        StringBuilder strb = new StringBuilder();
+        for (Object v : val) {
+            if (v instanceof String) {
+                strb.append("'").append(((String) v).toLowerCase()).append("'").append(",");
+            } else {
+                strb.append(v).append(",");
+            }
+        }
+        strb.deleteCharAt(strb.length() - 1);
+        return strb.toString();
     }
 
     /**
@@ -107,7 +149,6 @@ public class DBConnector {
         while (rs.next()) {
             orga.put(rs.getString("organism"), rs.getInt("id"));
         }
-
         return orga;
     }
 
@@ -135,25 +176,13 @@ public class DBConnector {
      * @throws SQLExeception
      */
     public SQLResult getAllData(String uniprot) throws SQLException {
-        pst.setString(1, uniprot);
-        pst.setString(2, uniprot);
-        rs = pst.executeQuery();
-        return new SQLResult(rs);
-    }
 
-    private String formatInClause(ArrayList<String> val) {
-        StringBuilder strb = new StringBuilder();
+        this.query += " where "
+                + "    ( p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "' )"
+                + " AND org.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
+                + " AND db.name IN ('hprd','biogrid', 'intact', 'dip', 'bind', 'mint')";
 
-        //strb.append('(');
-        
-        for (String v : val) {
-            strb.append(v.toLowerCase()).append(',');
-        }
-        strb.deleteCharAt(strb.length() - 1);
-
-        //strb.append(')');
-        
-        return strb.toString();
+        return new SQLResult(st.executeQuery(this.query));
     }
 
     /**
@@ -164,23 +193,31 @@ public class DBConnector {
      * @return SQLResult
      * @throws SQLExeception
      */
-    public SQLResult getAllData(String uniprot, ArrayList<String> db, ArrayList<Integer> orgs) throws SQLException {
-    	Array dba = con.createArrayOf("varchar", (String[]) db.toArray(new String[db.size()]));
-    	Array orgsa = con.createArrayOf("int", (Integer[]) orgs.toArray(new Integer[orgs.size()]));
-    	
-        pst.setString(1, uniprot);
-        pst.setString(2, uniprot);
-        pst.setArray(3, dba);
-        pst.setArray(4, orgsa);
-        
-        System.out.println(pst.toString());
-        
-        rs = pst.executeQuery();
-        return new SQLResult(rs);
+    public SQLResult getAllData(String uniprot, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
+        this.query += " where"
+                + " (p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "')"
+                + " AND org.tax_id IN ("
+                + this.formatInClause(orgs)
+                + ") "
+                + "AND db.name IN ("
+                + this.formatInClause(dbs)
+                + ") ";
+        return new SQLResult(st.executeQuery(this.query));
     }
 
+    /**
+     * Get keys of a SQLResult. These keys are the protein.id as stored in the
+     * database.
+     *
+     * @param sqlr
+     * @return
+     */
     public Set<String> getKeys(SQLResult sqlr) {
         return sqlr.keySet();
+    }
+
+    public String getQuery() {
+        return query;
     }
 
     @Override
@@ -190,8 +227,8 @@ public class DBConnector {
             if (rs != null) {
                 rs.close();
             }
-            if (pst != null) {
-                pst.close();
+            if (st != null) {
+                st.close();
             }
             if (con != null) {
                 con.close();
@@ -200,9 +237,5 @@ public class DBConnector {
         } catch (SQLException ex) {
             System.err.println("<html>Error while disconnecting : " + ex.getLocalizedMessage());
         }
-    }
-
-    public String getQuery() {
-        return query;
     }
 }
