@@ -9,6 +9,9 @@ import javax.swing.border.EmptyBorder;
 import cytoscape.Cytoscape;
 
 import java.awt.BorderLayout;
+import java.awt.Dialog.ModalityType;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 public abstract class LoadingWindow implements Runnable{
 	
@@ -36,11 +39,11 @@ public abstract class LoadingWindow implements Runnable{
 	private void initialize() {
 		loadingwindow = new JDialog();
 		loadingwindow.setUndecorated(true);
-		loadingwindow.setAlwaysOnTop(true);
+		loadingwindow.setModalityType(ModalityType.APPLICATION_MODAL);
 		
 		JPanel center_panel = new JPanel(); // New panel
 		center_panel.setLayout(new BorderLayout(0, 0));
-		center_panel.setBorder(new EmptyBorder(10,10,10,10)); // Boder adding a 10px margin
+		center_panel.setBorder(new EmptyBorder(10,10,10,10)); // Border adding a 10px margin
 		
 		text = new JLabel(message);
 		text.setBorder(new EmptyBorder(5,5,5,5));
@@ -71,6 +74,20 @@ public abstract class LoadingWindow implements Runnable{
 		loadingwindow.pack();
 		loadingwindow.setLocationRelativeTo(Cytoscape.getDesktop());
 		loadingwindow.toFront();
+		
+		Cytoscape.getDesktop().addFocusListener(new FocusListener() {
+			@Override
+			public void focusLost(FocusEvent arg0) {}
+			
+			@Override
+			public void focusGained(FocusEvent arg0) {
+				loadingwindow.setVisible(true);
+				loadingwindow.setAlwaysOnTop(true);
+				loadingwindow.toFront();
+				loadingwindow.requestFocus();
+				loadingwindow.setAlwaysOnTop(false);
+			}
+		});
 	}
 	
 

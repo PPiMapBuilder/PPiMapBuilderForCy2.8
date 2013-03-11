@@ -31,6 +31,7 @@ import java.awt.Color;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.LineBorder;
 import java.awt.Dimension;
+import java.rmi.ServerError;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -415,7 +416,6 @@ public class CreateNetworkFrame extends JFrame {
 	/**
 	 * Overrided setVisible method which reload data from database to update the window
 	 */
-	@Override
 	public void setVisible(boolean b) {
 		// Updating window
 		if (b) {
@@ -437,7 +437,8 @@ public class CreateNetworkFrame extends JFrame {
 			} catch (SQLException e) {
 				e.printStackTrace();
 				showError("Connection to database failed", "Connection error");
-				b = false; // We do not display the frame
+				b = false;
+				//throw new ServerError("Connection to database failed", null);
 			}
 
 			// Creation of the database list
@@ -453,6 +454,7 @@ public class CreateNetworkFrame extends JFrame {
 				e.printStackTrace();
 				showError("Connection to database failed", "Connection error");
 				b = false;
+				//throw new ServerError("Connection to database failed", null);
 			}
 
 			// Filling reference organism Combobox and adding all organism checkbox

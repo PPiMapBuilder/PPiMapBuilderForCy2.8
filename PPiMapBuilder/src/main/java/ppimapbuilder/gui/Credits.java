@@ -46,9 +46,11 @@ public class Credits extends JFrame {
 	 * Create the entire credits frame
 	 */
 	private Credits() {
-		setMaximumSize(new Dimension(266, 250));
-		setMinimumSize(new Dimension(266, 250));
-		setPreferredSize(new Dimension(266, 250));
+		Dimension size = new Dimension(315, 297);
+		setMaximumSize(size);
+		setMinimumSize(size);
+		setPreferredSize(size);
+		
 		setResizable(false);
 		setTitle("About PPiMapBuilder\n");
 		
@@ -99,18 +101,14 @@ public class Credits extends JFrame {
 			lblKvinGravouil.setBounds(167, 249, 127, 16);
 			getContentPane().add(lblKvinGravouil);
 			
-			JButton label = new JButton("<ppimapbuilder@gmail.com>");
+			JLabel label = new JLabel("<ppimapbuilder@gmail.com>");
+			label.setHorizontalAlignment(SwingConstants.CENTER);
 			label.setBorder(new EmptyBorder(0, 0, 0, 0));
 			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			label.setForeground(Color.GRAY);
 			label.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
 			label.setBounds(49, 168, 216, 16);
 			label.setOpaque(false);
-			label.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-				}
-			});
 			getContentPane().add(label);
 		} catch(Exception e) {
 			lblLogo.setText("LOGO");
@@ -118,7 +116,7 @@ public class Credits extends JFrame {
 		}
 		this.setLocationRelativeTo(null); // The frame is now at the center
 		
-		//this.setF
+		// Close window on escape
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		escapeListener = new WindowCloseEscapeListener(this);
 		manager.addKeyEventDispatcher(escapeListener);
