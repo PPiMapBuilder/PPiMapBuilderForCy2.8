@@ -35,6 +35,7 @@ public class CreateNetworkMenuAction extends CytoscapeAction {
 	public void actionPerformed(ActionEvent e) {
 		new LoadingWindow("Connecting to server database...") {
 			public void process() {
+				
 				myFrame = CreateNetworkFrame.Instance();
 				
 				myFrame.setVisible(true);
