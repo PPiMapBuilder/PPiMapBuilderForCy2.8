@@ -30,8 +30,8 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 	
 	private CreateNetworkFrame myFrame; // Frame which is contains the submit
 	private ArrayList<String> poiList; // List of proteins of interest
-	//private ArrayList<String> dbList; // List of selected organisms
-	//private ArrayList<String> orgaList; // List of selected databases
+	private ArrayList<String> dbList; // List of selected organisms
+	private ArrayList<Integer> orgaList; // List of selected databases
 	private CyNetwork myNetwork; // Result network
 	private PMBNode poiNode, node2; // nodes
 	
@@ -58,8 +58,8 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 			public void process() {
 				myFrame.close();
 				
-				//dbList = myFrame.getDatabaseValues(); // Retrieve the database list
-				//orgaList = myFrame.getOrganismValues(); // Retrieve the organism list
+				dbList = myFrame.getDatabaseValues(); // Retrieve the database list
+				orgaList = myFrame.getOrganismValues(); // Retrieve the organism list
 				
 				// Creation of the network
 				myNetwork = Cytoscape.createNetwork("", false); // Creation of a network (with the name of the poi)
@@ -69,7 +69,7 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 					SQLResult res;
 					// Get result from 
 					try {
-						res = myDBConnector.getAllData(id);
+						res = myDBConnector.getAllData(id, dbList, orgaList);
 						if(res.isEmpty()) throw new SQLException("empty "+id);
 					} catch (SQLException e1) {
 						JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getLocalizedMessage());
