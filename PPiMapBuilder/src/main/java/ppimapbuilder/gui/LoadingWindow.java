@@ -5,6 +5,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
+
+import cytoscape.Cytoscape;
+
 import java.awt.BorderLayout;
 
 public abstract class LoadingWindow implements Runnable{
@@ -67,7 +70,7 @@ public abstract class LoadingWindow implements Runnable{
 //		loadingwindow.getContentPane().add(spinner, BorderLayout.CENTER);
 		
 		loadingwindow.pack();
-		loadingwindow.setLocationRelativeTo(null);
+		loadingwindow.setLocationRelativeTo(Cytoscape.getDesktop());
 		loadingwindow.toFront();
 	}
 	
