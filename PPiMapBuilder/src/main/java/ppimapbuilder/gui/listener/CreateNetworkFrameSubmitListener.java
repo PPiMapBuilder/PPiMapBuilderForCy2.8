@@ -72,7 +72,7 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 						res = myDBConnector.getAllData(id);
 						if(res.isEmpty()) throw new SQLException("empty "+id);
 					} catch (SQLException e1) {
-						JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getMessage());
+						JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getLocalizedMessage());
 						return;
 					}
 					
