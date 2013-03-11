@@ -88,8 +88,8 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 						//Create Nodes
 						try {
 							
-							A = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameA"), true), fields.get("uniprotA"));
-							B = new PMBNode(Cytoscape.getCyNode(fields.get("interactor_nameB"), true), fields.get("uniprotB"));
+							A = new PMBNode(Cytoscape.getCyNode(fields.get("interactorA"), true), fields.get("uniprotidA"));
+							B = new PMBNode(Cytoscape.getCyNode(fields.get("interactorB"), true), fields.get("uniprotidB"));
 							myNetwork.addNode(A);
 							myNetwork.addNode(B);
 							myMediator.addNode(A);
@@ -99,10 +99,10 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 							interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
 							myNetwork.addEdge(interaction);
 						
-						} catch (UnknownHostException e1) {
-							e1.printStackTrace();
+						} catch (Exception e1) {
+							JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getLocalizedMessage());
+							return;
 						}
-						
 					}
 					
 				}

@@ -420,7 +420,7 @@ public class CreateNetworkFrame extends JFrame {
 		// Updating window
 		if (b) {
 			// Emptying form fields
-			txaIdentifiers.setText("");
+			txaIdentifiers.setText("Q49A88\nQ9VI74");
 			comboBox.removeAllItems();
 			panOtherOrganims.removeAll();
 			panSourceDatabases.removeAll();
@@ -456,14 +456,14 @@ public class CreateNetworkFrame extends JFrame {
 			}
 
 			// Filling reference organism Combobox and adding all organism checkbox
-			for (JCheckBox cbxOrga : organisms.values()) {
-				comboBox.addItem(cbxOrga.getText());
-				panOtherOrganims.add(cbxOrga);
+			for (JCheckBox checkOrga : organisms.values()) {
+				comboBox.addItem(checkOrga.getText());
+				panOtherOrganims.add(checkOrga);
 			}
-			comboBox.setSelectedIndex(0);
+			comboBox.setSelectedItem("Homo sapiens");
 			
 			// Disabling first organism checkbox 
-			organisms.get(organisms.keySet().toArray()[0]).setEnabled(false);
+			//organisms.get(organisms.keySet().toArray()[0]).setEnabled(false);
 				
 			// Adding all database checkbox
 			for (JCheckBox cbxDb: databases.values())

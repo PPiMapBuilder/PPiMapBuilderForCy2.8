@@ -36,6 +36,7 @@ public abstract class LoadingWindow implements Runnable{
 	private void initialize() {
 		loadingwindow = new JDialog();
 		loadingwindow.setUndecorated(true);
+		loadingwindow.setAlwaysOnTop(true);
 		
 		JPanel center_panel = new JPanel(); // New panel
 		center_panel.setLayout(new BorderLayout(0, 0));
@@ -46,8 +47,6 @@ public abstract class LoadingWindow implements Runnable{
 		
 		this.progressbar = new JProgressBar(); // New progress bar
 		progressbar.setIndeterminate(true); // Infinite progress bar
-		progressbar.setStringPainted(true); // Progress bar with text ?
-		progressbar.setString("Work in progress"); // Text ?
 		
 		center_panel.add(text, BorderLayout.CENTER); // Add the text to the panel
 		center_panel.add(progressbar, BorderLayout.SOUTH); // Add the progress bar to the panel

@@ -194,7 +194,7 @@ public class DBConnector {
      * @throws SQLExeception
      */
     public SQLResult getAllData(String uniprot, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
-        this.query += " where"
+        String q = this.query + " where"
                 + " (p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "')"
                 + " AND org.tax_id IN ("
                 + this.formatInClause(orgs)
@@ -202,7 +202,8 @@ public class DBConnector {
                 + "AND db.name IN ("
                 + this.formatInClause(dbs)
                 + ") ";
-        return new SQLResult(st.executeQuery(this.query));
+        System.out.println(q);
+        return new SQLResult(st.executeQuery(q));
     }
 
     /**
