@@ -1,12 +1,11 @@
 package ppimapbuilder.gui;
 
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.border.EmptyBorder;
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 
 public abstract class LoadingWindow implements Runnable{
 	
@@ -15,12 +14,15 @@ public abstract class LoadingWindow implements Runnable{
 	
 	private String message;
 	
+	private JProgressBar progressbar;
+	
 	/**
 	 * Create a new loading window with a displayed message
 	 * @param message
 	 */
 	public LoadingWindow(String message) {
 		this.message = message;
+		
 		run();
 	}
 	
@@ -35,8 +37,18 @@ public abstract class LoadingWindow implements Runnable{
 		// Boder adding a 5px margin
 		EmptyBorder margin = new EmptyBorder(5, 5, 5, 5);
 		
+		
+		JPanel center_panel = new JPanel(); // New panel
+		
+		
 		text = new JLabel(message);
 		text.setBorder(margin);
+		
+		
+		this.progressbar = new JProgressBar(); // New progress bar
+		progressbar.setIndeterminate(true); // Infinite progress bar
+		progressbar.setStringPainted(true); // Progress bar with text ?
+		progressbar.setString("Work in progress"); // Text ?
 		
 //		JLabel spinner =  new JLabel();
 //		spinner.setBorder(margin);
@@ -53,10 +65,15 @@ public abstract class LoadingWindow implements Runnable{
 //		
 //		loadingwindow.getContentPane().add(spinner, BorderLayout.CENTER);
 		
-		loadingwindow.getContentPane().add(text, BorderLayout.CENTER);
+		center_panel.add(text); // Add the text to the panel
+		center_panel.add(progressbar); // Add the progress bar to the panel
+		
+		
+		loadingwindow.getContentPane().add(center_panel, BorderLayout.CENTER); // Add the panel to the JDialog
 		
 		loadingwindow.pack();
 		loadingwindow.setLocationRelativeTo(null);
+		loadingwindow.toFront();
 	}
 	
 
@@ -69,13 +86,21 @@ public abstract class LoadingWindow implements Runnable{
 
 		loadingwindow.setVisible(true);
 		
-		SwingUtilities.invokeLater(new Runnable() {
+		/*SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				process();
+				//loadingwindow.setVisible(false);
+			}
+		});*/
+		
+		new Thread(new Runnable() { // Create a new thread for the treatment to keep the progress bar running.
+			@Override
+			public void run(){
+				process();
 				loadingwindow.setVisible(false);
 			}
-		});
+	    }).start();
 	}
 	
 	public abstract void process();
