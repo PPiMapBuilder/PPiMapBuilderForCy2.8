@@ -34,21 +34,22 @@ public abstract class LoadingWindow implements Runnable{
 		loadingwindow = new JDialog();
 		loadingwindow.setUndecorated(true);
 		
-		// Boder adding a 5px margin
-		EmptyBorder margin = new EmptyBorder(5, 5, 5, 5);
-		
-		
 		JPanel center_panel = new JPanel(); // New panel
-		
+		center_panel.setLayout(new BorderLayout(0, 0));
+		center_panel.setBorder(new EmptyBorder(10,10,10,10)); // Boder adding a 10px margin
 		
 		text = new JLabel(message);
-		text.setBorder(margin);
-		
+		text.setBorder(new EmptyBorder(5,5,5,5));
 		
 		this.progressbar = new JProgressBar(); // New progress bar
 		progressbar.setIndeterminate(true); // Infinite progress bar
 		progressbar.setStringPainted(true); // Progress bar with text ?
 		progressbar.setString("Work in progress"); // Text ?
+		
+		center_panel.add(text, BorderLayout.CENTER); // Add the text to the panel
+		center_panel.add(progressbar, BorderLayout.SOUTH); // Add the progress bar to the panel
+		
+		loadingwindow.getContentPane().add(center_panel, BorderLayout.CENTER); // Add the panel to the JDialog
 		
 //		JLabel spinner =  new JLabel();
 //		spinner.setBorder(margin);
@@ -64,12 +65,6 @@ public abstract class LoadingWindow implements Runnable{
 //		spinner.setIcon(gif);
 //		
 //		loadingwindow.getContentPane().add(spinner, BorderLayout.CENTER);
-		
-		center_panel.add(text); // Add the text to the panel
-		center_panel.add(progressbar); // Add the progress bar to the panel
-		
-		
-		loadingwindow.getContentPane().add(center_panel, BorderLayout.CENTER); // Add the panel to the JDialog
 		
 		loadingwindow.pack();
 		loadingwindow.setLocationRelativeTo(null);
