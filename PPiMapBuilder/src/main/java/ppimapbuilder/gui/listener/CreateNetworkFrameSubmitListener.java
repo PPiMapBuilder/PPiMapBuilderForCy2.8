@@ -2,18 +2,17 @@ package ppimapbuilder.gui.listener;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.data.Semantics;
+
 import ppimapbuilder.Mediator;
 import ppimapbuilder.PMBNode;
 import ppimapbuilder.gui.CreateNetworkFrame;
@@ -33,7 +32,6 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 	private ArrayList<String> dbList; // List of selected organisms
 	private ArrayList<Integer> orgaList; // List of selected databases
 	private CyNetwork myNetwork; // Result network
-	private PMBNode poiNode, node2; // nodes
 	
 	private DBConnector myDBConnector;
 	private Mediator myMediator = Mediator.Instance();
@@ -49,7 +47,7 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 		}
 		catch (ArrayStoreException e2) {
 			// Empty text area
-			JOptionPane.showMessageDialog(myFrame, "The identifier list is empty.", "", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(null, "The identifier list is empty.", "", JOptionPane.WARNING_MESSAGE);
 			return;
 		}
 		
@@ -72,7 +70,7 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 						res = myDBConnector.getAllData(id, dbList, orgaList);
 						if(res.isEmpty()) throw new SQLException("empty "+id);
 					} catch (SQLException e1) {
-						JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getLocalizedMessage());
+						JOptionPane.showMessageDialog(null, "Error SQL: "+e1.getLocalizedMessage());
 						return;
 					}
 					
@@ -100,11 +98,10 @@ public class CreateNetworkFrameSubmitListener implements ActionListener{
 							myNetwork.addEdge(interaction);
 						
 						} catch (Exception e1) {
-							JOptionPane.showMessageDialog(myFrame, "Error SQL: "+e1.getLocalizedMessage());
+							JOptionPane.showMessageDialog(null, "Error : "+e1.getLocalizedMessage());
 							return;
 						}
 					}
-					
 				}
 				
 				// Add the network to the mediator

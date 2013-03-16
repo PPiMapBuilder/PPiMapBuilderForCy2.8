@@ -14,15 +14,15 @@ import ppimapbuilder.gui.CreateNetworkFrame;
  *
  */
 public class CreateNetworkFrameReferenceOrganismListener implements ActionListener{
-	private CreateNetworkFrame window;
+	private CreateNetworkFrame createNetwork;
 	private JCheckBox previous = null;
 	
 	/**
 	 * Create a reference organism combobox listener with reference to its parent window
 	 * @param window
 	 */
-	public CreateNetworkFrameReferenceOrganismListener(CreateNetworkFrame window) {
-		this.window = window;
+	public CreateNetworkFrameReferenceOrganismListener(CreateNetworkFrame createNetwork) {
+		this.createNetwork = createNetwork;
 	}
 	
 	/**
@@ -34,13 +34,13 @@ public class CreateNetworkFrameReferenceOrganismListener implements ActionListen
 		JCheckBox check = null;
 		
 		// Get the checkbox corresponding to the selected element in combobox
-		for(JCheckBox c : window.getOrganisms().values())
+		for(JCheckBox c : createNetwork.getOrganisms().values())
 			if(c.getText().equals(select.getSelectedItem()))
 				check = c;
 		
 		if(check != null)  {
 			if(previous == null)
-				previous = (JCheckBox)window.getOrganisms().values().toArray()[0];
+				previous = (JCheckBox)createNetwork.getOrganisms().values().toArray()[0];
 
 			previous.setEnabled(true);
 			

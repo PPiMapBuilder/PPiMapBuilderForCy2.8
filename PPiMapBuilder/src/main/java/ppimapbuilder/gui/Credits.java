@@ -1,34 +1,21 @@
 package ppimapbuilder.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
 
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
 import ppimapbuilder.gui.listener.WindowCloseEscapeListener;
-import javax.swing.BoxLayout;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 
-import org.apache.lucene.store.Lock.With;
-
-import cytoscape.generated.Desktop;
+import cytoscape.Cytoscape;
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 /**
  * 
@@ -72,7 +59,7 @@ public class Credits extends JFrame {
 		getContentPane().add(lblPpimapbuilder);
 		
 		try {
-			lblLogo.setIcon(new ImageIcon(getClass().getResource("/logo.png")));
+			lblLogo.setIcon(new ImageIcon(getClass().getResource("/img/logo.png")));
 			
 			JLabel lblAuthors = new JLabel("Developpers:");
 			lblAuthors.setHorizontalAlignment(SwingConstants.CENTER);
@@ -123,7 +110,7 @@ public class Credits extends JFrame {
 			lblPabloEcheverria.setBounds(19, 223, 127, 16);
 			getContentPane().add(lblPabloEcheverria);
 			
-			JLabel lblPicardLabLogo = new JLabel(new ImageIcon(getClass().getResource("/picard_lab.png")));
+			JLabel lblPicardLabLogo = new JLabel(new ImageIcon(getClass().getResource("/img/picard_lab.png")));
 			lblPicardLabLogo.setLocation(185, 221);
 			size = new Dimension(93, 20);
 			lblPicardLabLogo.setPreferredSize(size);
@@ -135,7 +122,7 @@ public class Credits extends JFrame {
 			lblLogo.setText("LOGO");
 			e.printStackTrace();
 		}
-		this.setLocationRelativeTo(null); // The frame is now at the center
+		this.setLocationRelativeTo(Cytoscape.getDesktop()); // The frame is now at the center
 		
 		// Close window on escape
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();

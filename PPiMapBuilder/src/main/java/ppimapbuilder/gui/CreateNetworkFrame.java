@@ -7,7 +7,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,11 +50,12 @@ import java.io.IOException;
 /**
  * Network creation window
  */
-public class CreateNetworkFrame extends JFrame {
-	private static final long serialVersionUID = 1L;
-
+public class CreateNetworkFrame {
 	// Instance of the PPiMapBuilder frame to prevent several instances
 	private static CreateNetworkFrame _instance = null; 
+	
+	// The create network window
+	private JFrame window;
 
 	// Hash map of databases and organisms loaded from the database
 	private LinkedHashMap<Integer, JCheckBox> organisms;
@@ -80,7 +80,7 @@ public class CreateNetworkFrame extends JFrame {
 	 * Create the application.
 	 */
 	private CreateNetworkFrame() {
-		super("PPiMapBuilder - Create a network");
+		window = new JFrame("PPiMapBuilder - Create a network");
 
 		try {
 			myDBConnector = DBConnector.Instance();
@@ -137,7 +137,7 @@ public class CreateNetworkFrame extends JFrame {
 		splitPane.setDividerSize(5);
 		splitPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		splitPane.setContinuousLayout(true);
-		this.getContentPane().add(splitPane, BorderLayout.CENTER);
+		window.getContentPane().add(splitPane, BorderLayout.CENTER);
 
 		// Redraw the split panel divider
 		try {
@@ -176,14 +176,14 @@ public class CreateNetworkFrame extends JFrame {
 
 		// Bottom part
 		JPanel panBottomForm = initBottomPanel();
-		this.getContentPane().add(panBottomForm, BorderLayout.SOUTH);
+		window.getContentPane().add(panBottomForm, BorderLayout.SOUTH);
 		
 		// Resize window
-		this.setMinimumSize(new Dimension(500, 300));
-		this.setSize(new Dimension(550, 500));
+		window.setMinimumSize(new Dimension(500, 300));
+		window.setSize(new Dimension(550, 500));
 		
 		// Center window
-		this.setLocationRelativeTo(null);
+		window.setLocationRelativeTo(null);
 	}
 
 	/**
@@ -338,7 +338,7 @@ public class CreateNetworkFrame extends JFrame {
 		panBottomForm.add(btnSubmit);
 
 		//Set submit as default button
-		this.getRootPane().setDefaultButton(btnSubmit);
+		window.getRootPane().setDefaultButton(btnSubmit);
 
 		return panBottomForm;
 	}
@@ -410,73 +410,88 @@ public class CreateNetworkFrame extends JFrame {
 	 * Close the create network frame
 	 */
 	public void close() {
-		this.setVisible(false);
-	}
-
-	/**
-	 * Overrided setVisible method which reload data from database to update the window
-	 */
-	public void setVisible(boolean b) {
-		// Updating window
-		if (b) {
-			// Emptying form fields
-			txaIdentifiers.setText("Q49A88\nQ9VI74");
-			comboBox.removeAllItems();
-			panOtherOrganims.removeAll();
-			panSourceDatabases.removeAll();
-
-			// Creation of the organism list
-			organisms = new LinkedHashMap<Integer, JCheckBox>();
-			try {
-				LinkedHashMap<String, Integer> orga =  myDBConnector.getOrganisms();
-				for (Entry<String, Integer> entry : orga.entrySet()) {
-					JCheckBox j = new JCheckBox(entry.getKey(), true);
-					j.setBackground(Color.white);
-					organisms.put(entry.getValue(), j);
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				showError("Connection to database failed", "Connection error");
-				b = false;
-				//throw new ServerError("Connection to database failed", null);
-			}
-
-			// Creation of the database list
-			databases = new LinkedHashMap<String, JCheckBox>();
-			try {
-				ArrayList<String> dbs = myDBConnector.getDatabases();
-				for (String str : dbs) {
-					JCheckBox j = new JCheckBox(str, true);
-					j.setBackground(Color.white);
-					databases.put(str, j);
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				showError("Connection to database failed", "Connection error");
-				b = false;
-				//throw new ServerError("Connection to database failed", null);
-			}
-
-			// Filling reference organism Combobox and adding all organism checkbox
-			for (JCheckBox checkOrga : organisms.values()) {
-				comboBox.addItem(checkOrga.getText());
-				panOtherOrganims.add(checkOrga);
-			}
-			comboBox.setSelectedItem("Homo sapiens");
-			
-			// Disabling first organism checkbox 
-			//organisms.get(organisms.keySet().toArray()[0]).setEnabled(false);
-				
-			// Adding all database checkbox
-			for (JCheckBox cbxDb: databases.values())
-				panSourceDatabases.add(cbxDb);
-		}
-
-		super.setVisible(b);
+		window.setVisible(false);
 	}
 	
+	/**
+	 * 
+	 * @throws ServerError
+	 */
+	public void open() {
+		updateInterfaceWithDatabase();
+		
+		window.setLocationRelativeTo(Cytoscape.getDesktop());
+		window.setVisible(true);
+	}
+	
+	/**
+	 * 
+	 * @throws ServerError
+	 */
+	private void updateInterfaceWithDatabase() {
+		// Emptying form fields
+		txaIdentifiers.setText("Q49A88\nQ9VI74");
+		comboBox.removeAllItems();
+		panOtherOrganims.removeAll();
+		panSourceDatabases.removeAll();
+
+		// Creation of the organism list
+		organisms = new LinkedHashMap<Integer, JCheckBox>();
+		try {
+			LinkedHashMap<String, Integer> orga = myDBConnector.getOrganisms();
+			for (Entry<String, Integer> entry : orga.entrySet()) {
+				JCheckBox j = new JCheckBox(entry.getKey(), true);
+				j.setBackground(Color.white);
+				organisms.put(entry.getValue(), j);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Connection to database failed", "Connection error");
+			return;
+		}
+
+		// Creation of the database list
+		databases = new LinkedHashMap<String, JCheckBox>();
+		try {
+			ArrayList<String> dbs = myDBConnector.getDatabases();
+			for (String str : dbs) {
+				JCheckBox j = new JCheckBox(str, true);
+				j.setBackground(Color.white);
+				databases.put(str, j);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			showError("Connection to database failed", "Connection error");
+			return;
+		}
+
+		// Filling reference organism Combobox and adding all organism checkbox
+		for (JCheckBox checkOrga : organisms.values()) {
+			comboBox.addItem(checkOrga.getText());
+			panOtherOrganims.add(checkOrga);
+		}
+		// selecting Homo sapiens in the organism list
+		comboBox.setSelectedItem("Homo sapiens");
+
+		// Adding all database checkbox
+		for (JCheckBox cbxDb : databases.values())
+			panSourceDatabases.add(cbxDb);
+	}
+	
+	/**
+	 * Get the JFrame window
+	 * @return the JFrame window
+	 */
+	public JFrame getWindow() {
+		return window;
+	}
+	
+	/**
+	 * Displays an error message using <i>JOptionPane</i>
+	 * @param message the error message
+	 * @param title the title of the error window
+	 */
 	private void showError(String message, String title) {
 		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), title, message, JOptionPane.ERROR_MESSAGE);
 	}
-
 }

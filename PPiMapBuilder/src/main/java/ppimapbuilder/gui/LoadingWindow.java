@@ -9,37 +9,33 @@ import javax.swing.border.EmptyBorder;
 import cytoscape.Cytoscape;
 
 import java.awt.BorderLayout;
-import java.awt.Dialog.ModalityType;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 
 public abstract class LoadingWindow implements Runnable{
 	
 	private JDialog loadingwindow;
-	private JLabel text;
 	
-	private String message;
+	private JLabel text;
 	
 	private JProgressBar progressbar;
 	
 	/**
 	 * Create a new loading window with a displayed message
-	 * @param message
+	 * @param message the message that will be displayed on the loading window
 	 */
 	public LoadingWindow(String message) {
-		this.message = message;
-		
+		initialize(message);
 		run();
 	}
 	
 	/**
-	 * Creates the JDialog with spinner 
-	 * @return the dialog window
+	 * Creates the JDialog with progress bar and text message
+	 * @param message the message that will be displayed on the loading window
 	 */
-	private void initialize() {
+	private void initialize(String message) {
 		loadingwindow = new JDialog();
 		loadingwindow.setUndecorated(true);
-		//loadingwindow.setModalityType(ModalityType.DOCUMENT_MODAL);
 		
 		JPanel center_panel = new JPanel(); // New panel
 		center_panel.setLayout(new BorderLayout(0, 0));
@@ -51,64 +47,63 @@ public abstract class LoadingWindow implements Runnable{
 		this.progressbar = new JProgressBar(); // New progress bar
 		progressbar.setIndeterminate(true); // Infinite progress bar
 		
-		center_panel.add(text, BorderLayout.CENTER); // Add the text to the panel
+		center_panel.add(text, BorderLayout.CENTER); // Add the text label to the panel
 		center_panel.add(progressbar, BorderLayout.SOUTH); // Add the progress bar to the panel
 		
 		loadingwindow.getContentPane().add(center_panel, BorderLayout.CENTER); // Add the panel to the JDialog
-		
-//		JLabel spinner =  new JLabel();
-//		spinner.setBorder(margin);
-//		
-//		ImageIcon gif = null;
-//		try {
-//			gif = new ImageIcon(getClass().getResource("/spinner.gif"));
-//		} catch (Exception e) {}
-//		
-//		spinner.setMinimumSize(new Dimension(gif.getIconWidth(), gif.getIconHeight()));
-//		spinner.setPreferredSize(new Dimension(gif.getIconWidth(), gif.getIconHeight()));
-//		spinner.setMaximumSize(new Dimension(gif.getIconWidth(), gif.getIconHeight()));
-//		spinner.setIcon(gif);
-//		
-//		loadingwindow.getContentPane().add(spinner, BorderLayout.CENTER);
 		
 		loadingwindow.pack();
 		loadingwindow.setLocationRelativeTo(Cytoscape.getDesktop());
 		loadingwindow.toFront();
 		
-		Cytoscape.getDesktop().addFocusListener(new FocusListener() {
+		//Keep the loading window to front when cytoscape is focused
+		Cytoscape.getDesktop().addWindowFocusListener(new WindowFocusListener() {
 			@Override
-			public void focusLost(FocusEvent arg0) {}
+			public void windowLostFocus(WindowEvent arg0) {}
 			
 			@Override
-			public void focusGained(FocusEvent arg0) {
-				System.out.println("OK");
-				loadingwindow.setVisible(true);
-				loadingwindow.setAlwaysOnTop(true);
+			public void windowGainedFocus(WindowEvent arg0) {
 				loadingwindow.toFront();
-				loadingwindow.requestFocus();
-				loadingwindow.setAlwaysOnTop(false);
 			}
 		});
 	}
 	
-
+	
 	/**
-	 * When launch the loading window appear, run the treatment and close
+	 * Sets the progress bar's current value to n. (between 0 and 100)
+	 * @param n the new value
+	 */
+	public void setProgress(int n) {
+		progressbar.setValue(n);
+	}
+	
+	
+	/**
+	 * Sets the <i>indeterminate</i> property of the progress bar. 
+	 * An indeterminate progress bar continuously displays animation indicating that an operation of unknown length is occurring.
+	 * @param state <i>true</i> if the progress bar should change to indeterminate mode; <i>false</i> if it should revert to normal.
+	 */
+	public void setIndeterminate(boolean state) {
+		progressbar.setIndeterminate(state);
+	}
+	
+	
+	/**
+	 * Sets the displayed message on the loading window
+	 * @param message the message that will be displayed on the loading window
+	 */
+	public void setMessage(String message) {
+		this.text.setText(message);
+	}
+
+	
+	/**
+	 * When launch, the loading window will appear, then run the defined process and close
 	 */
 	@Override
 	public void run() {
-		initialize();
 
 		loadingwindow.setVisible(true);
-		
-		/*SwingUtilities.invokeLater(new Runnable() {
-			@Override
-			public void run() {
-				process();
-				//loadingwindow.setVisible(false);
-			}
-		});*/
-		
 		new Thread(new Runnable() { // Create a new thread for the treatment to keep the progress bar running.
 			@Override
 			public void run(){
@@ -118,5 +113,9 @@ public abstract class LoadingWindow implements Runnable{
 	    }).start();
 	}
 	
+	
+	/**
+	 * Process executed at launch. Need to be defined by the user
+	 */
 	public abstract void process();
 }
