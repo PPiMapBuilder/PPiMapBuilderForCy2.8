@@ -7,6 +7,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 
+import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -139,6 +140,7 @@ public class CreateNetworkFrame {
 		splitPane.setContinuousLayout(true);
 		window.getContentPane().add(splitPane, BorderLayout.CENTER);
 
+		// $hide>>$
 		// Redraw the split panel divider
 		try {
 			splitPane.setUI(new BasicSplitPaneUI() {
@@ -165,6 +167,7 @@ public class CreateNetworkFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		// $hide<<$
 
 		// Left part
 		JPanel panIndentifiers = initIndentifiersPanel();
@@ -250,7 +253,7 @@ public class CreateNetworkFrame {
 		JPanel panMainForm = new JPanel();
 		panMainForm.setMinimumSize(new Dimension(290, 10));
 		panMainForm.setBorder(new CompoundBorder(new MatteBorder(0, 0, 0, 5, (Color) darkForeground), panelBorder));
-		panMainForm.setLayout(new MigLayout("", "[49.00,grow]", "[][][][grow][][grow]"));
+		panMainForm.setLayout(new MigLayout("insets 5 5 5 5", "[49.00,grow][]", "[][][][grow][][grow]"));
 
 		// Reference organism label
 		JLabel lblReferenceOrganism = new JLabel("Reference organism:");
@@ -259,17 +262,23 @@ public class CreateNetworkFrame {
 		// Reference organism combobox
 		comboBox = new JComboBox();
 		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(this));
-		panMainForm.add(comboBox, "cell 0 1,growx");
+		
+		JLabel lblHelpRefOrganism = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
+		panMainForm.add(lblHelpRefOrganism, "cell 1 0");
+		panMainForm.add(comboBox, "cell 0 1 2 1,growx");
 
 		// Other organisms label
 		JLabel lblHomologOrganism = new JLabel("Other organisms:");
 		panMainForm.add(lblHomologOrganism, "cell 0 2");
+		
+		JLabel lblHelpOtherOrganism = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
+		panMainForm.add(lblHelpOtherOrganism, "cell 1 2");
 
 		// Other organisms scrollpane containing a panel that will contain checkbox at display
 		JScrollPane scrollPaneOtherOrganisms = new JScrollPane();
 		scrollPaneOtherOrganisms.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
 		scrollPaneOtherOrganisms.setBorder(fancyBorder);
-		panMainForm.add(scrollPaneOtherOrganisms, "cell 0 3,grow");
+		panMainForm.add(scrollPaneOtherOrganisms, "cell 0 3 2 1,grow");
 
 		// Other organisms panel that will contain checkbox at display
 		panOtherOrganims = new JPanel();
@@ -281,12 +290,15 @@ public class CreateNetworkFrame {
 		// Source databases label
 		javax.swing.JLabel lblSourceDatabases = new javax.swing.JLabel("Source databases:");
 		panMainForm.add(lblSourceDatabases, "cell 0 4");
+		
+		JLabel lblHelpSourceDatabase = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
+		panMainForm.add(lblHelpSourceDatabase, "cell 1 4");
 
 		// Source databases scrollpane containing a panel that will contain checkbox at display
 		JScrollPane scrollPaneSourceDatabases = new JScrollPane();
 		scrollPaneSourceDatabases.setBorder(fancyBorder);
 		scrollPaneSourceDatabases.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
-		panMainForm.add(scrollPaneSourceDatabases, "cell 0 5,grow");
+		panMainForm.add(scrollPaneSourceDatabases, "cell 0 5 2 1,grow");
 
 		// Source databases panel that will contain checkbox at display
 		panSourceDatabases = new JPanel();
@@ -418,8 +430,9 @@ public class CreateNetworkFrame {
 	 * @throws ServerError
 	 */
 	public void open() {
-		updateInterfaceWithDatabase();
-		
+		if(!window.isVisible()) {
+			updateInterfaceWithDatabase();
+		}
 		window.setLocationRelativeTo(Cytoscape.getDesktop());
 		window.setVisible(true);
 	}

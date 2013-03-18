@@ -38,7 +38,6 @@ public class CreateNetworkMenuAction extends CytoscapeAction {
 				
 				myFrame = CreateNetworkFrame.Instance();
 				myFrame.open();
-				
 				/* PANEL */
 				
 				// Creation of the panel
