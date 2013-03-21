@@ -4,18 +4,19 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.KeyboardFocusManager;
+import java.awt.Color;
 
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
+import ppimapbuilder.gui.label.JLinkLabel;
+import ppimapbuilder.gui.label.LogoIcon;
+import ppimapbuilder.gui.label.PicardLabIcon;
 import ppimapbuilder.gui.listener.WindowCloseEscapeListener;
-import javax.swing.border.EmptyBorder;
 
 import cytoscape.Cytoscape;
 
-import java.awt.Color;
+import net.miginfocom.swing.MigLayout;
 
 /**
  * 
@@ -35,96 +36,76 @@ public class Credits extends JFrame {
 	 * Create the entire credits frame
 	 */
 	private Credits() {
-		Dimension size = new Dimension(309, 372);
+		super("About PPiMapBuilder");
+		
+		Dimension size = new Dimension(340, 340);
 		setMaximumSize(size);
 		setMinimumSize(size);
 		setPreferredSize(size);
 		
 		setResizable(false);
-		setTitle("About PPiMapBuilder\n");
 		
-		getContentPane().setLayout(null);
-		JLabel lblLogo = new JLabel();
-		lblLogo.setHorizontalTextPosition(SwingConstants.CENTER);
-		lblLogo.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLogo.setMaximumSize(new Dimension(105, 136));
-		lblLogo.setBounds(89, 6, 136, 134);
-		getContentPane().add(lblLogo);
+		setLayout(new MigLayout("inset 5", "[grow][22px][grow]", "[grow][][][][grow][][][grow][][][][grow]"));
 		
+		// PPiMapBuilder Logo
+		JLabel lblLogo = new LogoIcon();
+		getContentPane().add(lblLogo, "cell 0 1 3,alignx center");
 		
+		// PPiMapBuilder Name
 		JLabel lblPpimapbuilder = new JLabel("PPiMapBuilder");
-		lblPpimapbuilder.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPpimapbuilder.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		lblPpimapbuilder.setBounds(99, 143, 117, 28);
-		getContentPane().add(lblPpimapbuilder);
+		getContentPane().add(lblPpimapbuilder, "cell 0 2 3,alignx center");
 		
-		try {
-			lblLogo.setIcon(new ImageIcon(getClass().getResource("/img/logo.png")));
-			
-			JLabel lblAuthors = new JLabel("Developpers:");
-			lblAuthors.setHorizontalAlignment(SwingConstants.CENTER);
-			lblAuthors.setBounds(93, 255, 127, 16);
-			getContentPane().add(lblAuthors);
-			
-			JLabel lblGuillaumeCornutPierre = new JLabel("Guillaume CORNUT");
-			lblGuillaumeCornutPierre.setToolTipText("Wonderful Gui");
-			lblGuillaumeCornutPierre.setHorizontalAlignment(SwingConstants.CENTER);
-			lblGuillaumeCornutPierre.setBounds(19, 282, 127, 16);
-			getContentPane().add(lblGuillaumeCornutPierre);
-			
-			JLabel lblPierreCressant = new JLabel("Pierre CRESSANT");
-			lblPierreCressant.setToolTipText("Amazing Piotr");
-			lblPierreCressant.setHorizontalAlignment(SwingConstants.CENTER);
-			lblPierreCressant.setBounds(168, 283, 127, 16);
-			getContentPane().add(lblPierreCressant);
-			
-			JLabel lblPierreDupuis = new JLabel("Pierre DUPUIS");
-			lblPierreDupuis.setToolTipText("Tremendous Boss");
-			lblPierreDupuis.setHorizontalAlignment(SwingConstants.CENTER);
-			lblPierreDupuis.setBounds(19, 311, 127, 16);
-			getContentPane().add(lblPierreDupuis);
-			
-			JLabel lblKvinGravouil = new JLabel("Kévin GRAVOUIL");
-			lblKvinGravouil.setToolTipText("Marvelous Keuv");
-			lblKvinGravouil.setHorizontalAlignment(SwingConstants.CENTER);
-			lblKvinGravouil.setBounds(168, 311, 127, 16);
-			getContentPane().add(lblKvinGravouil);
-			
-			JLabel label = new JLabel("<ppimapbuilder@gmail.com>");
-			label.setHorizontalAlignment(SwingConstants.CENTER);
-			label.setBorder(new EmptyBorder(0, 0, 0, 0));
-			label.setCursor(new Cursor(Cursor.HAND_CURSOR));
-			label.setForeground(Color.GRAY);
-			label.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
-			label.setBounds(49, 168, 216, 16);
-			label.setOpaque(false);
-			getContentPane().add(label);
-			
-			JLabel lblInitiatedBy = new JLabel("Initiated by:");
-			lblInitiatedBy.setHorizontalAlignment(SwingConstants.CENTER);
-			lblInitiatedBy.setBounds(94, 193, 127, 16);
-			getContentPane().add(lblInitiatedBy);
-			
-			JLabel lblPabloEcheverria = new JLabel("Pablo ECHEVERRÍA");
-			lblPabloEcheverria.setHorizontalAlignment(SwingConstants.CENTER);
-			lblPabloEcheverria.setBounds(19, 223, 127, 16);
-			getContentPane().add(lblPabloEcheverria);
-			
-			JLabel lblPicardLabLogo = new JLabel(new ImageIcon(getClass().getResource("/img/picard_lab.png")));
-			lblPicardLabLogo.setLocation(185, 221);
-			size = new Dimension(93, 20);
-			lblPicardLabLogo.setPreferredSize(size);
-			lblPicardLabLogo.setMaximumSize(size);
-			lblPicardLabLogo.setMinimumSize(size);
-			lblPicardLabLogo.setSize(size);
-			getContentPane().add(lblPicardLabLogo);
-		} catch(Exception e) {
-			lblLogo.setText("LOGO");
-			e.printStackTrace();
-		}
-		this.setLocationRelativeTo(Cytoscape.getDesktop()); // The frame is now at the center
+		// PPiMapBuilder email
+		JLabel lblEmail = new JLinkLabel("<ppimapbuilder@gmail.com>", "mailto:ppimapbuilder@gmail.com");
+		lblEmail.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		lblEmail.setForeground(Color.GRAY);
+		lblEmail.setFont(new Font("Lucida Grande", Font.PLAIN, 11));
+		getContentPane().add(lblEmail, "cell 0 3 3 1,alignx center");
 		
-		// Close window on escape
+		// Initiated by
+		JLabel lblInitiatedBy = new JLabel("Initiated by:");
+		lblInitiatedBy.setFont(new Font("Lucida Grande", Font.BOLD, 12));
+		getContentPane().add(lblInitiatedBy, "cell 0 5 3 1,alignx center");
+			
+		// Pablo Echeverría
+		JLabel lblPabloEcheverria = new JLabel("Pablo Echeverría");
+		getContentPane().add(lblPabloEcheverria, "cell 0 6,alignx center");
+		
+		// PicardLab logo
+		JLabel lblPicardLabLogo = new PicardLabIcon();
+		lblPicardLabLogo.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		getContentPane().add(lblPicardLabLogo, "cell 2 6,alignx center");
+		
+		// Developpers
+		JLabel lblAuthors = new JLabel("Developpers:");
+		lblAuthors.setFont(new Font("Lucida Grande", Font.BOLD, 12));
+		getContentPane().add(lblAuthors, "cell 0 8 3 1,alignx center");
+		
+		// Guillaume Cornut
+		JLabel lblGuillaumeCornutPierre = new JLabel("Guillaume Cornut");
+		lblGuillaumeCornutPierre.setToolTipText("Wonderful Gui");
+		getContentPane().add(lblGuillaumeCornutPierre, "cell 0 9,alignx center");
+		
+		// Pierre Cressant
+		JLabel lblPierreCressant = new JLabel("Pierre Cressant");
+		lblPierreCressant.setToolTipText("Amazing Piotr");
+		getContentPane().add(lblPierreCressant, "cell 2 9,alignx center");
+			
+		// Pierre Dupuis
+		JLabel lblPierreDupuis = new JLabel("Pierre Dupuis");
+		lblPierreDupuis.setToolTipText("Tremendous Boss");
+		getContentPane().add(lblPierreDupuis, "cell 0 10,alignx center");
+		
+		// Kévin Gravouil
+		JLabel lblKvinGravouil = new JLabel("Kévin Gravouil");
+		lblKvinGravouil.setToolTipText("Marvelous Keuv");
+		getContentPane().add(lblKvinGravouil, "cell 2 10,alignx center");
+			
+		// The frame is now centered relatively to Cytoscape
+		this.setLocationRelativeTo(Cytoscape.getDesktop()); 
+		
+		// Close window on escape key
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		escapeListener = new WindowCloseEscapeListener(this);
 		manager.addKeyEventDispatcher(escapeListener);
