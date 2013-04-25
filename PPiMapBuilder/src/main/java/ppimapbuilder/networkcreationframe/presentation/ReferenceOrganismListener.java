@@ -1,4 +1,4 @@
-package ppimapbuilder.gui.listener;
+package ppimapbuilder.networkcreationframe.presentation;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -6,22 +6,21 @@ import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 
-import ppimapbuilder.gui.CreateNetworkFrame;
 
 /**
  * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class CreateNetworkFrameReferenceOrganismListener implements ActionListener{
-	private CreateNetworkFrame createNetwork;
+public class ReferenceOrganismListener implements ActionListener{
+	private NetworkCreationFrame createNetwork;
 	private JCheckBox previous = null;
 	
 	/**
 	 * Create a reference organism combobox listener with reference to its parent window
 	 * @param window
 	 */
-	public CreateNetworkFrameReferenceOrganismListener(CreateNetworkFrame createNetwork) {
+	public ReferenceOrganismListener(NetworkCreationFrame createNetwork) {
 		this.createNetwork = createNetwork;
 	}
 	

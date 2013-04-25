@@ -1,25 +1,22 @@
-package ppimapbuilder.gui.listener;
+package ppimapbuilder.menu.presentation;
 
 import cytoscape.util.CytoscapeAction;
 import java.awt.event.ActionEvent;
-
-import ppimapbuilder.gui.Credits;
+import ppimapbuilder.menu.PMBMenuControl;
 
 /**
  * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class CreditsMenuAction extends CytoscapeAction {
+public class CreditMenuAction extends CytoscapeAction {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Credits myFrame = Credits.Instance(); // Frame for the credits
-
 	/**
 	 * Default constructor
 	 */
-	public CreditsMenuAction() {
+	public CreditMenuAction() {
 		super();
 	}
 	
@@ -28,6 +25,6 @@ public class CreditsMenuAction extends CytoscapeAction {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		myFrame.setVisible(true); // Set the frame visible
+		PMBMenuControl.openCreditFrame();
 	}
 }

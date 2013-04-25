@@ -1,4 +1,4 @@
-package ppimapbuilder.gui;
+package ppimapbuilder.creditframe.presentation;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -10,7 +10,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
-import ppimapbuilder.gui.listener.WindowCloseEscapeListener;
 import javax.swing.border.EmptyBorder;
 
 import cytoscape.Cytoscape;
@@ -22,19 +21,19 @@ import java.awt.Color;
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
  *
  */
-public class Credits extends JFrame {
+public class CreditFrame extends JFrame {
 
 	private static final long serialVersionUID = 1L; // Instance of the ppimapbuilder menu to prevent several instances 
 	
-	private static Credits _instance = null; // Instance of the PPiMapBuilder menu to prevent several instances 
+	private static CreditFrame _instance = null; // Instance of the PPiMapBuilder menu to prevent several instances 
 
-	private WindowCloseEscapeListener escapeListener;
+	private EscapeCloseListener escapeListener;
 	
 	/**
 	 * Default constructor which is private to prevent several instances
 	 * Create the entire credits frame
 	 */
-	private Credits() {
+	private CreditFrame() {
 		Dimension size = new Dimension(309, 372);
 		setMaximumSize(size);
 		setMinimumSize(size);
@@ -126,17 +125,17 @@ public class Credits extends JFrame {
 		
 		// Close window on escape
 		KeyboardFocusManager manager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
-		escapeListener = new WindowCloseEscapeListener(this);
+		escapeListener = new EscapeCloseListener(this);
 		manager.addKeyEventDispatcher(escapeListener);
 	}
 	
 	/**
-	 * Method to access the unique instance of Credits
+	 * Method to access the unique instance of CreditFrame
 	 * @return _instance
 	 */
-	public static Credits Instance() {
+	public static CreditFrame Instance() {
 		if (_instance == null)
-			_instance = new Credits();
+			_instance = new CreditFrame();
 		return _instance;
 	}
 }

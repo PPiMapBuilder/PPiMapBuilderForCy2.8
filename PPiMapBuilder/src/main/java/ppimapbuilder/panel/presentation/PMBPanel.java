@@ -1,11 +1,11 @@
-package ppimapbuilder.gui;
+package ppimapbuilder.panel.presentation;
 
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.Set;
 import javax.swing.*;
-import ppimapbuilder.Mediator;
-import ppimapbuilder.PMBNode;
+import ppimapbuilder.network.NetworkControl;
+import ppimapbuilder.network.presentation.PMBNode;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
@@ -22,7 +22,7 @@ public class PMBPanel extends JPanel {
 	private static final long serialVersionUID = 1;
 	
 	private static PMBPanel _instance = null; // Instance of the ppimapbuilder panel to prevent several instances 
-	private Mediator myMediator;
+	private NetworkControl myMediator;
 	
 	private JLabel lblGeneName, lblGeneNameValue, lblUniprotId, lblUniprotIdValue, lblDescription, lblDescriptionValue, lblCellularComponent, lblCcList, lblBiologicalProcesses, lblBpList, lblMolecularFunction, lblMfList;  
 	private JPanel proteinInfoPanel, geneOntologyPanel;
@@ -146,9 +146,10 @@ public class PMBPanel extends JPanel {
 				lblMfList.setText("");
 								
 				//PMBNode myNode = (PMBNode) selectedNodes.iterator().next();
-				myMediator = Mediator.Instance();
+				myMediator = NetworkControl.Instance();
 				
-				PMBNode myNode = myMediator.getNode(selectedNodes.iterator().next().getIdentifier());
+				/* TODO : Retrieve node information from data panel (when the attributes will be done...) */
+				PMBNode myNode = myMediator.getNode(current_network, selectedNodes.iterator().next().getIdentifier());
 				
 				lblGeneNameValue.setText(myNode.getGeneName());
 				lblUniprotIdValue.setText(myNode.getUniprotId());

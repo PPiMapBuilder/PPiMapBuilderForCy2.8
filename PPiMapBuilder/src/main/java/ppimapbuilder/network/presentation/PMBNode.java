@@ -1,4 +1,4 @@
-package ppimapbuilder;
+package ppimapbuilder.network.presentation;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;

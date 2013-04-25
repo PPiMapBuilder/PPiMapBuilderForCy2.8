@@ -1,4 +1,4 @@
-package ppimapbuilder.gui;
+package ppimapbuilder;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;

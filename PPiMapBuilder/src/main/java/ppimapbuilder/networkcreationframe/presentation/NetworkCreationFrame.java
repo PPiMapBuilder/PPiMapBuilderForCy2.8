@@ -1,4 +1,4 @@
-package ppimapbuilder.gui;
+package ppimapbuilder.networkcreationframe.presentation;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -6,10 +6,8 @@ import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
-
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
@@ -20,19 +18,11 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.SpringLayout;
 import java.awt.Component;
 import javax.swing.border.EmptyBorder;
-
-import cytoscape.Cytoscape;
-import ppimapbuilder.gui.listener.CreateNetworkFrameReferenceOrganismListener;
-import ppimapbuilder.gui.listener.CreateNetworkFrameSubmitListener;
-import ppimapbuilder.ppidb.api.DBConnector;
-
 import javax.swing.JCheckBox;
 import java.awt.Color;
 import javax.swing.border.MatteBorder;
 import javax.swing.border.LineBorder;
 import java.awt.Dimension;
-import java.rmi.ServerError;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -40,20 +30,18 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.BoxLayout;
-
 import java.awt.Font;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.IOException;
 
 /**
  * Network creation window
  */
-public class CreateNetworkFrame {
+public class NetworkCreationFrame {
 	// Instance of the PPiMapBuilder frame to prevent several instances
-	private static CreateNetworkFrame _instance = null; 
+	private static NetworkCreationFrame _instance = null; 
 	
 	// The create network window
 	private JFrame window;
@@ -64,7 +52,7 @@ public class CreateNetworkFrame {
 
 	// Uniprot identifiers text area and reference organism combobox
 	private JTextArea txaIdentifiers;
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 
 	// Databases and organism panels containing all checkbox
 	private JPanel panSourceDatabases;
@@ -75,36 +63,24 @@ public class CreateNetworkFrame {
 	private CompoundBorder panelBorder;
 	private CompoundBorder fancyBorder;
 
-	private DBConnector myDBConnector;
-
 	/**
 	 * Create the application.
 	 */
-	private CreateNetworkFrame() {
+	private NetworkCreationFrame() {
 		window = new JFrame("PPiMapBuilder - Create a network");
 
-		try {
-			myDBConnector = DBConnector.Instance();
-		} catch (SQLException e) {
-			showError("Connection to database failed", "Connection error!");
-			e.printStackTrace();
-		} catch (IOException e) {
-			showError("Server config missing!", "Server config");
-			e.printStackTrace();
-		}
-		
 		// Create all component in the window
 		initialize();
 	}
 
 	/**
-	 * Method to access the unique instance of CreateNetworkFrame
+	 * Method to access the unique instance of NetworkCreationFrame
 	 * 
 	 * @return _instance
 	 */
-	public static CreateNetworkFrame Instance() {
+	public static NetworkCreationFrame Instance() {
 		if (_instance == null)
-			_instance = new CreateNetworkFrame();
+			_instance = new NetworkCreationFrame();
 		return _instance;
 	}
 
@@ -260,8 +236,8 @@ public class CreateNetworkFrame {
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 
 		// Reference organism combobox
-		comboBox = new JComboBox();
-		comboBox.addActionListener(new CreateNetworkFrameReferenceOrganismListener(this));
+		comboBox = new JComboBox<String>(); // TODO : check if organisms are always strings...
+		comboBox.addActionListener(new ReferenceOrganismListener(this));
 		
 		JLabel lblHelpRefOrganism = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
 		panMainForm.add(lblHelpRefOrganism, "cell 1 0");
@@ -345,7 +321,7 @@ public class CreateNetworkFrame {
 		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnSubmit, 5, SpringLayout.NORTH, panBottomForm);
 		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnSubmit, -50, SpringLayout.EAST, panBottomForm);
 		//Submit action listener
-		btnSubmit.addActionListener(new CreateNetworkFrameSubmitListener(this, myDBConnector));
+		btnSubmit.addActionListener(new SubmitListener());
 		//Add submit to panel
 		panBottomForm.add(btnSubmit);
 
@@ -364,6 +340,14 @@ public class CreateNetworkFrame {
 	}
 
 	/**
+	 * Organism hash accessor
+	 * @return the organism hash
+	 */
+	public LinkedHashMap<Integer, JCheckBox> getOrganisms() {
+		return organisms;
+	}
+
+	/**
 	 * 
 	 * @return list of database values
 	 */
@@ -377,15 +361,7 @@ public class CreateNetworkFrame {
 		
 		return databaseList;
 	}
-
-	/**
-	 * Organism hash accessor
-	 * @return the organism hash
-	 */
-	public LinkedHashMap<Integer, JCheckBox> getOrganisms() {
-		return organisms;
-	}
-
+	
 	/**
 	 * 
 	 * @return list of organism values
@@ -417,7 +393,7 @@ public class CreateNetworkFrame {
 		}
 		return identifierList;
 	}
-
+	
 	/**
 	 * Close the create network frame
 	 */
@@ -426,56 +402,36 @@ public class CreateNetworkFrame {
 	}
 	
 	/**
-	 * 
-	 * @throws ServerError
+	 * Get the JFrame window
+	 * @return the JFrame window
 	 */
-	public void open() {
-		if(!window.isVisible()) {
-			updateInterfaceWithDatabase();
-		}
-		window.setLocationRelativeTo(Cytoscape.getDesktop());
-		window.setVisible(true);
+	public JFrame getWindow() {
+		return window;
 	}
 	
-	/**
-	 * 
-	 * @throws ServerError
-	 */
-	private void updateInterfaceWithDatabase() {
+	public void clearFormFields() {
 		// Emptying form fields
 		txaIdentifiers.setText("Q49A88\nQ9VI74");
 		comboBox.removeAllItems();
 		panOtherOrganims.removeAll();
 		panSourceDatabases.removeAll();
+	}
 
+	public void updateLists(LinkedHashMap<String, Integer> orga, ArrayList<String> dbs) {
 		// Creation of the organism list
 		organisms = new LinkedHashMap<Integer, JCheckBox>();
-		try {
-			LinkedHashMap<String, Integer> orga = myDBConnector.getOrganisms();
-			for (Entry<String, Integer> entry : orga.entrySet()) {
-				JCheckBox j = new JCheckBox(entry.getKey(), true);
-				j.setBackground(Color.white);
-				organisms.put(entry.getValue(), j);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			showError("Connection to database failed", "Connection error");
-			return;
+		for (Entry<String, Integer> entry : orga.entrySet()) {
+			JCheckBox j = new JCheckBox(entry.getKey(), true);
+			j.setBackground(Color.white);
+			organisms.put(entry.getValue(), j);
 		}
 
 		// Creation of the database list
 		databases = new LinkedHashMap<String, JCheckBox>();
-		try {
-			ArrayList<String> dbs = myDBConnector.getDatabases();
-			for (String str : dbs) {
-				JCheckBox j = new JCheckBox(str, true);
-				j.setBackground(Color.white);
-				databases.put(str, j);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			showError("Connection to database failed", "Connection error");
-			return;
+		for (String str : dbs) {
+			JCheckBox j = new JCheckBox(str, true);
+			j.setBackground(Color.white);
+			databases.put(str, j);
 		}
 
 		// Filling reference organism Combobox and adding all organism checkbox
@@ -491,20 +447,7 @@ public class CreateNetworkFrame {
 			panSourceDatabases.add(cbxDb);
 	}
 	
-	/**
-	 * Get the JFrame window
-	 * @return the JFrame window
-	 */
-	public JFrame getWindow() {
-		return window;
-	}
 	
-	/**
-	 * Displays an error message using <i>JOptionPane</i>
-	 * @param message the error message
-	 * @param title the title of the error window
-	 */
-	private void showError(String message, String title) {
-		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), title, message, JOptionPane.ERROR_MESSAGE);
-	}
+	// TODO : getters for reference organism !
+
 }

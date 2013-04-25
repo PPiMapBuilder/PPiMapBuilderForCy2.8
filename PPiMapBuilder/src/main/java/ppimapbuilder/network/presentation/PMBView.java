@@ -1,4 +1,4 @@
-package ppimapbuilder;
+package ppimapbuilder.network.presentation;
 
 import giny.model.Edge;
 import giny.model.GraphPerspective;
@@ -14,6 +14,8 @@ import java.awt.event.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+
+import ppimapbuilder.network.NetworkControl;
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
@@ -37,7 +39,7 @@ import ding.view.NodeContextMenuListener;
 public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
-	private Mediator myMediator = Mediator.Instance();
+	private NetworkControl myMediator = NetworkControl.Instance();
 	
 	/**
 	 * Constructor
@@ -54,7 +56,7 @@ public class PMBView implements CyNetworkView {
 
 			public void mousePressed(MouseEvent e) { // When there is a click on this view
 				if ( ((DGraphView) Cytoscape.getCurrentNetworkView()).getPickedNodeView(e.getPoint ()) != null) { // If the click is on a node
-					myMediator.updatePanel(); // We update the panel
+					NetworkControl.Instance().updatePanel(); // We update the panel
 				}
 			}
 

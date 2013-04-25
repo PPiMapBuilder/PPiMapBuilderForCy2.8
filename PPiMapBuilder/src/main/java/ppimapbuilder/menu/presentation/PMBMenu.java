@@ -1,9 +1,7 @@
-package ppimapbuilder.gui;
+package ppimapbuilder.menu.presentation;
 
 import javax.swing.*;
 
-import ppimapbuilder.gui.listener.CreateNetworkMenuAction;
-import ppimapbuilder.gui.listener.CreditsMenuAction;
 
 /**
  * 
@@ -18,7 +16,7 @@ public class PMBMenu extends JMenu{
 	
 	private JMenuItem menuItem_create_network, menuItem_credits; // Menu item to create a new network and to display the credits
 	private CreateNetworkMenuAction myCreateNetworkAction; // Action to create a network
-	private CreditsMenuAction myCreditsAction; // Action to display the credit
+	private CreditMenuAction myCreditsAction; // Action to display the credit
 	
 	/**
 	 * Default constructor which is private to prevent several instances
@@ -32,7 +30,7 @@ public class PMBMenu extends JMenu{
 		menuItem_create_network.addActionListener(myCreateNetworkAction); // Link this action to the menu item
 		
 		menuItem_credits = new JMenuItem("About PPiMapBuilder"); // Create the menu item corresponding to the credits display
-		myCreditsAction = new CreditsMenuAction(); // Create the action
+		myCreditsAction = new CreditMenuAction(); // Create the action
 		menuItem_credits.addActionListener(myCreditsAction); // Link this action to the menu item
 		
 		this.add(menuItem_create_network); // Add the menu item to the main menu
