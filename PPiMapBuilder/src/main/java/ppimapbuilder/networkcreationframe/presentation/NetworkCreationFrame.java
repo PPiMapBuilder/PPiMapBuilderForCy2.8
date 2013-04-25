@@ -236,7 +236,7 @@ public class NetworkCreationFrame {
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 
 		// Reference organism combobox
-		comboBox = new JComboBox<String>(); // TODO : check if organisms are always strings...
+		comboBox = new JComboBox();
 		comboBox.addActionListener(new ReferenceOrganismListener(this));
 		
 		JLabel lblHelpRefOrganism = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
