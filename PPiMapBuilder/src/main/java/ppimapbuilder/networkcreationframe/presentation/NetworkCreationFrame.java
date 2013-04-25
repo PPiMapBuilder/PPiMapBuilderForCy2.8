@@ -5,18 +5,15 @@ import javax.swing.JScrollPane;
 import java.awt.BorderLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import net.miginfocom.swing.MigLayout;
-import javax.swing.SpringLayout;
-import java.awt.Component;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JCheckBox;
 import java.awt.Color;
@@ -31,7 +28,6 @@ import javax.swing.plaf.basic.BasicSplitPaneDivider;
 import javax.swing.plaf.basic.BasicSplitPaneUI;
 import javax.swing.BoxLayout;
 import java.awt.Font;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -52,7 +48,7 @@ public class NetworkCreationFrame {
 
 	// Uniprot identifiers text area and reference organism combobox
 	private JTextArea txaIdentifiers;
-	private JComboBox<String> comboBox;
+	private JComboBox cbReferenceOrganism;
 
 	// Databases and organism panels containing all checkbox
 	private JPanel panSourceDatabases;
@@ -175,46 +171,39 @@ public class NetworkCreationFrame {
 		// Uniprot identifiers left panel
 		JPanel panIndentifiers = new JPanel();
 		panIndentifiers.setBorder(new CompoundBorder(new MatteBorder(0, 5, 0, 0, (Color) darkForeground), panelBorder));
-		panIndentifiers.setLayout(new BorderLayout(0, 0));
+		panIndentifiers.setLayout(new MigLayout("inset 10", "[129px,grow][14px:14px:14px,right]", "[20px][366px,grow][35px]"));
 
 		// Label "Uniprot identifiers"
 		JLabel lblIdentifiers = new JLabel("Uniprot Identifiers\n");
-		lblIdentifiers.setToolTipText("Please enter here uniprot protein indentifier(s) (one per line)");
-		panIndentifiers.add(lblIdentifiers, BorderLayout.NORTH);
-		lblIdentifiers.setBorder(new EmptyBorder(2, 5, 2, 5));
+		panIndentifiers.add(lblIdentifiers, "flowx,cell 0 0,alignx left,aligny top");
+
+		// Uniprot identifiers Help Icon
+		JLabel lblHelpUniprotIdentifiers = new HelpIcon("Please enter Uniprot identifiers (one per line)");
+		lblHelpUniprotIdentifiers.setHorizontalAlignment(SwingConstants.RIGHT);
+		panIndentifiers.add(lblHelpUniprotIdentifiers, "cell 1 0");
 
 		// Text area uniprot identifiers
-		txaIdentifiers = new JTextArea();
+		txaIdentifiers = new JTextArea(); 
 		txaIdentifiers.setFont(new Font("Monospaced", Font.PLAIN, 13));
 		txaIdentifiers.setBorder(new EmptyBorder(5, 5, 5, 5));
-		txaIdentifiers.setMargin(new Insets(10, 10, 10, 10));
 
 		// Scroll pane around the text area
 		JScrollPane scrollPane = new JScrollPane(txaIdentifiers);
 		scrollPane.setViewportBorder(new EmptyBorder(0, 0, 0, 0));
 		scrollPane.setBorder(fancyBorder);
-		panIndentifiers.add(scrollPane, BorderLayout.CENTER);
+		panIndentifiers.add(scrollPane, "cell 0 1 2 1,grow");
 
-		// Panel with clear button
-		JPanel panClear = new JPanel();
-		panClear.setPreferredSize(new Dimension(0, 35));
-		FlowLayout fl_panClear = (FlowLayout) panClear.getLayout();
-		fl_panClear.setAlignment(FlowLayout.RIGHT);
-		panClear.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panClear.setBorder(new EmptyBorder(0, 0, 0, 0));
-		panIndentifiers.add(panClear, BorderLayout.SOUTH);
-
-		// Clear button
-		JButton btnClear = new JButton("Clear");
-		btnClear.setMnemonic(KeyEvent.VK_CLEAR);
-		btnClear.setAlignmentX(Component.RIGHT_ALIGNMENT);
-		panClear.add(btnClear);
-		btnClear.setPreferredSize(new Dimension(90, 27));
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+		// Cancel button
+		JButton button = new JButton("Clear");
+		button.setMnemonic(KeyEvent.VK_CLEAR);
+		button.setAlignmentX(1.0f);
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
 				txaIdentifiers.setText("");
 			}
 		});
+		panIndentifiers.add(button, "cell 0 2 2 1,alignx right,aligny center");
 
 		return panIndentifiers;
 	}
@@ -229,25 +218,29 @@ public class NetworkCreationFrame {
 		JPanel panMainForm = new JPanel();
 		panMainForm.setMinimumSize(new Dimension(290, 10));
 		panMainForm.setBorder(new CompoundBorder(new MatteBorder(0, 0, 0, 5, (Color) darkForeground), panelBorder));
-		panMainForm.setLayout(new MigLayout("insets 5 5 5 5", "[49.00,grow][]", "[][][][grow][][grow]"));
+		panMainForm.setLayout(new MigLayout("inset 10", "[49.00,grow][14px:14px:14px,right]", "[][][][grow][][grow]"));
 
 		// Reference organism label
 		JLabel lblReferenceOrganism = new JLabel("Reference organism:");
 		panMainForm.add(lblReferenceOrganism, "cell 0 0");
 
 		// Reference organism combobox
-		comboBox = new JComboBox();
-		comboBox.addActionListener(new ReferenceOrganismListener(this));
-		
-		JLabel lblHelpRefOrganism = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
+		cbReferenceOrganism = new JComboBox();
+		cbReferenceOrganism.addActionListener(new ReferenceOrganismListener(this));
+
+		// Reference organism Help Icon
+		JLabel lblHelpRefOrganism = new HelpIcon("Select here the organism from which the protein you entered come from");
+		lblHelpRefOrganism.setHorizontalAlignment(SwingConstants.RIGHT);
 		panMainForm.add(lblHelpRefOrganism, "cell 1 0");
-		panMainForm.add(comboBox, "cell 0 1 2 1,growx");
+		panMainForm.add(cbReferenceOrganism, "cell 0 1 2 1,growx");
 
 		// Other organisms label
 		JLabel lblHomologOrganism = new JLabel("Other organisms:");
 		panMainForm.add(lblHomologOrganism, "cell 0 2");
-		
-		JLabel lblHelpOtherOrganism = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
+
+		// Other organisms Help Icon
+		JLabel lblHelpOtherOrganism = new HelpIcon("Select here the other organism in which you want to search homologous interactions");
+		lblHelpOtherOrganism.setHorizontalAlignment(SwingConstants.RIGHT);
 		panMainForm.add(lblHelpOtherOrganism, "cell 1 2");
 
 		// Other organisms scrollpane containing a panel that will contain checkbox at display
@@ -266,8 +259,10 @@ public class NetworkCreationFrame {
 		// Source databases label
 		javax.swing.JLabel lblSourceDatabases = new javax.swing.JLabel("Source databases:");
 		panMainForm.add(lblSourceDatabases, "cell 0 4");
-		
-		JLabel lblHelpSourceDatabase = new JLabel(new ImageIcon(getClass().getResource("/img/help.png")));
+
+		// Source databases Help Icon
+		JLabel lblHelpSourceDatabase = new HelpIcon("Select here the databases from which the interactions will be retrieved");
+		lblHelpSourceDatabase.setHorizontalAlignment(SwingConstants.RIGHT);
 		panMainForm.add(lblHelpSourceDatabase, "cell 1 4");
 
 		// Source databases scrollpane containing a panel that will contain checkbox at display
@@ -295,35 +290,28 @@ public class NetworkCreationFrame {
 		
 		//Bottom Panel
 		panBottomForm.setBackground(darkForeground);
-		panBottomForm.setPreferredSize(new Dimension(10, 39));
+		panBottomForm.setPreferredSize(new Dimension(0, 42));
 		panBottomForm.setBorder(new EmptyBorder(0, 0, 0, 0));
-		SpringLayout sl_panBottomForm = new SpringLayout();
-		panBottomForm.setLayout(sl_panBottomForm);
-
+		
 		//Cancel Button
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.setMnemonic(KeyEvent.VK_CANCEL);
-		btnCancel.setPreferredSize(new Dimension(100, 29));
-		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnCancel, 5, SpringLayout.NORTH, panBottomForm);
-		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnCancel, -180, SpringLayout.EAST, panBottomForm);
 		//Cancel action listener
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				close();
 			}
 		});
+		panBottomForm.setLayout(new MigLayout("inset 5", "[grow][100px][][100px]", "[29px]"));
 		//Add cancel to panel
-		panBottomForm.add(btnCancel);
+		panBottomForm.add(btnCancel, "cell 1 0,alignx center,aligny center");
 
 		//Submit Button
 		JButton btnSubmit = new JButton("Submit");
-		btnSubmit.setPreferredSize(new Dimension(100, 29));
-		sl_panBottomForm.putConstraint(SpringLayout.NORTH, btnSubmit, 5, SpringLayout.NORTH, panBottomForm);
-		sl_panBottomForm.putConstraint(SpringLayout.EAST, btnSubmit, -50, SpringLayout.EAST, panBottomForm);
 		//Submit action listener
 		btnSubmit.addActionListener(new SubmitListener());
 		//Add submit to panel
-		panBottomForm.add(btnSubmit);
+		panBottomForm.add(btnSubmit, "cell 3 0,alignx center,aligny center");
 
 		//Set submit as default button
 		window.getRootPane().setDefaultButton(btnSubmit);
@@ -348,10 +336,10 @@ public class NetworkCreationFrame {
 	}
 
 	/**
-	 * 
+	 * Get the list of selected databases
 	 * @return list of database values
 	 */
-	public ArrayList<String> getDatabaseValues() {
+	public ArrayList<String> getSelectedDatabases() {
 		ArrayList<String> databaseList = new ArrayList<String>();
 		
 		// For each entry of the database linkedHashmap
@@ -363,22 +351,38 @@ public class NetworkCreationFrame {
 	}
 	
 	/**
-	 * 
-	 * @return list of organism values
+	 * Get the list of selected organisms
+	 * @return list of organism taxid
 	 */
-	public ArrayList<Integer> getOrganismValues() {
+	public ArrayList<Integer> getSelectedOrganisms() {
 		ArrayList<Integer> organismList = new ArrayList<Integer>();
 		
 		// For each entry of the organism linkedHashmap
 		for (Entry<Integer, JCheckBox> entry : this.getOrganisms().entrySet())
 			if (entry.getValue().isSelected()) // If the checkbox is selected
-				organismList.add(entry.getKey()); // The organism name is add into the list to be returned
+				organismList.add(entry.getKey()); // The organism taxid is added into the list to be returned
 
 		return organismList;
 	}
+	
+	/**
+	 * Get the selected reference organism
+	 * @return the reference organism taxid
+	 */
+	public Integer getSelectedReferenceOrganism() {
+		//TODO: Test this method
+		String refOrganism = (String)this.cbReferenceOrganism.getSelectedItem();
+		
+		// For each entry of the organism linkedHashmap
+		for (Entry<Integer, JCheckBox> entry : this.getOrganisms().entrySet())
+			if (entry.getValue().getName() == refOrganism) // If the organism is the organism selected 
+				return entry.getKey(); // The organism taxid is returned
+		return null; //error (shouldn't happen)
+	}
+	
 
 	/**
-	 * 
+	 * Get the list of protein entred by the user in the text area.
 	 * @return list of protein identifiers
 	 */
 	public ArrayList<String> getIdentifiers() throws ArrayStoreException {
@@ -412,7 +416,7 @@ public class NetworkCreationFrame {
 	public void clearFormFields() {
 		// Emptying form fields
 		txaIdentifiers.setText("Q49A88\nQ9VI74");
-		comboBox.removeAllItems();
+		cbReferenceOrganism.removeAllItems();
 		panOtherOrganims.removeAll();
 		panSourceDatabases.removeAll();
 	}
@@ -436,18 +440,14 @@ public class NetworkCreationFrame {
 
 		// Filling reference organism Combobox and adding all organism checkbox
 		for (JCheckBox checkOrga : organisms.values()) {
-			comboBox.addItem(checkOrga.getText());
+			cbReferenceOrganism.addItem(checkOrga.getText());
 			panOtherOrganims.add(checkOrga);
 		}
 		// selecting Homo sapiens in the organism list
-		comboBox.setSelectedItem("Homo sapiens");
+		cbReferenceOrganism.setSelectedItem("Homo sapiens");
 
 		// Adding all database checkbox
 		for (JCheckBox cbxDb : databases.values())
 			panSourceDatabases.add(cbxDb);
 	}
-	
-	
-	// TODO : getters for reference organism !
-
 }

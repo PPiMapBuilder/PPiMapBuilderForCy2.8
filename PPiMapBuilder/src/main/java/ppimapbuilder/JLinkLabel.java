@@ -22,12 +22,23 @@ public class JLinkLabel extends JLabel {
 			public void mouseEntered(MouseEvent arg0) {}
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				if (Desktop.isDesktopSupported()) {
-        			Desktop desktop = Desktop.getDesktop();
-        			try {
-        				desktop.browse(new URI(url));
-        			} catch (Exception ex) {}
-        		}
+				try {
+					if (Desktop.isDesktopSupported()) {
+	                    Desktop desktop = Desktop.getDesktop();
+	                    desktop.browse(new URI(url));
+					} else {
+						String OS = System.getProperty("os.name").toLowerCase();
+						
+						if (OS.indexOf("win") >= 0)
+	                        Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler " + url);
+						if(OS.indexOf("mac") >= 0)
+							Runtime.getRuntime().exec("open " + url);
+						else if(OS.indexOf("nix") >= 0 || OS.indexOf("nux") >= 0 || OS.indexOf("aix") > 0 )
+	                        Runtime.getRuntime().exec("x-www-browser " + url);
+					}
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
 			}
 		});
 	}

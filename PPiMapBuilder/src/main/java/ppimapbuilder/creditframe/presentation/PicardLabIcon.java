@@ -1,8 +1,6 @@
 package ppimapbuilder.creditframe.presentation;
 
 import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import ppimapbuilder.JLinkLabel;
 
 /**

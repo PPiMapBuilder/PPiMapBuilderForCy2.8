@@ -55,10 +55,10 @@ public class NetworkCreationFrameControl {
 		}
 		
 		// DB list
-		dbList = myFrame.getDatabaseValues(); // Retrieve the database list
+		dbList = myFrame.getSelectedDatabases(); // Retrieve the database list
 		
 		// Orga list
-		orgaList = myFrame.getOrganismValues(); // Retrieve the organism list
+		orgaList = myFrame.getSelectedOrganisms(); // Retrieve the organism list
 		
 		// TODO : distinguish the reference organism !
 		NetworkControl.Instance().createNetwork(poiList, dbList, orgaList);
