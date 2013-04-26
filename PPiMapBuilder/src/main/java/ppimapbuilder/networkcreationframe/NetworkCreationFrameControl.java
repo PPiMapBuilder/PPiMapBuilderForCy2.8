@@ -63,6 +63,7 @@ public class NetworkCreationFrameControl {
 		// TODO : distinguish the reference organism !
 		NetworkControl.Instance().createNetwork(poiList, dbList, orgaList);
 		
+		
 	}
 	
 	public static void closeFrame() {

@@ -39,7 +39,6 @@ import ding.view.NodeContextMenuListener;
 public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
-	private NetworkControl myMediator = NetworkControl.Instance();
 	
 	/**
 	 * Constructor
