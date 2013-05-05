@@ -42,57 +42,37 @@ public class DBConnector {
      * located in the resources folder. It looks like
      * "jdbc:postgresql://<localhost>/<dbname>"
      */
-    private String url;
+    private final String url;
     /**
      * Database user used by JDBC. Must me stored in a "server.cfg" at the
      * second line,located in the resources folder.
      */
-    private String user;
+    private final String user;
     /**
      * Database password used by JDBC. Must me stored in a "server.cfg",at the
      * third line , located in the resources folder.
      */
-    private String password;
+    private final String password;
     /**
-     * SQL query for selecting every data. .getAllData() methodes add WHERE
-     * clause to this String and execute the query.
+     * Prepared statement used to retrieve homologies.
      */
-    private final String query;
     private final PreparedStatement pstmt;
 
     /**
      * Default constructor
      */
     private DBConnector() throws SQLException, IOException {
-        this.getServerConfig();
 
-        con = DriverManager.getConnection(this.url, this.user, this.password);
-        this.query = "select distinct "
-                + "    interaction.id as \"id\", "
-                + "    p1.uniprot_id as \"uniprotidA\", "
-                + "    p1.gene_name as \"interactorA\", "
-                + "    p1.organism_id as \"taxidA\", "
-                + "    org1.name as \"orgaA\", "
-                + "    p2.uniprot_id as \"uniprotidB\", "
-                + "    p2.gene_name as \"interactorB\", "
-                + "    p2.organism_id as \"taxidB\", "
-                + "    org2.name as \"orgaB\", "
-                + "    db.name as \"srcdb\", "
-                + "    expsys.name as \"expsys\", "
-                + "    pub.pubmed_id as \"pubmed\" "
-                + "from interaction "
-                + "    join protein as \"p1\" on interaction.protein_id1 = p1.id "
-                + "    join protein as \"p2\" on interaction.protein_id2 = p2.id "
-                + "    join organism as \"org1\" on p1.organism_id = org1.tax_id "
-                + "    join organism as \"org2\" on p2.organism_id = org2.tax_id "
-                + "    join link_data_interaction as \"lnk\" on lnk.interaction_id = interaction.id "
-                + "    join interaction_data as \"intdata\" on lnk.interaction_data_id = intdata.id "
-                + "    join source_database as \"db\" on intdata.db_source_name = db.name "
-                + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system "
-                + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id ";
+        // get server config
+        BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/server.cfg")));
+        this.url = br.readLine();
+        this.user = br.readLine();
+        this.password = br.readLine();
+        br.close();
 
-        st = con.createStatement();
-
+        // connect the database then prepare statement
+        this.con = DriverManager.getConnection(this.url, this.user, this.password);
+        this.st = con.createStatement();
         this.pstmt = this.con.prepareStatement(""
                 + "select\n"
                 + "	protein.id as \"ptn_id\",\n"
@@ -108,29 +88,6 @@ public class DBConnector {
                 + "	where p.id = ?\n"
                 + ")\n"
                 + "AND protein.organism_id = ?");
-
-
-    }
-
-    /**
-     * Retrieve server configuration from "server.cfg" file. This file must be
-     * located in the resource folder.
-     *
-     * @throws IOException
-     */
-    private void getServerConfig() throws IOException {
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/server.cfg")));
-        } catch (Exception e) {
-            throw new IOException();
-        }
-
-        this.url = br.readLine();
-        this.user = br.readLine();
-        this.password = br.readLine();
-
-        br.close();
     }
 
     /**
@@ -196,26 +153,10 @@ public class DBConnector {
     }
 
     /**
-     * Get data about a protein identified by its UniprotID.
-     *
-     * @param uniprot UniprotID
-     * @return SQLResult
-     * @throws SQLExeception
-     */
-    public SQLResult getAllData(String uniprot) throws SQLException {
-
-        return new SQLResult(st.executeQuery(this.query + " where "
-                + "    ( p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "' )"
-                + " AND org1.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
-                + " AND org2.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
-                + " AND db.name IN ('hprd','biogrid', 'intact', 'dip', 'bind', 'mint')"));
-    }
-
-    /**
      * Get data about a protein identified by its UniprotID from a list of
      * source databases and a list of organisms. Available fiels: p1_id,
-     * p1_gene_name, p1_uniprot_id, p1_taxid, p2_id, p2_gene_name,
-     * p2_uniprot_id, p2_taxid
+     * p1_gene_name, p1_uniprot_id, p1_taxid, p1_org_name, p2_id, p2_gene_name,
+     * p2_uniprot_id, p2_taxid, p2_org_name srcdb, expsys, pubmed
      *
      * @param uniprot
      * @param taxIdRef
@@ -226,66 +167,66 @@ public class DBConnector {
      */
     public SQLResult getAllData(String uniprot, int taxIdRef, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
         String q = ""
-                + "	select\n"
-                + "		interaction.id as \"id\",\n"
-                + "		p1.id as \"p1_id\",\n"
-                + "		p1.gene_name as \"p1_gene_name\",\n"
-                + "		p1.uniprot_id as \"p1_uniprot_id\",\n"
-                + "		p1.organism_id as \"p1_taxid\",\n"
-                + "		p2.id as \"p2_id\",\n"
-                + "		p2.gene_name as \"p2_gene_name\",\n"
-                + "		p2.uniprot_id as \"p2_uniprot_id\",\n"
-                + "		p2.organism_id as \"p2_taxid\"\n"
-                + "	from interaction\n"
-                + "	join protein as \"p1\" on interaction.protein_id1 = p1.id\n"
-                + "	join protein as \"p2\" on interaction.protein_id2 = p2.id\n"
-                + "	join organism as \"org1\" on p1.organism_id = org1.tax_id\n"
-                + "	join organism as \"org2\" on p2.organism_id = org2.tax_id\n"
-                + "	where interaction.protein_id1 IN (\n"
-                + "		select protein.id\n"
-                + "		from homology\n"
-                + "		full join protein on protein.id = homology.ptn_id\n"
-                + "		where homology.h_id in (\n"
-                + "			select h.h_id\n"
-                + "			from protein as \"p\"\n"
-                + "			join homology as \"h\" on p.id = h.ptn_id\n"
-                + "			where p.uniprot_id = '" + uniprot + "'\n"
+                + "	SELECT\n"
+                + "		interaction.id AS \"id\",\n"
+                + "		p1.id AS \"p1_id\",\n"
+                + "		p1.gene_name AS \"p1_gene_name\",\n"
+                + "		p1.uniprot_id AS \"p1_uniprot_id\",\n"
+                + "		p1.organism_id AS \"p1_taxid\",\n"
+                + "		org1.name AS \"p1_org_name\",\n"
+                + "		p2.id AS \"p2_id\",\n"
+                + "		p2.gene_name AS \"p2_gene_name\",\n"
+                + "		p2.uniprot_id AS \"p2_uniprot_id\",\n"
+                + "		p2.organism_id AS \"p2_taxid\",\n"
+                + "		org2.name AS \"p2_org_name\",\n"
+                + "		db.name AS \"srcdb\",\n"
+                + "		expsys.name AS \"expsys\",\n"
+                + "		pub.pubmed_id AS \"pubmed\"\n"
+                + "	FROM interaction\n"
+                + "		join protein AS \"p1\" ON interaction.protein_id1 = p1.id\n"
+                + "		join protein AS \"p2\" ON interaction.protein_id2 = p2.id\n"
+                + "		join organism AS \"org1\" ON p1.organism_id = org1.tax_id\n"
+                + "		join organism AS \"org2\" ON p2.organism_id = org2.tax_id\n"
+                + "		join link_data_interaction AS \"lnk\" ON lnk.interaction_id = interaction.id\n"
+                + "		join interaction_data AS \"intdata\" ON lnk.interaction_data_id = intdata.id\n"
+                + "		join source_database AS \"db\" ON intdata.db_source_name = db.name\n"
+                + "		join experimental_system AS \"expsys\" ON expsys.name = intdata.experimental_system\n"
+                + "		join publication AS \"pub\" ON pub.pubmed_id = intdata.pubmed_id\n"
+                + "	WHERE interaction.protein_id1 IN (\n"
+                + "		SELECT protein.id\n"
+                + "		FROM homology\n"
+                + "		JOIN protein on protein.id = homology.ptn_id\n"
+                + "		WHERE homology.h_id IN (\n"
+                + "			SELECT h.h_id\n"
+                + "			FROM protein AS \"p\"\n"
+                + "			JOIN homology AS \"h\" ON p.id = h.ptn_id\n"
+                + "			WHERE p.uniprot_id = '" + uniprot + "'\n"
                 + "		)\n"
                 + "		UNION\n"
-                + "		select protein.id\n"
-                + "		from protein\n"
-                + "		where protein.uniprot_id = '" + uniprot + "'\n"
+                + "		SELECT protein.id\n"
+                + "		FROM protein\n"
+                + "		WHERE protein.uniprot_id = '" + uniprot + "'\n"
                 + "	) \n"
                 + "	OR interaction.protein_id2\n"
-                + "	 IN (\n"
-                + "		select protein.id\n"
-                + "		from homology\n"
-                + "		full join protein on protein.id = homology.ptn_id\n"
-                + "		where homology.h_id in (\n"
-                + "			select h.h_id\n"
-                + "			from protein as \"p\"\n"
-                + "			join homology as \"h\" on p.id = h.ptn_id\n"
-                + "			where p.uniprot_id = '" + uniprot + "'\n"
+                + "	IN (\n"
+                + "		SELECT protein.id\n"
+                + "		FROM homology\n"
+                + "		JOIN protein ON protein.id = homology.ptn_id\n"
+                + "		WHERE homology.h_id IN (\n"
+                + "			SELECT h.h_id\n"
+                + "			FROM protein AS \"p\"\n"
+                + "			JOIN homology AS \"h\" on p.id = h.ptn_id\n"
+                + "			WHERE p.uniprot_id = '" + uniprot + "'\n"
                 + "		)\n"
                 + "		UNION\n"
-                + "		select protein.id\n"
-                + "		from protein\n"
-                + "		where protein.uniprot_id = '" + uniprot + "'\n"
-                + "	) \n"
-                + "	and ( (p1.organism_id = " + taxIdRef + ") or (p2.organism_id = " + taxIdRef + ") )";
-
-
-        /*
-         q += " AND org1.tax_id IN ("
-         + this.formatInClause(orgs)
-         + ") "
-         + " AND org2.tax_id IN ("
-         + this.formatInClause(orgs)
-         + ") "
-         + "AND db.name IN ("
-         + this.formatInClause(dbs)
-         + ") ";
-         */
+                + "		SELECT protein.id\n"
+                + "		FROM protein\n"
+                + "		WHERE protein.uniprot_id = '" + uniprot + "'\n"
+                + "	)\n"
+                + "	AND ( (p1.organism_id = " + taxIdRef + ") OR (p2.organism_id = " + taxIdRef + ") )\n"
+                + "	AND org1.tax_id IN (" + this.formatInClause(orgs) + ")\n"
+                + "	AND org2.tax_id IN (" + this.formatInClause(orgs) + ")\n"
+                + "	AND db.name IN (" + this.formatInClause(dbs) + ")\n";
 
         System.out.println(q);
         return new SQLResult(st.executeQuery(q));
@@ -333,10 +274,6 @@ public class DBConnector {
      */
     public Set<String> getKeys(SQLResult sqlr) {
         return sqlr.keySet();
-    }
-
-    public String getQuery() {
-        return query;
     }
 
     @Override
