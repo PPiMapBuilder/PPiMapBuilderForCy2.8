@@ -1,109 +1,40 @@
 package ppimapbuilder.panel.presentation;
 
+import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.Set;
-import javax.swing.*;
-import ppimapbuilder.network.NetworkControl;
-import ppimapbuilder.network.presentation.PMBNode;
-import ppimapbuilder.panel.PMBPanelControl;
-import cytoscape.CyNetwork;
-import cytoscape.CyNode;
-import cytoscape.Cytoscape;
-import javax.swing.border.TitledBorder;
-import java.awt.Component;
+import java.awt.Insets;
 
-/**
- * 
- * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
- *
- */
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+
+import net.miginfocom.swing.MigLayout;
+import ppimapbuilder.network.presentation.PMBNode;
+import cytoscape.CyEdge;
+import javax.swing.ScrollPaneConstants;
+
+/** @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL */
 public class PMBPanel extends JPanel {
 
 	private static final long serialVersionUID = 1;
 	
 	private static PMBPanel _instance = null; // Instance of the ppimapbuilder panel to prevent several instances 
 
-	private JLabel lblGeneName, lblGeneNameValue, lblUniprotId, lblUniprotIdValue, lblDescription, lblDescriptionValue, lblCellularComponent, lblCcList, lblBiologicalProcesses, lblBpList, lblMolecularFunction, lblMfList;  
+	private JLabel lblCellularComponent, lblBiologicalProcesses, lblMolecularFunction;  
+	private JTextLabel lblGeneNameValue, lblUniprotIdValue, lblDescriptionValue;
 	private JPanel proteinInfoPanel, geneOntologyPanel;
 	
-	/**
-	 * Default constructor which is private to prevent several instances
-	 * Creates a panel and add the different components
-	 */
-	private PMBPanel() {
-		super();
-		this.setName("PPiMapBuilder");
-		
-		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		
-		// Protein label
-		
-		proteinInfoPanel = new JPanel();
-		proteinInfoPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-		proteinInfoPanel.setLayout(new BoxLayout(proteinInfoPanel, BoxLayout.Y_AXIS));
-		proteinInfoPanel.setBorder(new TitledBorder(null, "Protein", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		proteinInfoPanel.setPreferredSize(new Dimension(300, 300));
-		
-		lblGeneName = new JLabel();
-		lblGeneName.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		proteinInfoPanel.add(lblGeneName);
-		
-		lblGeneNameValue = new JLabel();
-		proteinInfoPanel.add(lblGeneNameValue);
-		
-		lblUniprotId = new JLabel();
-		lblUniprotId.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		proteinInfoPanel.add(lblUniprotId);
-		
-		lblUniprotIdValue = new JLabel();
-		proteinInfoPanel.add(lblUniprotIdValue);
-		
-		lblDescription = new JLabel();
-		lblDescription.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		proteinInfoPanel.add(lblDescription);
-		
-		lblDescriptionValue = new JLabel();
-		proteinInfoPanel.add(lblDescriptionValue);
-		
-		proteinInfoPanel.setVisible(false);
-		
-		// Gene Ontology panel
-		geneOntologyPanel = new JPanel();
-		geneOntologyPanel.setLayout(new BoxLayout(geneOntologyPanel, BoxLayout.Y_AXIS));
-		geneOntologyPanel.setBorder(new TitledBorder(null, "Gene Ontology", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		geneOntologyPanel.setPreferredSize(new Dimension(300, 300));
-		
-		lblCellularComponent = new JLabel();
-		lblCellularComponent.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		geneOntologyPanel.add(lblCellularComponent);
-		
-		lblCcList = new JLabel();
-		geneOntologyPanel.add(lblCcList);
-		
-		lblBiologicalProcesses = new JLabel();
-		lblBiologicalProcesses.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		geneOntologyPanel.add(lblBiologicalProcesses);
-		
-		lblBpList = new JLabel();
-		geneOntologyPanel.add(lblBpList);
-		
-		lblMolecularFunction = new JLabel();
-		lblMolecularFunction.setFont(new Font("Lucida Grande", Font.BOLD, 14));
-		geneOntologyPanel.add(lblMolecularFunction);
-		
-		lblMfList = new JLabel();
-		geneOntologyPanel.add(lblMfList);
-		
-		geneOntologyPanel.setVisible(false);
-		
-		// Main panel
-		this.add(proteinInfoPanel);
-		this.add(geneOntologyPanel);
-		this.setPreferredSize(new Dimension(300, 600));
-		this.setMinimumSize(new Dimension(300, 600));
-		
-	}
+	private JScrollPane proteinInfoScroll, geneOntologyScroll;
+	
+	private JPanel edgeInfoPanel, nodeInfoPanel;
+	
 	
 	/**
 	 * Method to access the unique instance of PMBPanel
@@ -115,86 +46,184 @@ public class PMBPanel extends JPanel {
 		return _instance;
 	}
 	
+	
 	/**
-	 * Method which modify the panel display according to the selected nodes
+	 * Default constructor which is private to prevent several instances
+	 * Creates a panel and add the different components
 	 */
-	public void update() {
-		CyNetwork current_network = Cytoscape.getCurrentNetwork(); // Retrieve the current network
-
-		if (current_network != null) { // If this network exits
-			
-			proteinInfoPanel.setVisible(true);
-			geneOntologyPanel.setVisible(true);
-
-			@SuppressWarnings("unchecked") // Delete the warnings for the getSelectedNodes() method
-			Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
-			
-			if (selectedNodes.size() == 1) { // If one node is selected
-				
-				// Reinitialization of the values
-				lblGeneName.setText("HUGO Gene Name");
-				lblGeneNameValue.setText("");
-				lblUniprotId.setText("Uniprot Accesion");
-				lblUniprotIdValue.setText("");
-				lblDescription.setText("Description");
-				lblDescriptionValue.setText("");
-				lblCellularComponent.setText("");
-				lblCcList.setText("");
-				lblBiologicalProcesses.setText("");
-				lblBpList.setText("");
-				lblMolecularFunction.setText("");
-				lblMfList.setText("");
-								
-				/* TODO : Retrieve node information from data panel (when the attributes will be done...) */
-				PMBNode myNode = PMBPanelControl.getNode(current_network, selectedNodes.iterator().next().getIdentifier());
-				
-				lblGeneNameValue.setText(myNode.getGeneName());
-				lblUniprotIdValue.setText(myNode.getUniprotId());
-				lblDescriptionValue.setText(myNode.getProteinDescription());
-				
-				if (!myNode.getComponentList().isEmpty()) {
-					lblCellularComponent.setText("Cellular Component");	
-					lblCcList.setText("<html><ul>");
-					for (String str : myNode.getComponentList())
-						lblCcList.setText(lblCcList.getText()+"<li>"+str+"</li>");
-					lblCcList.setText(lblCcList.getText()+"</ul></html>");
-				}
-				
-				if (!myNode.getProcessList().isEmpty()) {
-					lblBiologicalProcesses.setText("Biological Processes");	
-					lblBpList.setText("<html><ul>");
-					for (String str : myNode.getProcessList())
-						lblBpList.setText(lblBpList.getText()+"<li>"+str+"</li>");
-					lblBpList.setText(lblBpList.getText()+"</ul></html>");
-				}
-				
-				if (!myNode.getFunctionList().isEmpty()) {
-					lblMolecularFunction.setText("Molecular Functions");
-					lblMfList.setText("<html><ul>");
-					for (String str : myNode.getFunctionList())
-						lblMfList.setText(lblMfList.getText()+"<li>"+str+"</li>");
-					lblMfList.setText(lblMfList.getText()+"</ul></html>");
-				}
-
-			}
-			else {
-				proteinInfoPanel.setVisible(false);
-				geneOntologyPanel.setVisible(false);
-
-				lblGeneName.setText("");
-				lblGeneNameValue.setText("");
-				lblUniprotId.setText("");
-				lblUniprotIdValue.setText("");
-				lblDescription.setText("");
-				lblDescriptionValue.setText("");
-				lblCellularComponent.setText("");
-				lblCcList.setText("");
-				lblBiologicalProcesses.setText("");
-				lblBpList.setText("");
-				lblMolecularFunction.setText("");
-				lblMfList.setText("");
-			}
-				
-		}
+	private PMBPanel() {
+		super();
+		this.setName("PPiMapBuilder");
+		
+		initNodeInfoPanel();
+		initEdgeInfoPanel();
+		
+		// Main panel
+		setLayout(new BorderLayout());		
+		setPreferredSize(new Dimension(300, 600));
+		setOpaque(false);
+		
+		update();
 	}
+	
+	
+	/** Initialize the node info panel */
+	public void initNodeInfoPanel() {
+		nodeInfoPanel = new JPanel(new MigLayout("inset 5", "[grow]", "[145px:145px,grow 20][growprio 101,grow]"));
+		nodeInfoPanel.setOpaque(false);
+		
+		JLabel lblGeneName, lblUniprotId, lblDescription;
+		
+		Font title = new Font("Lucida Grande", Font.BOLD, 14);
+
+		// Protein info panel
+		proteinInfoPanel = new JPanel();
+		proteinInfoPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+		proteinInfoPanel.setLayout(new BoxLayout(proteinInfoPanel, BoxLayout.Y_AXIS));
+		proteinInfoPanel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+
+		// Protein scroll pane
+		proteinInfoScroll = new JScrollPane(proteinInfoPanel);
+		proteinInfoScroll.setBorder(new TitledBorder(null, "Protein", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		proteinInfoScroll.setOpaque(false);
+		
+		// Protein labels
+		lblGeneName = new JLabel("HUGO Gene Name");
+		lblGeneName.setFont(title);
+		proteinInfoPanel.add(lblGeneName);
+		
+		lblGeneNameValue = new JTextLabel();
+		proteinInfoPanel.add(lblGeneNameValue);
+		
+		lblUniprotId = new JLabel("Uniprot Accesion");
+		lblUniprotId.setFont(title);
+		proteinInfoPanel.add(lblUniprotId);
+		
+		lblUniprotIdValue = new JTextLabel();
+		proteinInfoPanel.add(lblUniprotIdValue);
+		
+		lblDescription = new JLabel("Description");
+		lblDescription.setFont(title);
+		proteinInfoPanel.add(lblDescription);
+		
+		lblDescriptionValue = new JTextLabel();
+		proteinInfoPanel.add(lblDescriptionValue);
+		
+		
+		// Gene ontology panel
+		geneOntologyPanel = new JPanel();
+		geneOntologyPanel.setLayout(new MigLayout("inset 0", "[grow]", "[20px][grow][20px][grow][20px][grow][growprio 101, grow]"));
+		geneOntologyPanel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
+
+		// Gene ontology scroll pane
+		geneOntologyScroll = new JScrollPane(geneOntologyPanel);
+		geneOntologyScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		geneOntologyScroll.setBorder(new TitledBorder(null, "Gene Ontology", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		geneOntologyScroll.setOpaque(false);
+		
+		// Gene ontology labels
+		lblCellularComponent = new JLabel("Cellular Component");
+		lblCellularComponent.setFont(title);
+		geneOntologyPanel.add(lblCellularComponent, "cell 0 0, grow");
+		
+		lblBiologicalProcesses = new JLabel("Biological Processes");
+		lblBiologicalProcesses.setFont(title);
+		geneOntologyPanel.add(lblBiologicalProcesses, "cell 0 1, grow");
+		
+		lblMolecularFunction = new JLabel("Molecular Functions");
+		lblMolecularFunction.setFont(title);
+		geneOntologyPanel.add(lblMolecularFunction, "cell 0 2, grow");
+		
+		
+		nodeInfoPanel.add(proteinInfoScroll, "cell 0 0,grow");
+		nodeInfoPanel.add(geneOntologyScroll, "cell 0 1,grow");
+		
+		//Demo
+		//lblGeneNameValue.setText("val");
+		//lblUniprotIdValue.setText("val");
+		//lblDescriptionValue.setText("<html>val<br/><br/>d</html>");
+		//
+		//lblCcList.setText("val");
+		//lblBpList.setText("val");
+		//lblMfList.setText("<html>val<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>m</html>");
+	}
+	
+	
+	/** Initialize the edge info panel */
+	public void initEdgeInfoPanel() {
+		edgeInfoPanel = new JPanel();
+		edgeInfoPanel.setOpaque(false);
+	}
+	
+	
+	/**
+	 * Update the panel with the selected Node
+	 * @param selectedNode
+	 */
+	public void update(PMBNode selectedNode) {
+		removeAll();
+		add(nodeInfoPanel);
+						
+		/* TODO : Retrieve node information from data panel (when the attributes will be done...) */
+		
+		//Protein info
+		lblGeneNameValue.setText(selectedNode.getGeneName().trim());
+		lblUniprotIdValue.setText(selectedNode.getUniprotId().trim());
+		lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
+		
+		//Gene ontology
+		geneOntologyPanel.removeAll();
+		int row = 0;
+		if (!selectedNode.getComponentList().isEmpty()) {
+			geneOntologyPanel.add(lblCellularComponent, "cell 0 "+(row++)+"");
+			geneOntologyPanel.add(new JTextList(selectedNode.getComponentList()), "cell 0 "+(row++)+"");
+		}
+		
+		if (!selectedNode.getProcessList().isEmpty()) {
+			geneOntologyPanel.add(lblBiologicalProcesses, "cell 0 "+(row++)+"");
+			geneOntologyPanel.add(new JTextList(selectedNode.getProcessList()), "cell 0 "+(row++)+"");
+		} 
+		
+		if (!selectedNode.getFunctionList().isEmpty()) {
+			geneOntologyPanel.add(lblMolecularFunction, "cell 0 "+(row++)+"");
+			geneOntologyPanel.add(new JTextList(selectedNode.getFunctionList()), "cell 0 "+(row++)+"");
+		}
+		geneOntologyPanel.add(new JLabel(), "cell 0 "+(row++)+", grow");
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				repaint();
+			}
+		});
+	}
+	
+	
+	/**
+	 * Update the panel with the selected Edge
+	 * @param selectedEdge
+	 */
+	public void update(CyEdge selectedEdge) {
+		
+	}
+	
+	
+	/** Update the panel when nothing is selected */
+	public void update() {
+		removeAll();
+		JLabel noSelection = new JLabel("<html><center>Please select one node or one edge of a PPiMapBuilder generated network to get information about them.</center></html>");
+		
+		try {
+			noSelection.setIcon(new ImageIcon(getClass().getResource("/img/info.png")));
+		} catch(Exception e) {}
+		
+		add(noSelection);
+		
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				repaint();
+			}
+		});
+	} 
 }

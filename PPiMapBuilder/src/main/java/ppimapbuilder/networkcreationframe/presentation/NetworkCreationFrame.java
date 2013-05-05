@@ -32,11 +32,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 
-/**
- * Network creation window
- */
+/** Network creation frame */
 public class NetworkCreationFrame {
-	// Instance of the PPiMapBuilder frame to prevent several instances
+	/** Instance of the PPiMapBuilder frame to prevent several instances */
 	private static NetworkCreationFrame _instance = null; 
 	
 	// The create network window
@@ -59,9 +57,7 @@ public class NetworkCreationFrame {
 	private CompoundBorder panelBorder;
 	private CompoundBorder fancyBorder;
 
-	/**
-	 * Create the application.
-	 */
+	/** Create the network creation frame */
 	private NetworkCreationFrame() {
 		window = new JFrame("PPiMapBuilder - Create a network");
 
@@ -71,7 +67,6 @@ public class NetworkCreationFrame {
 
 	/**
 	 * Method to access the unique instance of NetworkCreationFrame
-	 * 
 	 * @return _instance
 	 */
 	public static NetworkCreationFrame Instance() {
@@ -80,9 +75,7 @@ public class NetworkCreationFrame {
 		return _instance;
 	}
 
-	/**
-	 * Initialize the contents of the frame
-	 */
+	/** Initialize the contents of the frame */
 	private void initialize() {
 		// Slightly darker color than window background color
 		darkForeground = UIManager.getColor("Panel.background");
@@ -164,7 +157,6 @@ public class NetworkCreationFrame {
 	/**
 	 * Creating indentifiers panel with label and text area used to fill the
 	 * uniprot identifiers
-	 * 
 	 * @return the generated JPanel
 	 */
 	private JPanel initIndentifiersPanel() {
@@ -384,7 +376,7 @@ public class NetworkCreationFrame {
 	
 
 	/**
-	 * Get the list of protein entred by the user in the text area.
+	 * Get the list of protein entered by the user in the text area.
 	 * @return list of protein identifiers
 	 */
 	public ArrayList<String> getIdentifiers() throws ArrayStoreException {
@@ -400,9 +392,7 @@ public class NetworkCreationFrame {
 		return identifierList;
 	}
 	
-	/**
-	 * Close the create network frame
-	 */
+	/** Close the create network frame */
 	public void close() {
 		window.setVisible(false);
 	}
@@ -415,6 +405,7 @@ public class NetworkCreationFrame {
 		return window;
 	}
 	
+	/** Clearing all fields and lists of the form displayed in the frame */
 	public void clearFormFields() {
 		// Emptying form fields
 		txaIdentifiers.setText("Q49A88\nQ9VI74");
@@ -423,6 +414,11 @@ public class NetworkCreationFrame {
 		panSourceDatabases.removeAll();
 	}
 
+	/** 
+	 * Update the database list, organism list and organism combobox with the given lists
+	 * @param orga a LinkedHashMap of organisms with names in key and taxid in value
+	 * @param dbs an ArrayList of database name
+	 */
 	public void updateLists(LinkedHashMap<String, Integer> orga, ArrayList<String> dbs) {
 		// Creation of the organism list
 		organisms = new LinkedHashMap<Integer, JCheckBox>();

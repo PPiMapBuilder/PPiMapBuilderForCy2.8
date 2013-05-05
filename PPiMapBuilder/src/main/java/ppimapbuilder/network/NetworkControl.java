@@ -1,9 +1,12 @@
 package ppimapbuilder.network;
 
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Set;
+
 import javax.swing.JOptionPane;
 import ppimapbuilder.LoadingWindow;
 import ppimapbuilder.network.presentation.PMBNode;
@@ -12,11 +15,13 @@ import ppimapbuilder.networkcreationframe.NetworkCreationFrameControl;
 import ppimapbuilder.panel.PMBPanelControl;
 import ppimapbuilder.ppidb.api.SQLResult;
 import cytoscape.CyEdge;
+import cytoscape.CyNode;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.data.Semantics;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CytoscapeDesktop;
+import ding.view.DGraphView;
 
 /**
  *  
@@ -25,6 +30,8 @@ import cytoscape.view.CytoscapeDesktop;
  */
 public class NetworkControl implements PropertyChangeListener {
 	
+	private static final CyNetworkView DGraphView = null;
+
 	private static NetworkControl _instance = null; // Instance for singleton pattern
 	
 	private LinkedHashMap<CyNetwork, ArrayList<PMBNode>> myNetworks;
@@ -88,17 +95,20 @@ public class NetworkControl implements PropertyChangeListener {
 	}
 	
 	/**
-	 * Method which call the update() method from the ppimapbuilder panel
+	 * Get all the nodes of a network managed by the plugin
+	 * @param myNetwork
+	 * @return
 	 */
-	public void updatePanel() {
-		// For now there is one action, but we can extend this method with different conditions according that we click on node or edge for example
-		PMBPanelControl.updatePanel();
-	}
-	
 	public ArrayList<PMBNode> getMyNodes(CyNetwork myNetwork) {
 		return myNetworks.get(myNetwork);
 	}
 	
+	/**
+	 * Get a node in a network by its identifier
+	 * @param myNetwork
+	 * @param identifier
+	 * @return
+	 */
 	public PMBNode getNode(CyNetwork myNetwork, String identifier) {
 		for (PMBNode n : this.getMyNodes(myNetwork)) {
 			if (n.getGeneName().equals(identifier)) {
@@ -204,7 +214,23 @@ public class NetworkControl implements PropertyChangeListener {
 		};
 	}
 	
+	/** Method handling clicks on the network */
+	public void mousePressed(Point targetedPoint) {
+		CyNetwork current_network = Cytoscape.getCurrentNetwork(); // Retrieve the current network
 
-
+		Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
+		DGraphView graph = ((DGraphView)Cytoscape.getCurrentNetworkView());
+		
+		if(graph.getPickedEdgeView(targetedPoint) != null) {
+			PMBPanelControl.updatePanel();
+		}
+		else if (graph.getPickedNodeView(targetedPoint) != null) { // If the click is on a node
+			PMBNode myNode = getNode(current_network, selectedNodes.iterator().next().getIdentifier());
+			PMBPanelControl.updatePanel(myNode);
+		}
+		else PMBPanelControl.updatePanel(); //Clear the panel
+		
+		 // We update the panel
+	}
 
 }
