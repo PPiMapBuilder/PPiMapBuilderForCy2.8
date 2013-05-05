@@ -17,8 +17,11 @@ import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
 import ppimapbuilder.network.presentation.PMBNode;
+import ppimapbuilder.panel.presentation.ScrollablePanel.ScrollableSizeHint;
 import cytoscape.CyEdge;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+
 
 /** @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL */
 public class PMBPanel extends JPanel {
@@ -29,7 +32,7 @@ public class PMBPanel extends JPanel {
 
 	private JLabel lblCellularComponent, lblBiologicalProcesses, lblMolecularFunction;  
 	private JTextLabel lblGeneNameValue, lblUniprotIdValue, lblDescriptionValue;
-	private JPanel proteinInfoPanel, geneOntologyPanel;
+	private ScrollablePanel proteinInfoPanel, geneOntologyPanel;
 	
 	private JScrollPane proteinInfoScroll, geneOntologyScroll;
 	
@@ -61,7 +64,7 @@ public class PMBPanel extends JPanel {
 		// Main panel
 		setLayout(new BorderLayout());		
 		setPreferredSize(new Dimension(300, 600));
-		setOpaque(false);
+		
 		
 		update();
 	}
@@ -70,22 +73,24 @@ public class PMBPanel extends JPanel {
 	/** Initialize the node info panel */
 	public void initNodeInfoPanel() {
 		nodeInfoPanel = new JPanel(new MigLayout("inset 5", "[grow]", "[145px:145px,grow 20][growprio 101,grow]"));
-		nodeInfoPanel.setOpaque(false);
 		
 		JLabel lblGeneName, lblUniprotId, lblDescription;
 		
 		Font title = new Font("Lucida Grande", Font.BOLD, 14);
 
 		// Protein info panel
-		proteinInfoPanel = new JPanel();
+		proteinInfoPanel = new ScrollablePanel();
+		proteinInfoPanel.setScrollableWidth(ScrollableSizeHint.FIT);
+		proteinInfoPanel.setScrollableHeight(ScrollableSizeHint.STRETCH);
+		proteinInfoPanel.setScrollableBlockIncrement(ScrollablePanel.VERTICAL, ScrollablePanel.IncrementType.PERCENT, 200);
 		proteinInfoPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 		proteinInfoPanel.setLayout(new BoxLayout(proteinInfoPanel, BoxLayout.Y_AXIS));
 		proteinInfoPanel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
 
 		// Protein scroll pane
 		proteinInfoScroll = new JScrollPane(proteinInfoPanel);
-		proteinInfoScroll.setBorder(new TitledBorder(null, "Protein", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		proteinInfoScroll.setOpaque(false);
+		proteinInfoScroll.setBorder(new TitledBorder(null, "Protein", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
 		// Protein labels
 		lblGeneName = new JLabel("HUGO Gene Name");
@@ -111,15 +116,18 @@ public class PMBPanel extends JPanel {
 		
 		
 		// Gene ontology panel
-		geneOntologyPanel = new JPanel();
+		geneOntologyPanel = new ScrollablePanel();
+		geneOntologyPanel.setScrollableWidth(ScrollableSizeHint.FIT);
+		geneOntologyPanel.setScrollableHeight(ScrollableSizeHint.STRETCH);
+		geneOntologyPanel.setScrollableBlockIncrement(ScrollablePanel.VERTICAL, ScrollablePanel.IncrementType.PERCENT, 200);
 		geneOntologyPanel.setLayout(new MigLayout("inset 0", "[grow]", "[20px][grow][20px][grow][20px][grow][growprio 101, grow]"));
 		geneOntologyPanel.setBorder(new EmptyBorder(new Insets(0, 0, 0, 0)));
 
 		// Gene ontology scroll pane
 		geneOntologyScroll = new JScrollPane(geneOntologyPanel);
+		geneOntologyScroll.setOpaque(false);
 		geneOntologyScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		geneOntologyScroll.setBorder(new TitledBorder(null, "Gene Ontology", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		geneOntologyScroll.setOpaque(false);
 		
 		// Gene ontology labels
 		lblCellularComponent = new JLabel("Cellular Component");
@@ -133,7 +141,6 @@ public class PMBPanel extends JPanel {
 		lblMolecularFunction = new JLabel("Molecular Functions");
 		lblMolecularFunction.setFont(title);
 		geneOntologyPanel.add(lblMolecularFunction, "cell 0 2, grow");
-		
 		
 		nodeInfoPanel.add(proteinInfoScroll, "cell 0 0,grow");
 		nodeInfoPanel.add(geneOntologyScroll, "cell 0 1,grow");
@@ -152,7 +159,6 @@ public class PMBPanel extends JPanel {
 	/** Initialize the edge info panel */
 	public void initEdgeInfoPanel() {
 		edgeInfoPanel = new JPanel();
-		edgeInfoPanel.setOpaque(false);
 	}
 	
 	
@@ -188,11 +194,11 @@ public class PMBPanel extends JPanel {
 			geneOntologyPanel.add(lblMolecularFunction, "cell 0 "+(row++)+"");
 			geneOntologyPanel.add(new JTextList(selectedNode.getFunctionList()), "cell 0 "+(row++)+"");
 		}
-		geneOntologyPanel.add(new JLabel(), "cell 0 "+(row++)+", grow");
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				validate();
 				repaint();
 			}
 		});
@@ -222,6 +228,7 @@ public class PMBPanel extends JPanel {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				validate();
 				repaint();
 			}
 		});
