@@ -1,9 +1,19 @@
 package ppimapbuilder;
 
+import java.net.UnknownHostException;
+
 import ppimapbuilder.menu.presentation.PMBMenu;
+import ppimapbuilder.network.presentation.PMBNode;
+import ppimapbuilder.network.presentation.PMBView;
 import ppimapbuilder.panel.PMBPanelControl;
+import cytoscape.CyEdge;
+import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.data.Semantics;
 import cytoscape.plugin.CytoscapePlugin;
+import cytoscape.visual.CalculatorCatalog;
+import cytoscape.visual.VisualMappingManager;
+import cytoscape.visual.VisualStyle;
 
 /**
  * 
@@ -22,7 +32,7 @@ public class PMBPlugin extends CytoscapePlugin {
 		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(myMenu); // Add the menu to the plugins menu
 		PMBPanelControl.createPanel(); // Creates the PPiMapBuilder panel
 	
-		try {
+		/*try {
 			Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
 
 			CyNetwork myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
@@ -47,7 +57,7 @@ public class PMBPlugin extends CytoscapePlugin {
 			}			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-		}
+		}*/
 		
 	
 	}

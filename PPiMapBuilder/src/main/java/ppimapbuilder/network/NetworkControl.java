@@ -141,7 +141,7 @@ public class NetworkControl implements PropertyChangeListener {
 				// Creation of the network components
 				for (String id : poiList) { // For each protein of interest
 					
-					SQLResult res = NetworkAbstraction.getAllData(id, dbList, orgaList);
+					SQLResult res = NetworkAbstraction.getAllData(id, dbList, orgaList, refOrganism);
 					
 					PMBNode A, B;
 					CyEdge interaction;
