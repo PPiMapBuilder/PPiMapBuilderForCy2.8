@@ -149,10 +149,8 @@ public class NetworkControl implements PropertyChangeListener {
 
 						// For each line
 						for(String row: res.keySet()) {
-							System.out.println("#8");
 							//Get fields
 							fields = res.getData(row);
-							System.out.println("#9");
 
 							//Create Nodes
 							try {
