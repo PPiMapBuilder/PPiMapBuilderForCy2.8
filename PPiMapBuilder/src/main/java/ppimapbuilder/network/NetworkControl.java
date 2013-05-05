@@ -3,6 +3,7 @@ package ppimapbuilder.network;
 import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -190,11 +191,16 @@ public class NetworkControl implements PropertyChangeListener {
 
 								myNetwork.addEdge(interaction);
 
-							} catch (Exception e1) {
+							} catch (UnknownHostException e) {
+								JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Connection error!", "Connection to Uniprot database failed", JOptionPane.ERROR_MESSAGE);
+								myNetworks.remove(myNetwork);
+								Cytoscape.destroyNetwork(myNetwork);
+								return;
+							} /*catch (Exception e1) {
 								JOptionPane.showMessageDialog(null, "Error : "+e1.getLocalizedMessage());
 								e1.printStackTrace();
 								return;
-							}
+							}*/
 						}
 
 					}

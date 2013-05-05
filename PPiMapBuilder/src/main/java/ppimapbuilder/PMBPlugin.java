@@ -9,6 +9,7 @@ import ppimapbuilder.panel.PMBPanelControl;
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.CytoscapeInit;
 import cytoscape.data.Semantics;
 import cytoscape.plugin.CytoscapePlugin;
 import cytoscape.visual.CalculatorCatalog;
@@ -58,7 +59,6 @@ public class PMBPlugin extends CytoscapePlugin {
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}*/
-		
 	
 	}
 
