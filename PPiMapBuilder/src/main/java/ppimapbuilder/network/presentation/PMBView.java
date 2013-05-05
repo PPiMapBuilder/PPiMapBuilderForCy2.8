@@ -14,25 +14,19 @@ import java.awt.event.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import com.jhlabs.image.FieldWarpFilter.Line;
-
 import ppimapbuilder.network.NetworkControl;
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.layout.CyLayoutAlgorithm;
-import cytoscape.render.immed.nodeshape.NodeShape;
 import cytoscape.view.CyEdgeView;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CyNodeView;
-import cytoscape.visual.ArrowShape;
 import cytoscape.visual.CalculatorCatalog;
 import cytoscape.visual.EdgeAppearanceCalculator;
 import cytoscape.visual.GlobalAppearanceCalculator;
 import cytoscape.visual.LineStyle;
-import cytoscape.visual.NodeAppearance;
 import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.VisualMappingManager;
 import cytoscape.visual.VisualPropertyType;
@@ -41,7 +35,6 @@ import cytoscape.visual.calculators.BasicCalculator;
 import cytoscape.visual.calculators.Calculator;
 import cytoscape.visual.mappings.DiscreteMapping;
 import cytoscape.visual.mappings.ObjectMapping;
-import cytoscape.visual.mappings.PassThroughMapping;
 import ding.view.DGraphView;
 import ding.view.EdgeContextMenuListener;
 import ding.view.NodeContextMenuListener;
@@ -109,28 +102,36 @@ public class PMBView implements CyNetworkView {
 
 		VisualStyle visualStyle = new VisualStyle(visualStyleName);
 
-		// Node default appearance
+		/* Node appearance */
 		NodeAppearanceCalculator nodeAppCalc = this.myView.getVisualStyle().getNodeAppearanceCalculator();
 		nodeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getNodeAppearanceCalculator().getDefaultAppearance());
+		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_FILL_COLOR, new Color(160, 255, 144)); // Node color
 		
-		// Edge default appearance
+		//nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_FILL_COLOR, new Color(255, 133, 133));
+		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_SHAPE, cytoscape.visual.NodeShape.ELLIPSE);
+		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_LINE_WIDTH, 1.5);
+		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_BORDER_COLOR, Color.black);
+		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_LABEL_COLOR, Color.BLACK);
+		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_FONT_SIZE, 10);
+		
+		/* Edge appearance */
 		EdgeAppearanceCalculator edgeAppCalc = this.myView.getVisualStyle().getEdgeAppearanceCalculator();
 		edgeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getEdgeAppearanceCalculator().getDefaultAppearance());
-		
-		// Global default appearance
-		GlobalAppearanceCalculator globalAppCalc = this.myView.getVisualStyle().getGlobalAppearanceCalculator();
-			
+		edgeAppCalc.getDefaultAppearance().set(VisualPropertyType.EDGE_COLOR, Color.darkGray);
 		// Edge line style
-		DiscreteMapping arrowMapping = new DiscreteMapping(LineStyle.SOLID, ObjectMapping.EDGE_MAPPING);
+		DiscreteMapping arrowMapping = new DiscreteMapping(LineStyle.SOLID, ObjectMapping.EDGE_MAPPING); 
 		arrowMapping.setControllingAttributeName("Origin", network, false);
 		arrowMapping.putMapValue("Interolog", LineStyle.DASH_DOT);
 		Calculator edgeCalculator = new BasicCalculator("edge line style ppimapbuilder", arrowMapping, VisualPropertyType.EDGE_LINE_STYLE);
 		edgeAppCalc.setCalculator(edgeCalculator);
-
-		// Global node selection
-		globalAppCalc.setDefaultNodeSelectionColor(Color.cyan);
 		
-		// Add calculators to visual style
+		/* Global appearance */
+		GlobalAppearanceCalculator globalAppCalc = this.myView.getVisualStyle().getGlobalAppearanceCalculator();
+		globalAppCalc.setDefaultNodeSelectionColor(new Color(130, 208, 255)); // Global node selection
+		globalAppCalc.setDefaultBackgroundColor(Color.white);
+		globalAppCalc.setDefaultEdgeSelectionColor(Color.lightGray);
+		
+		/* Add calculators to visual style */
 		visualStyle.setEdgeAppearanceCalculator(edgeAppCalc);
 		visualStyle.setNodeAppearanceCalculator(nodeAppCalc);
 		visualStyle.setGlobalAppearanceCalculator(globalAppCalc);

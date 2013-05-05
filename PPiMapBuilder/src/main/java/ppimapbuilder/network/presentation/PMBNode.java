@@ -2,9 +2,6 @@ package ppimapbuilder.network.presentation;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-
-import javax.swing.JOptionPane;
-
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.interfaces.uniprot.dbx.go.Go;
 import uk.ac.ebi.kraken.uuw.services.remoting.EntryRetrievalService;
