@@ -42,11 +42,17 @@ public class PMBNode extends CyNode {
 	 * Constructor which creates a ppimapbuilder node directly from a CyNode
 	 * @param myNode
 	 */
-	public PMBNode(CyNode myNode, String uniprotId) throws UnknownHostException {
+	public PMBNode(CyNode myNode, String uniprotId, String taxid) throws UnknownHostException {
 		this(myNode.getRootGraph(), myNode.getRootGraphIndex());
 		
+		Cytoscape.getNodeAttributes().setUserEditable("Gene name", false);
+		Cytoscape.getNodeAttributes().setUserEditable("Uniprot id", false);
+		Cytoscape.getNodeAttributes().setUserEditable("Taxonomy id", false);
+		Cytoscape.getNodeAttributes().setUserEditable("canonicalName", false);
+		
 		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Gene name", myNode.getIdentifier()); // Add the gene name as node attribute
-		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Uniprot id", uniprotId);//A.getUniprotId());
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Uniprot id", uniprotId);
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Taxonomy id", taxid);
 		
 		this.geneName = myNode.getIdentifier(); // The identifier and the gene name are the same information
 		this.uniprotId = uniprotId; // Uniprot Id which is used to retrieve the uniprot entry

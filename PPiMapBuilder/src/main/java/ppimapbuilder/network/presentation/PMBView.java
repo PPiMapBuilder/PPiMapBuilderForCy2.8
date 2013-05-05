@@ -15,17 +15,33 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import com.jhlabs.image.FieldWarpFilter.Line;
+
 import ppimapbuilder.network.NetworkControl;
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.layout.CyLayoutAlgorithm;
+import cytoscape.render.immed.nodeshape.NodeShape;
 import cytoscape.view.CyEdgeView;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CyNodeView;
+import cytoscape.visual.ArrowShape;
+import cytoscape.visual.CalculatorCatalog;
+import cytoscape.visual.EdgeAppearanceCalculator;
+import cytoscape.visual.GlobalAppearanceCalculator;
+import cytoscape.visual.LineStyle;
+import cytoscape.visual.NodeAppearance;
+import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.VisualMappingManager;
+import cytoscape.visual.VisualPropertyType;
 import cytoscape.visual.VisualStyle;
+import cytoscape.visual.calculators.BasicCalculator;
+import cytoscape.visual.calculators.Calculator;
+import cytoscape.visual.mappings.DiscreteMapping;
+import cytoscape.visual.mappings.ObjectMapping;
+import cytoscape.visual.mappings.PassThroughMapping;
 import ding.view.DGraphView;
 import ding.view.EdgeContextMenuListener;
 import ding.view.NodeContextMenuListener;
@@ -39,6 +55,8 @@ import ding.view.NodeContextMenuListener;
 public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
+	
+	public static final String visualStyleName = "PPiMapBuilder Style";
 	
 	/**
 	 * Constructor
@@ -66,9 +84,58 @@ public class PMBView implements CyNetworkView {
 			public void mouseClicked(MouseEvent arg0) {}
 		});
 		
-		((DGraphView) this.myView).getCanvas(DGraphView.Canvas.BACKGROUND_CANVAS).setBackground(Color.white);
-		this.myView.setZoom(3); // Zoom the network view (because there are only two nodes)
+		//((DGraphView) this.myView).getCanvas(DGraphView.Canvas.BACKGROUND_CANVAS).setBackground(Color.white);
+		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
+		CalculatorCatalog catalog = manager.getCalculatorCatalog();
+
+		VisualStyle vs = catalog.getVisualStyle(visualStyleName);
+		if (vs == null) {
+			vs = createVisualStyle(myNetwork);
+			catalog.addVisualStyle(vs);
+		}
+		
+		this.myView.setVisualStyle(vs.getName());
+
+		manager.setVisualStyle(vs);
+		this.myView.redrawGraph(true,true);
+		
+		
+		this.myView.setZoom(2); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
+		
+	}
+	
+	public VisualStyle createVisualStyle(CyNetwork network) {
+
+		VisualStyle visualStyle = new VisualStyle(visualStyleName);
+
+		// Node default appearance
+		NodeAppearanceCalculator nodeAppCalc = this.myView.getVisualStyle().getNodeAppearanceCalculator();
+		nodeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getNodeAppearanceCalculator().getDefaultAppearance());
+		
+		// Edge default appearance
+		EdgeAppearanceCalculator edgeAppCalc = this.myView.getVisualStyle().getEdgeAppearanceCalculator();
+		edgeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getEdgeAppearanceCalculator().getDefaultAppearance());
+		
+		// Global default appearance
+		GlobalAppearanceCalculator globalAppCalc = this.myView.getVisualStyle().getGlobalAppearanceCalculator();
+			
+		// Edge line style
+		DiscreteMapping arrowMapping = new DiscreteMapping(LineStyle.SOLID, ObjectMapping.EDGE_MAPPING);
+		arrowMapping.setControllingAttributeName("Origin", network, false);
+		arrowMapping.putMapValue("Interolog", LineStyle.DASH_DOT);
+		Calculator edgeCalculator = new BasicCalculator("Example Edge Arrow Shape Calculator", arrowMapping, VisualPropertyType.EDGE_LINE_STYLE);
+		edgeAppCalc.setCalculator(edgeCalculator);
+
+		// Global node selection
+		globalAppCalc.setDefaultNodeSelectionColor(Color.cyan);
+		
+		// Add calculators to visual style
+		visualStyle.setEdgeAppearanceCalculator(edgeAppCalc);
+		visualStyle.setNodeAppearanceCalculator(nodeAppCalc);
+		visualStyle.setGlobalAppearanceCalculator(globalAppCalc);
+		
+		return visualStyle;
 	}
 
 	/* OVERRIDE OF EVERY IMPLEMENTABLE METHOD TO RUN IT THROUGH THE CYNETWORKVIEW ATTRIBUTE */
