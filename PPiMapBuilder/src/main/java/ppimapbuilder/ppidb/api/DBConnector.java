@@ -64,17 +64,10 @@ public class DBConnector {
     private DBConnector() throws SQLException, IOException {
 
         // get server config
-        BufferedReader br = null;
-        try {
-            br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/server.cfg")));
-        } catch (Exception e) {
-            throw new IOException();
-        }
-
+        BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/server.cfg")));
         this.url = br.readLine();
         this.user = br.readLine();
         this.password = br.readLine();
-
         br.close();
 
         // connect the database then prepare statement
