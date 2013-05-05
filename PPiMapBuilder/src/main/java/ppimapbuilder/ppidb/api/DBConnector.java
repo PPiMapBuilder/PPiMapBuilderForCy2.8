@@ -1,8 +1,6 @@
 package ppimapbuilder.ppidb.api;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -215,7 +213,7 @@ public class DBConnector {
                 + "		p2.id as \"p2_id\",\n"
                 + "		p2.gene_name as \"p2_gene_name\",\n"
                 + "		p2.uniprot_id as \"p2_uniprot_id\",\n"
-                + "		p2.organism_id as \"p2_taxid\",\n"
+                + "		p2.organism_id as \"p2_taxid\"\n"
                 + "	from interaction\n"
                 + "	join protein as \"p1\" on interaction.protein_id1 = p1.id\n"
                 + "	join protein as \"p2\" on interaction.protein_id2 = p2.id\n"
@@ -229,12 +227,12 @@ public class DBConnector {
                 + "			select h.h_id\n"
                 + "			from protein as \"p\"\n"
                 + "			join homology as \"h\" on p.id = h.ptn_id\n"
-                + "			where p.uniprot_id = " + uniprot + "\n"
+                + "			where p.uniprot_id = '" + uniprot + "'\n"
                 + "		)\n"
                 + "		UNION\n"
                 + "		select protein.id\n"
                 + "		from protein\n"
-                + "		where protein.uniprot_id = " + uniprot + "\n"
+                + "		where protein.uniprot_id = '" + uniprot + "'\n"
                 + "	) \n"
                 + "	OR interaction.protein_id2\n"
                 + "	 IN (\n"
@@ -245,12 +243,12 @@ public class DBConnector {
                 + "			select h.h_id\n"
                 + "			from protein as \"p\"\n"
                 + "			join homology as \"h\" on p.id = h.ptn_id\n"
-                + "			where p.uniprot_id = " + uniprot + "\n"
+                + "			where p.uniprot_id = '" + uniprot + "'\n"
                 + "		)\n"
                 + "		UNION\n"
                 + "		select protein.id\n"
                 + "		from protein\n"
-                + "		where protein.uniprot_id = " + uniprot + "\n"
+                + "		where protein.uniprot_id = '" + uniprot + "'\n"
                 + "	) \n"
                 + "	and ( (p1.organism_id = " + taxIdRef + ") or (p2.organism_id = " + taxIdRef + ") )";
 
