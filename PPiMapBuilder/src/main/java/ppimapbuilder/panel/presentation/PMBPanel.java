@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -16,11 +17,11 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import net.miginfocom.swing.MigLayout;
+import ppimapbuilder.JLinkLabel;
 import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.panel.presentation.ScrollablePanel.ScrollableSizeHint;
 import cytoscape.CyEdge;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
 
 
 /** @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL */
@@ -31,7 +32,9 @@ public class PMBPanel extends JPanel {
 	private static PMBPanel _instance = null; // Instance of the ppimapbuilder panel to prevent several instances 
 
 	private JLabel lblCellularComponent, lblBiologicalProcesses, lblMolecularFunction;  
-	private JTextLabel lblGeneNameValue, lblUniprotIdValue, lblDescriptionValue;
+	private JLabel lblGeneNameValue, lblDescriptionValue;
+
+	private JLinkLabel lblUniprotIdValue;
 	private ScrollablePanel proteinInfoPanel, geneOntologyPanel;
 	
 	private JScrollPane proteinInfoScroll, geneOntologyScroll;
@@ -65,14 +68,13 @@ public class PMBPanel extends JPanel {
 		setLayout(new BorderLayout());		
 		setPreferredSize(new Dimension(300, 600));
 		
-		
 		update();
 	}
 	
 	
 	/** Initialize the node info panel */
 	public void initNodeInfoPanel() {
-		nodeInfoPanel = new JPanel(new MigLayout("inset 5", "[grow]", "[145px:145px,grow 20][growprio 101,grow]"));
+		nodeInfoPanel = new JPanel(new MigLayout("inset 5", "[grow]", "[158px:158px,grow 20][growprio 101,grow]"));
 		
 		JLabel lblGeneName, lblUniprotId, lblDescription;
 		
@@ -97,21 +99,24 @@ public class PMBPanel extends JPanel {
 		lblGeneName.setFont(title);
 		proteinInfoPanel.add(lblGeneName);
 		
-		lblGeneNameValue = new JTextLabel();
+		lblGeneNameValue = new JLabel();
+		lblGeneNameValue.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
 		proteinInfoPanel.add(lblGeneNameValue);
 		
 		lblUniprotId = new JLabel("Uniprot Accesion");
 		lblUniprotId.setFont(title);
 		proteinInfoPanel.add(lblUniprotId);
 		
-		lblUniprotIdValue = new JTextLabel();
+		lblUniprotIdValue = new JLinkLabel();
+		lblUniprotIdValue.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
 		proteinInfoPanel.add(lblUniprotIdValue);
 		
 		lblDescription = new JLabel("Description");
 		lblDescription.setFont(title);
 		proteinInfoPanel.add(lblDescription);
 		
-		lblDescriptionValue = new JTextLabel();
+		lblDescriptionValue = new JLabel();
+		lblDescriptionValue.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
 		proteinInfoPanel.add(lblDescriptionValue);
 		
 		
@@ -144,15 +149,11 @@ public class PMBPanel extends JPanel {
 		
 		nodeInfoPanel.add(proteinInfoScroll, "cell 0 0,grow");
 		nodeInfoPanel.add(geneOntologyScroll, "cell 0 1,grow");
-		
+
 		//Demo
 		//lblGeneNameValue.setText("val");
 		//lblUniprotIdValue.setText("val");
 		//lblDescriptionValue.setText("<html>val<br/><br/>d</html>");
-		//
-		//lblCcList.setText("val");
-		//lblBpList.setText("val");
-		//lblMfList.setText("<html>val<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>m</html>");
 	}
 	
 	
@@ -174,7 +175,8 @@ public class PMBPanel extends JPanel {
 		
 		//Protein info
 		lblGeneNameValue.setText(selectedNode.getGeneName().trim());
-		lblUniprotIdValue.setText(selectedNode.getUniprotId().trim());
+		lblUniprotIdValue.setUrl("http://uniprot.org/uniprot/"+selectedNode.getUniprotId().trim());
+		lblUniprotIdValue.setText("<html><u>"+selectedNode.getUniprotId().trim()+"</u></html>");
 		lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
 		
 		//Gene ontology
