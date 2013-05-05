@@ -16,13 +16,10 @@ public class NetworkAbstraction {
 		// Get result from 
 		try {
 			res = DBConnector.Instance().getAllData(id, refOrganism, dbList, orgaList);
-			if(res.isEmpty()) throw new SQLException("empty "+id);
-		} catch (SQLException e1) {
-			JOptionPane.showMessageDialog(null, "Error SQL : "+e1.getLocalizedMessage());
-			return null;
-		}
-		catch (IOException e2) {
-			JOptionPane.showMessageDialog(null, "Error config : "+e2.getLocalizedMessage());
+			if(res.isEmpty()) 
+				JOptionPane.showMessageDialog(null, id+" not found");
+		} catch (Exception e1) {
+			//JOptionPane.showMessageDialog(null, "Error SQL : "+e1.getLocalizedMessage());
 			return null;
 		}
 		return res;

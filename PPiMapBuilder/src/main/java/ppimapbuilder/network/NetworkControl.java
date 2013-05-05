@@ -118,24 +118,22 @@ public class NetworkControl implements PropertyChangeListener {
 		return null;
 	}
 	
-	// TODO : distinguish the reference organism !	
 	public void createNetwork(final ArrayList<String> poiList, final ArrayList<String> dbList, final ArrayList<Integer> orgaList, final int refOrganism) {
 		
 		// Will display the loading window until the treatment is done
 		new LoadingWindow("Generating network...") {
 			public void process() {
-			
+				
 				NetworkCreationFrameControl.closeFrame();
 				
 				// Creation of the network
 				myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
-				addNetwork(myNetwork);
-				
+								
 				Cytoscape.getEdgeAttributes().setUserEditable("Source database", false);
 				Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
 				Cytoscape.getEdgeAttributes().setUserEditable("Experimental system", false);
 				Cytoscape.getEdgeAttributes().setUserEditable("Pubmed id", false);
-				Cytoscape.getEdgeAttributes().setUserEditable("Predictive from", false);
+				Cytoscape.getEdgeAttributes().setUserEditable("Predicted from", false);
 				Cytoscape.getEdgeAttributes().setUserEditable("canonicalName", false);
 				
 				// Creation of the network components
@@ -143,63 +141,75 @@ public class NetworkControl implements PropertyChangeListener {
 					
 					SQLResult res = NetworkAbstraction.getAllData(id, dbList, orgaList, refOrganism);
 					
-					PMBNode A, B;
-					CyEdge interaction;
-					LinkedHashMap<String, String> fields;
-					
-					// For each line
-					for(String row: res.keySet()) {
-						//Get fields
-						fields = res.getData(row);
+					if (res != null) {
 						
-						//Create Nodes
-						try {
-							
-							A = new PMBNode(Cytoscape.getCyNode(fields.get("interactorA"), true), fields.get("uniprotidA"), fields.get("taxidA"));
-							B = new PMBNode(Cytoscape.getCyNode(fields.get("interactorB"), true), fields.get("uniprotidB"), fields.get("taxidB"));
-							myNetwork.addNode(A);
-							myNetwork.addNode(B);
-							
-							addNode(myNetwork, A);
-							addNode(myNetwork, B);
-							
-							//Create Edges
-							interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
-							
-							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
-							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
-							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
-							
-							String organismA = (String) fields.get("orgaA");
-							String organismB = (String) fields.get("orgaB");							
-							
-							if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
-								if (Integer.parseInt(fields.get("taxidA")) == refOrganism ) { // If this organism is the reference one
-									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
-									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
+						PMBNode A, B;
+						CyEdge interaction;
+						LinkedHashMap<String, String> fields;
+
+						// For each line
+						for(String row: res.keySet()) {
+							System.out.println("#8");
+							//Get fields
+							fields = res.getData(row);
+							System.out.println("#9");
+
+							//Create Nodes
+							try {
+
+								A = new PMBNode(Cytoscape.getCyNode(fields.get("interactorA"), true), fields.get("uniprotidA"), fields.get("taxidA"));
+								B = new PMBNode(Cytoscape.getCyNode(fields.get("interactorB"), true), fields.get("uniprotidB"), fields.get("taxidB"));
+								myNetwork.addNode(A);
+								myNetwork.addNode(B);
+
+								addNode(myNetwork, A);
+								addNode(myNetwork, B);
+
+								//Create Edges
+								interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
+
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
+
+								String organismA = (String) fields.get("orgaA");
+								String organismB = (String) fields.get("orgaB");							
+
+								if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
+									if (Integer.parseInt(fields.get("taxidA")) == refOrganism ) { // If this organism is the reference one
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
+									}
+									else { // If this organism is another organism
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
+									}
 								}
-								else { // If this organism is another organism
+								else {
 									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
-									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
 								}
+
+								myNetwork.addEdge(interaction);
+
+							} catch (Exception e1) {
+								JOptionPane.showMessageDialog(null, "Error : "+e1.getLocalizedMessage());
+								e1.printStackTrace();
+								return;
 							}
-							else {
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
-							}
-							
-							myNetwork.addEdge(interaction);
-						
-						} catch (Exception e1) {
-							JOptionPane.showMessageDialog(null, "Error : "+e1.getLocalizedMessage());
-							e1.printStackTrace();
-							return;
 						}
+
 					}
 				}
 				
-				// Add a view to the network
-				addViewToNetwork(myNetwork);
+				if (myNetwork.getNodeCount() == 0) {
+					Cytoscape.destroyNetwork(myNetwork);
+				}
+				else {
+					addNetwork(myNetwork);
+					// Add a view to the network
+					addViewToNetwork(myNetwork);
+				}
 			}
 		};
 	}
