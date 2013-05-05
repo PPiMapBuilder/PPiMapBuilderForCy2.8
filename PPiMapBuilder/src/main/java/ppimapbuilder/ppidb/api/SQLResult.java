@@ -104,6 +104,11 @@ public class SQLResult {
     public Collection<LinkedHashMap<String, String>> values() {
         return ret.values();
     }
+    
+    public String getIdFieldName() {
+		return idFieldName;
+	}
+    
 }
 
 /*

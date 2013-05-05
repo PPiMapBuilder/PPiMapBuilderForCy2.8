@@ -233,7 +233,24 @@ public class DBConnector {
         ArrayList<Integer> proteinId = new ArrayList<Integer>();
         
         SQLResult res = new SQLResult(st.executeQuery(q));
+        LinkedHashMap<String, LinkedHashMap<String, String>> resCopy = new LinkedHashMap<String, LinkedHashMap<String,String>>();
+
         if (res != null) {
+        	
+        	LinkedHashMap<String, String> fields2;
+			for(String row: res.keySet()) {
+				resCopy.put(row, new LinkedHashMap<String, String>());
+				
+				fields2 = res.getData(row);
+				
+				for (String field : fields2.keySet()) {
+					resCopy.get(row).put(field, fields2.get(field));
+				}
+			}
+			
+	        SQLResult finalRes = new SQLResult(res.getIdFieldName(), resCopy);
+        	
+        	
         	LinkedHashMap<String, String> fields;
 			for(String row: res.keySet()) {
 				fields = res.getData(row);
@@ -248,41 +265,32 @@ public class DBConnector {
 			if (!proteinId.isEmpty()) {
 				HashMap<Integer, HashMap<String, String>> homologs = this.getHomologous(proteinId, taxIdRef);
 
-				LinkedHashMap<String, LinkedHashMap<String, String>> resCopy = new LinkedHashMap<String, LinkedHashMap<String,String>>();
-				
-				LinkedHashMap<String, String> fields2;
 				for(String row: res.keySet()) {
-					resCopy.put(row, new LinkedHashMap<String, String>());
-					
 					fields2 = res.getData(row);
-					
-					for (String field : fields2.keySet()) {
-						resCopy.get(row).put(field, fields2.get(field));
-					}
-					
+
 					if (!fields2.get("p1_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) { // If the protein is not from the reference organism
 						if (homologs.containsKey(fields2.get("p1_id"))) { // If an homolog exists for this protein and this reference organism
-							res.getAllData().get(fields2.get("id")).put(res.getAllData().get(fields2.get("id")).get("p1_gene_name"), homologs.get(fields2.get("p1_id")).get("ptn_gene_name"));
-							res.getAllData().get(fields2.get("id")).put(res.getAllData().get(fields2.get("id")).get("p1_uniprot_id"), homologs.get(fields2.get("p1_id")).get("ptn_uniprot_id"));
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p1_gene_name"), homologs.get(fields2.get("p1_id")).get("ptn_gene_name"));
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p1_uniprot_id"), homologs.get(fields2.get("p1_id")).get("ptn_uniprot_id"));
 						}
 						else { // If not, we remove the interaction
-							res.getAllData().remove(fields2.get("id"));
+							finalRes.getDataSet().remove(fields2.get("id"));
 						}
 					}
 					if (!fields2.get("p2_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
 						if (homologs.containsKey(fields2.get("p2_id"))) {
-							res.getAllData().get(fields2.get("id")).put(res.getAllData().get(fields2.get("id")).get("p2_gene_name"), homologs.get(fields2.get("p2_id")).get("ptn_gene_name"));
-							res.getAllData().get(fields2.get("id")).put(res.getAllData().get(fields2.get("id")).get("p2_uniprot_id"), homologs.get(fields2.get("p2_id")).get("ptn_uniprot_id"));
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p2_gene_name"), homologs.get(fields2.get("p2_id")).get("ptn_gene_name"));
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p2_uniprot_id"), homologs.get(fields2.get("p2_id")).get("ptn_uniprot_id"));
 						}
 						else {
-							res.getAllData().remove(fields2.get("id"));
+							finalRes.getDataSet().remove(fields2.get("id"));
 						}
 					}
-				}
+				}			
 			}
+	        return finalRes;
         }
-        return res2;
-        
+        return null;
     }
 
     /**
