@@ -32,7 +32,7 @@ public class PMBPlugin extends CytoscapePlugin {
 		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(myMenu); // Add the menu to the plugins menu
 		PMBPanelControl.createPanel(); // Creates the PPiMapBuilder panel
 	
-		try {
+		/*try {
 			Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
 
 			CyNetwork myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
@@ -57,7 +57,7 @@ public class PMBPlugin extends CytoscapePlugin {
 			}			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-		}
+		}*/
 		
 	
 	}

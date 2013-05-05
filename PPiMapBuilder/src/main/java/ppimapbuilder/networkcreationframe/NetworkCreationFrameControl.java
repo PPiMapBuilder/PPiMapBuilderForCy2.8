@@ -43,6 +43,7 @@ public class NetworkCreationFrameControl {
 		ArrayList<String> poiList; // List of proteins of interest
 		ArrayList<String> dbList; // List of selected organisms
 		ArrayList<Integer> orgaList; // List of selected databases
+		int refOrganism;
 		
 		// POI list
 		try {
@@ -60,8 +61,11 @@ public class NetworkCreationFrameControl {
 		// Orga list
 		orgaList = myFrame.getSelectedOrganisms(); // Retrieve the organism list
 		
+		// Reference orga
+		refOrganism = myFrame.getSelectedReferenceOrganism();
+		
 		// TODO : distinguish the reference organism !
-		NetworkControl.Instance().createNetwork(poiList, dbList, orgaList, myFrame.getSelectedReferenceOrganism());
+		NetworkControl.Instance().createNetwork(poiList, dbList, orgaList, refOrganism);
 		
 		
 	}

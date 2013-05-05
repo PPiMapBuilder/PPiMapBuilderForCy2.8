@@ -372,11 +372,19 @@ public class NetworkCreationFrame {
 	public Integer getSelectedReferenceOrganism() {
 		//TODO: Test this method
 		String refOrganism = (String)this.cbReferenceOrganism.getSelectedItem();
+		System.out.println("#1 : "+refOrganism);
 		
+		int i =0;
 		// For each entry of the organism linkedHashmap
-		for (Entry<Integer, JCheckBox> entry : this.getOrganisms().entrySet())
-			if (entry.getValue().getName() == refOrganism) // If the organism is the organism selected 
+		for (Entry<Integer, JCheckBox> entry : this.getOrganisms().entrySet()) {
+			System.out.println("#2 : "+entry.getValue().getText());
+			if (entry.getValue().getText().equalsIgnoreCase(refOrganism)) {// If the organism is the organism selected 
+				System.out.println("#3");
 				return entry.getKey(); // The organism taxid is returned
+			}
+			System.out.println("#4");
+		}
+		System.out.println("#5");
 		return null; //error (shouldn't happen)
 	}
 	
