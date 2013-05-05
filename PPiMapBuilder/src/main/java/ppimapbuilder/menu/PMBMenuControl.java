@@ -22,10 +22,10 @@ public class PMBMenuControl {
 					PMBPanelControl.focusPanel(); // Focus on the panel	
 				} catch (SQLException e) {
 					JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Connection error!", "Connection to database failed", JOptionPane.ERROR_MESSAGE);
-					//e.printStackTrace();
+					e.printStackTrace();
 				} catch (IOException e) {
 					JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Server config","Server config missing!", JOptionPane.ERROR_MESSAGE);
-					//e.printStackTrace();
+					e.printStackTrace();
 				}
 						
 			}
