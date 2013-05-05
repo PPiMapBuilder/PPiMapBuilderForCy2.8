@@ -11,11 +11,11 @@ import ppimapbuilder.ppidb.api.SQLResult;
 
 public class NetworkAbstraction {
 	
-	public static SQLResult getAllData(String id, ArrayList<String> dbList, ArrayList<Integer> orgaList) {
+	public static SQLResult getAllData(String id, ArrayList<String> dbList, ArrayList<Integer> orgaList, int refOrganism) {
 		SQLResult res;
 		// Get result from 
 		try {
-			res = DBConnector.Instance().getAllData(id, dbList, orgaList);
+			res = DBConnector.Instance().getAllData(id, refOrganism, dbList, orgaList);
 			if(res.isEmpty()) 
 				JOptionPane.showMessageDialog(null, id+" not found");
 		} catch (Exception e1) {

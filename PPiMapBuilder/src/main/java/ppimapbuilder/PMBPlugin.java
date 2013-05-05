@@ -1,9 +1,19 @@
 package ppimapbuilder;
 
+import java.net.UnknownHostException;
+
 import ppimapbuilder.menu.presentation.PMBMenu;
+import ppimapbuilder.network.presentation.PMBNode;
+import ppimapbuilder.network.presentation.PMBView;
 import ppimapbuilder.panel.PMBPanelControl;
+import cytoscape.CyEdge;
+import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.data.Semantics;
 import cytoscape.plugin.CytoscapePlugin;
+import cytoscape.visual.CalculatorCatalog;
+import cytoscape.visual.VisualMappingManager;
+import cytoscape.visual.VisualStyle;
 
 /**
  * 
