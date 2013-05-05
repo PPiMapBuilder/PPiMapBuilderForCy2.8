@@ -6,7 +6,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
-
 import javax.swing.JOptionPane;
 import ppimapbuilder.LoadingWindow;
 import ppimapbuilder.network.presentation.PMBNode;

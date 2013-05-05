@@ -14,35 +14,17 @@ public class NetworkCreationFrameAbstraction {
 
 	private DBConnector myDBConnector;
 	
-	public NetworkCreationFrameAbstraction() {
-		try {
+	public NetworkCreationFrameAbstraction() throws SQLException, IOException {
 			myDBConnector = DBConnector.Instance();
-		} catch (SQLException e) {
-			showError("Connection to database failed", "Connection error!");
-			e.printStackTrace();
-		} catch (IOException e) {
-			showError("Server config missing!", "Server config");
-			e.printStackTrace();
-		}
 	}
 	
-	/**
-	 * Displays an error message using <i>JOptionPane</i>
-	 * @param message the error message
-	 * @param title the title of the error window
-	 */
-	private void showError(String message, String title) {
-		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), title, message, JOptionPane.ERROR_MESSAGE);
-	}
-	
-
 	public LinkedHashMap<String, Integer> getOrganisms() {
 		LinkedHashMap<String, Integer> orga;
 		try {
 			orga = myDBConnector.getOrganisms();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			showError("Connection to database failed", "Connection error");
+			JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Connection error", "Connection to database failed", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
 		return orga;
@@ -54,7 +36,7 @@ public class NetworkCreationFrameAbstraction {
 			db = myDBConnector.getDatabases();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			showError("Connection to database failed", "Connection error");
+			JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Connection error", "Connection to database failed", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
 		return db;
