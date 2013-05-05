@@ -194,7 +194,9 @@ public class DBConnector {
 
     /**
      * Get data about a protein identified by its UniprotID from a list of
-     * source databases and a list of organisms
+     * source databases and a list of organisms. Available fiels: p1_id,
+     * p1_gene_name, p1_uniprot_id, p1_organism_id, p2_id, p2_gene_name,
+     * p2_uniprot_id, p2_organism_id
      *
      * @param uniprot
      * @param taxIdRef
@@ -253,18 +255,18 @@ public class DBConnector {
                 + "	and ( (p1.organism_id = " + taxIdRef + ") or (p2.organism_id = " + taxIdRef + ") )";
 
 
-/*
-        q += " AND org1.tax_id IN ("
-                + this.formatInClause(orgs)
-                + ") "
-                + " AND org2.tax_id IN ("
-                + this.formatInClause(orgs)
-                + ") "
-                + "AND db.name IN ("
-                + this.formatInClause(dbs)
-                + ") ";
-*/
-        
+        /*
+         q += " AND org1.tax_id IN ("
+         + this.formatInClause(orgs)
+         + ") "
+         + " AND org2.tax_id IN ("
+         + this.formatInClause(orgs)
+         + ") "
+         + "AND db.name IN ("
+         + this.formatInClause(dbs)
+         + ") ";
+         */
+
         System.out.println(q);
         return new SQLResult(st.executeQuery(q));
     }
