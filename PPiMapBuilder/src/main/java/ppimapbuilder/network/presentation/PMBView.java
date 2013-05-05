@@ -56,7 +56,7 @@ public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
 	
-	public static final String visualStyleName = "PPiMapBuilder Style";
+	public static final String visualStyleName = "PPiMapBuilderStyle";
 	
 	/**
 	 * Constructor
@@ -124,7 +124,7 @@ public class PMBView implements CyNetworkView {
 		DiscreteMapping arrowMapping = new DiscreteMapping(LineStyle.SOLID, ObjectMapping.EDGE_MAPPING);
 		arrowMapping.setControllingAttributeName("Origin", network, false);
 		arrowMapping.putMapValue("Interolog", LineStyle.DASH_DOT);
-		Calculator edgeCalculator = new BasicCalculator("Example Edge Arrow Shape Calculator", arrowMapping, VisualPropertyType.EDGE_LINE_STYLE);
+		Calculator edgeCalculator = new BasicCalculator("edge line style ppimapbuilder", arrowMapping, VisualPropertyType.EDGE_LINE_STYLE);
 		edgeAppCalc.setCalculator(edgeCalculator);
 
 		// Global node selection
