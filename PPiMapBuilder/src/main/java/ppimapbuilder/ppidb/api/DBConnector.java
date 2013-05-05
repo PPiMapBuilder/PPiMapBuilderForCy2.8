@@ -187,7 +187,8 @@ public class DBConnector {
 
         this.query += " where "
                 + "    ( p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "' )"
-                + " AND org.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
+                + " AND org1.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
+                + " AND org2.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
                 + " AND db.name IN ('hprd','biogrid', 'intact', 'dip', 'bind', 'mint')";
 
         return new SQLResult(st.executeQuery(this.query));
@@ -204,7 +205,10 @@ public class DBConnector {
     public SQLResult getAllData(String uniprot, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
         String q = this.query + " where"
                 + " (p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "')"
-                + " AND org.tax_id IN ("
+                + " AND org1.tax_id IN ("
+                + this.formatInClause(orgs)
+                + ") "
+                + " AND org2.tax_id IN ("
                 + this.formatInClause(orgs)
                 + ") "
                 + "AND db.name IN ("
