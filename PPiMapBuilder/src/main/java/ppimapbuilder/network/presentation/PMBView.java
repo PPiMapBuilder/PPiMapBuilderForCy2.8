@@ -7,15 +7,15 @@ import giny.model.RootGraph;
 import giny.view.EdgeView;
 import giny.view.GraphViewChangeListener;
 import giny.view.NodeView;
+
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Paint;
-import java.awt.event.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-
-import com.jhlabs.image.FieldWarpFilter.Line;
 
 import ppimapbuilder.network.NetworkControl;
 import cytoscape.CyEdge;
@@ -23,16 +23,13 @@ import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.layout.CyLayoutAlgorithm;
-import cytoscape.render.immed.nodeshape.NodeShape;
 import cytoscape.view.CyEdgeView;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CyNodeView;
-import cytoscape.visual.ArrowShape;
 import cytoscape.visual.CalculatorCatalog;
 import cytoscape.visual.EdgeAppearanceCalculator;
 import cytoscape.visual.GlobalAppearanceCalculator;
 import cytoscape.visual.LineStyle;
-import cytoscape.visual.NodeAppearance;
 import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.VisualMappingManager;
 import cytoscape.visual.VisualPropertyType;
@@ -41,7 +38,7 @@ import cytoscape.visual.calculators.BasicCalculator;
 import cytoscape.visual.calculators.Calculator;
 import cytoscape.visual.mappings.DiscreteMapping;
 import cytoscape.visual.mappings.ObjectMapping;
-import cytoscape.visual.mappings.PassThroughMapping;
+
 import ding.view.DGraphView;
 import ding.view.EdgeContextMenuListener;
 import ding.view.NodeContextMenuListener;
@@ -55,26 +52,24 @@ import ding.view.NodeContextMenuListener;
 public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
-	
+
 	public static final String visualStyleName = "PPiMapBuilderStyle";
-	
+
 	/**
 	 * Constructor
 	 * Create the CyNetworkView into the myView attributes and decorates it with specific methods
 	 * @param myNetwork
 	 */
 	public PMBView(CyNetwork myNetwork) {
-		
+
 		this.myView = Cytoscape.createNetworkView(myNetwork); // Create the view as usual
-		
+
 		((DGraphView) this.myView).getCanvas().addMouseListener(new MouseListener() { // Add a mouse listener to this view
-			
+
 			public void mouseReleased(MouseEvent arg0) {}
 
 			public void mousePressed(MouseEvent e) { // When there is a click on this view
-				if ( ((DGraphView) Cytoscape.getCurrentNetworkView()).getPickedNodeView(e.getPoint ()) != null) { // If the click is on a node
-					NetworkControl.Instance().updatePanel(); // We update the panel
-				}
+				NetworkControl.Instance().mousePressed(e.getPoint());
 			}
 
 			public void mouseExited(MouseEvent arg0) {}
@@ -83,7 +78,7 @@ public class PMBView implements CyNetworkView {
 
 			public void mouseClicked(MouseEvent arg0) {}
 		});
-		
+
 		//((DGraphView) this.myView).getCanvas(DGraphView.Canvas.BACKGROUND_CANVAS).setBackground(Color.white);
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = manager.getCalculatorCatalog();
@@ -93,18 +88,18 @@ public class PMBView implements CyNetworkView {
 			vs = createVisualStyle(myNetwork);
 			catalog.addVisualStyle(vs);
 		}
-		
+
 		this.myView.setVisualStyle(vs.getName());
 
 		manager.setVisualStyle(vs);
 		this.myView.redrawGraph(true,true);
-		
-		
+
+
 		this.myView.setZoom(2); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
-		
+
 	}
-	
+
 	public VisualStyle createVisualStyle(CyNetwork network) {
 
 		VisualStyle visualStyle = new VisualStyle(visualStyleName);
@@ -112,14 +107,14 @@ public class PMBView implements CyNetworkView {
 		// Node default appearance
 		NodeAppearanceCalculator nodeAppCalc = this.myView.getVisualStyle().getNodeAppearanceCalculator();
 		nodeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getNodeAppearanceCalculator().getDefaultAppearance());
-		
+
 		// Edge default appearance
 		EdgeAppearanceCalculator edgeAppCalc = this.myView.getVisualStyle().getEdgeAppearanceCalculator();
 		edgeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getEdgeAppearanceCalculator().getDefaultAppearance());
-		
+
 		// Global default appearance
 		GlobalAppearanceCalculator globalAppCalc = this.myView.getVisualStyle().getGlobalAppearanceCalculator();
-			
+
 		// Edge line style
 		DiscreteMapping arrowMapping = new DiscreteMapping(LineStyle.SOLID, ObjectMapping.EDGE_MAPPING);
 		arrowMapping.setControllingAttributeName("Origin", network, false);
@@ -129,17 +124,17 @@ public class PMBView implements CyNetworkView {
 
 		// Global node selection
 		globalAppCalc.setDefaultNodeSelectionColor(Color.cyan);
-		
+
 		// Add calculators to visual style
 		visualStyle.setEdgeAppearanceCalculator(edgeAppCalc);
 		visualStyle.setNodeAppearanceCalculator(nodeAppCalc);
 		visualStyle.setGlobalAppearanceCalculator(globalAppCalc);
-		
+
 		return visualStyle;
 	}
 
 	/* OVERRIDE OF EVERY IMPLEMENTABLE METHOD TO RUN IT THROUGH THE CYNETWORKVIEW ATTRIBUTE */
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -161,7 +156,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView addEdgeView(int arg0) {
 		return myView.addEdgeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -171,7 +166,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView addEdgeView(String arg0, int arg1) {
 		return myView.addEdgeView(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -179,7 +174,7 @@ public class PMBView implements CyNetworkView {
 	public void addGraphViewChangeListener(GraphViewChangeListener arg0) {
 		myView.addGraphViewChangeListener(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -188,7 +183,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView addNodeView(int arg0) {
 		return myView.addNodeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -198,7 +193,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView addNodeView(String arg0, int arg1) {
 		return myView.addNodeView(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -208,21 +203,21 @@ public class PMBView implements CyNetworkView {
 	public NodeView addNodeView(int arg0, NodeView arg1) {
 		return myView.addNodeView(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void disableEdgeSelection() {
 		myView.disableEdgeSelection();
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void disableNodeSelection() {
 		myView.disableNodeSelection();
 	}
-	
+
 	/**
 	 * 
 	 * @return int
@@ -230,7 +225,7 @@ public class PMBView implements CyNetworkView {
 	public int edgeCount() {
 		return myView.edgeCount();
 	}
-	
+
 	/**
 	 * 
 	 * @return boolean
@@ -238,28 +233,28 @@ public class PMBView implements CyNetworkView {
 	public boolean edgeSelectionEnabled() {
 		return myView.edgeSelectionEnabled();
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void enableEdgeSelection() {
 		myView.enableEdgeSelection();
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void enableNodeSelection() {
 		myView.enableNodeSelection();
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void fitContent() {
 		myView.fitContent();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -268,7 +263,7 @@ public class PMBView implements CyNetworkView {
 	public Object[] getAllEdgePropertyData(int arg0) {
 		return myView.getAllEdgePropertyData(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -277,7 +272,7 @@ public class PMBView implements CyNetworkView {
 	public Object[] getAllNodePropertyData(int arg0) {
 		return myView.getAllNodePropertyData(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -285,14 +280,14 @@ public class PMBView implements CyNetworkView {
 	public Paint getBackgroundPaint() {
 		return myView.getBackgroundPaint();
 	}
-	
+
 	/**
 	 * 
 	 */
 	public Component getComponent() {
 		return myView.getComponent();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -302,7 +297,7 @@ public class PMBView implements CyNetworkView {
 	public Object[] getContextMethods(String arg0, boolean arg1) {
 		return myView.getContextMethods(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -312,7 +307,7 @@ public class PMBView implements CyNetworkView {
 	public Object[] getContextMethods(String arg0, Object[] arg1) {
 		return myView.getContextMethods(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -322,7 +317,7 @@ public class PMBView implements CyNetworkView {
 	public boolean getEdgeBooleanProperty(int arg0, int arg1) {
 		return myView.getEdgeBooleanProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -332,7 +327,7 @@ public class PMBView implements CyNetworkView {
 	public double getEdgeDoubleProperty(int arg0, int arg1) {
 		return myView.getEdgeDoubleProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -342,7 +337,7 @@ public class PMBView implements CyNetworkView {
 	public float getEdgeFloatProperty(int arg0, int arg1) {
 		return myView.getEdgeFloatProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -352,7 +347,7 @@ public class PMBView implements CyNetworkView {
 	public int getEdgeIntProperty(int arg0, int arg1) {
 		return myView.getEdgeIntProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -362,7 +357,7 @@ public class PMBView implements CyNetworkView {
 	public Object getEdgeObjectProperty(int arg0, int arg1) {
 		return myView.getEdgeObjectProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -371,7 +366,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView getEdgeView(int arg0) {
 		return myView.getEdgeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -380,7 +375,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView getEdgeView(Edge arg0) {
 		return myView.getEdgeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @return int
@@ -388,7 +383,7 @@ public class PMBView implements CyNetworkView {
 	public int getEdgeViewCount() {
 		return myView.getEdgeViewCount();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -397,7 +392,7 @@ public class PMBView implements CyNetworkView {
 	public Iterator getEdgeViewsIterator() {
 		return myView.getEdgeViewsIterator();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -406,7 +401,7 @@ public class PMBView implements CyNetworkView {
 	public List getEdgeViewsList() {
 		return myView.getEdgeViewsList();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -417,7 +412,7 @@ public class PMBView implements CyNetworkView {
 	public List getEdgeViewsList(Node arg0, Node arg1) {
 		return myView.getEdgeViewsList();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -429,7 +424,7 @@ public class PMBView implements CyNetworkView {
 	public List getEdgeViewsList(int arg0, int arg1, boolean arg2) {
 		return myView.getEdgeViewsList(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -437,7 +432,7 @@ public class PMBView implements CyNetworkView {
 	public GraphPerspective getGraphPerspective() {
 		return myView.getGraphPerspective();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -445,7 +440,7 @@ public class PMBView implements CyNetworkView {
 	public String getIdentifier() {
 		return myView.getIdentifier();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -455,7 +450,7 @@ public class PMBView implements CyNetworkView {
 	public boolean getNodeBooleanProperty(int arg0, int arg1) {
 		return myView.getNodeBooleanProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -465,7 +460,7 @@ public class PMBView implements CyNetworkView {
 	public double getNodeDoubleProperty(int arg0, int arg1) {
 		return myView.getNodeDoubleProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -475,7 +470,7 @@ public class PMBView implements CyNetworkView {
 	public float getNodeFloatProperty(int arg0, int arg1) {
 		return myView.getNodeFloatProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -485,7 +480,7 @@ public class PMBView implements CyNetworkView {
 	public int getNodeIntProperty(int arg0, int arg1) {
 		return myView.getNodeIntProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -495,7 +490,7 @@ public class PMBView implements CyNetworkView {
 	public Object getNodeObjectProperty(int arg0, int arg1) {
 		return myView.getNodeObjectProperty(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -504,7 +499,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView getNodeView(Node arg0) {
 		return myView.getNodeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -513,7 +508,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView getNodeView(int arg0) {
 		return myView.getNodeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -521,7 +516,7 @@ public class PMBView implements CyNetworkView {
 	public int getNodeViewCount() {
 		return myView.getNodeViewCount();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -530,7 +525,7 @@ public class PMBView implements CyNetworkView {
 	public Iterator getNodeViewsIterator() {
 		return myView.getNodeViewsIterator();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -538,7 +533,7 @@ public class PMBView implements CyNetworkView {
 	public RootGraph getRootGraph() {
 		return myView.getRootGraph();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -546,7 +541,7 @@ public class PMBView implements CyNetworkView {
 	public int[] getSelectedEdgeIndices() {
 		return myView.getSelectedEdgeIndices();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -555,7 +550,7 @@ public class PMBView implements CyNetworkView {
 	public List getSelectedEdges() {
 		return myView.getSelectedEdges();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -563,7 +558,7 @@ public class PMBView implements CyNetworkView {
 	public int[] getSelectedNodeIndices() {
 		return myView.getSelectedNodeIndices();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -572,7 +567,7 @@ public class PMBView implements CyNetworkView {
 	public List getSelectedNodes() {
 		return myView.getSelectedNodes();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -580,7 +575,7 @@ public class PMBView implements CyNetworkView {
 	public double getZoom() {
 		return myView.getZoom();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -589,7 +584,7 @@ public class PMBView implements CyNetworkView {
 	public boolean hideGraphObject(Object arg0) {
 		return myView.hideGraphObject(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -599,7 +594,7 @@ public class PMBView implements CyNetworkView {
 	public boolean hideGraphObjects(List arg0) {
 		return myView.hideGraphObjects(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -607,7 +602,7 @@ public class PMBView implements CyNetworkView {
 	public int nodeCount() {
 		return myView.nodeCount();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -615,7 +610,7 @@ public class PMBView implements CyNetworkView {
 	public boolean nodeSelectionEnabled() {
 		return myView.nodeSelectionEnabled();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -624,7 +619,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView removeEdgeView(EdgeView arg0) {
 		return myView.removeEdgeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -633,7 +628,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView removeEdgeView(Edge arg0) {
 		return myView.removeEdgeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -642,7 +637,7 @@ public class PMBView implements CyNetworkView {
 	public EdgeView removeEdgeView(int arg0) {
 		return myView.removeEdgeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -650,7 +645,7 @@ public class PMBView implements CyNetworkView {
 	public void removeGraphViewChangeListener(GraphViewChangeListener arg0) {
 		myView.removeGraphViewChangeListener(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -659,7 +654,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView removeNodeView(NodeView arg0) {
 		return myView.removeNodeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -668,7 +663,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView removeNodeView(Node arg0) {
 		return myView.removeNodeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -677,7 +672,7 @@ public class PMBView implements CyNetworkView {
 	public NodeView removeNodeView(int arg0) {
 		return myView.removeNodeView(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -686,7 +681,7 @@ public class PMBView implements CyNetworkView {
 	public void setAllEdgePropertyData(int arg0, Object[] arg1) {
 		myView.setAllEdgePropertyData(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -695,7 +690,7 @@ public class PMBView implements CyNetworkView {
 	public void setAllNodePropertyData(int arg0, Object[] arg1) {
 		myView.setAllNodePropertyData(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -703,7 +698,7 @@ public class PMBView implements CyNetworkView {
 	public void setBackgroundPaint(Paint arg0) {
 		myView.setBackgroundPaint(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -714,7 +709,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setEdgeBooleanProperty(int arg0, int arg1, boolean arg2) {
 		return myView.setEdgeBooleanProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -725,7 +720,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setEdgeDoubleProperty(int arg0, int arg1, double arg2) {
 		return myView.setEdgeDoubleProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -736,7 +731,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setEdgeFloatProperty(int arg0, int arg1, float arg2) {
 		return myView.setEdgeFloatProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -747,7 +742,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setEdgeIntProperty(int arg0, int arg1, int arg2) {
 		return myView.setEdgeIntProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -758,7 +753,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setEdgeObjectProperty(int arg0, int arg1, Object arg2) {
 		return myView.setEdgeObjectProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -766,7 +761,7 @@ public class PMBView implements CyNetworkView {
 	public void setIdentifier(String arg0) {
 		myView.setIdentifier(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -777,7 +772,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setNodeBooleanProperty(int arg0, int arg1, boolean arg2) {
 		return myView.setNodeBooleanProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -788,7 +783,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setNodeDoubleProperty(int arg0, int arg1, double arg2) {
 		return myView.setNodeDoubleProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -799,7 +794,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setNodeFloatProperty(int arg0, int arg1, float arg2) {
 		return myView.setNodeFloatProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -810,7 +805,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setNodeIntProperty(int arg0, int arg1, int arg2) {
 		return myView.setNodeIntProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -821,7 +816,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setNodeObjectProperty(int arg0, int arg1, Object arg2) {
 		return myView.setNodeObjectProperty(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -829,7 +824,7 @@ public class PMBView implements CyNetworkView {
 	public void setZoom(double arg0) {
 		myView.setZoom(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -838,7 +833,7 @@ public class PMBView implements CyNetworkView {
 	public boolean showGraphObject(Object arg0) {
 		return myView.showGraphObject(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -848,14 +843,14 @@ public class PMBView implements CyNetworkView {
 	public boolean showGraphObjects(List arg0) {
 		return myView.showGraphObjects(arg0);
 	}
-	
+
 	/**
 	 * 
 	 */
 	public void updateView() {
 		myView.updateView();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -863,7 +858,7 @@ public class PMBView implements CyNetworkView {
 	public void addEdgeContextMenuListener(EdgeContextMenuListener arg0) {
 		myView.addEdgeContextMenuListener(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -871,7 +866,7 @@ public class PMBView implements CyNetworkView {
 	public void addNodeContextMenuListener(NodeContextMenuListener arg0) {
 		myView.addNodeContextMenuListener(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -879,7 +874,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLayout(CyLayoutAlgorithm arg0) {
 		myView.applyLayout(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -889,7 +884,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLayout(CyLayoutAlgorithm arg0, CyNode[] arg1, CyEdge[] arg2) {
 		myView.applyLayout(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -899,7 +894,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLayout(CyLayoutAlgorithm arg0, CyNodeView[] arg1, CyEdgeView[] arg2) {
 		myView.applyLayout(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -909,7 +904,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLayout(CyLayoutAlgorithm arg0, int[] arg1, int[] arg2) {
 		myView.applyLayout(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -919,7 +914,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLockedLayout(CyLayoutAlgorithm arg0, CyNode[] arg1, CyEdge[] arg2) {
 		myView.applyLockedLayout(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -929,7 +924,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLockedLayout(CyLayoutAlgorithm arg0, CyNodeView[] arg1, CyEdgeView[] arg2) {
 		myView.applyLockedLayout(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -939,7 +934,7 @@ public class PMBView implements CyNetworkView {
 	public void applyLockedLayout(CyLayoutAlgorithm arg0, int[] arg1, int[] arg2) {
 		myView.applyLockedLayout(arg0, arg1, arg2);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -948,7 +943,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(CyEdge arg0) {
 		return myView.applyVizMap(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -957,7 +952,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(EdgeView arg0) {
 		return myView.applyVizMap(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -966,7 +961,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(CyNode arg0) {
 		return myView.applyVizMap(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -975,7 +970,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(NodeView arg0) {
 		return myView.applyVizMap(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -985,7 +980,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(CyEdge arg0, VisualStyle arg1) {
 		return myView.applyVizMap(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -995,7 +990,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(EdgeView arg0, VisualStyle arg1) {
 		return myView.applyVizMap(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1005,7 +1000,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(CyNode arg0, VisualStyle arg1) {
 		return myView.applyVizMap(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1015,7 +1010,7 @@ public class PMBView implements CyNetworkView {
 	public boolean applyVizMap(NodeView arg0, VisualStyle arg1) {
 		return myView.applyVizMap(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1023,7 +1018,7 @@ public class PMBView implements CyNetworkView {
 	public void applyVizmapper(VisualStyle arg0) {
 		myView.applyVizmapper(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1032,7 +1027,7 @@ public class PMBView implements CyNetworkView {
 	public Object getClientData(String arg0) {
 		return myView.getClientData(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1041,7 +1036,7 @@ public class PMBView implements CyNetworkView {
 	public Collection getClientDataNames() {
 		return myView.getClientDataNames();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1049,7 +1044,7 @@ public class PMBView implements CyNetworkView {
 	public CyNetwork getNetwork() {
 		return myView.getNetwork();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1057,7 +1052,7 @@ public class PMBView implements CyNetworkView {
 	public String getTitle() {
 		return myView.getTitle();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1065,7 +1060,7 @@ public class PMBView implements CyNetworkView {
 	public CyNetworkView getView() {
 		return myView.getView();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1073,7 +1068,7 @@ public class PMBView implements CyNetworkView {
 	public boolean getVisualMapperEnabled() {
 		return myView.getVisualMapperEnabled();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1081,7 +1076,7 @@ public class PMBView implements CyNetworkView {
 	public VisualStyle getVisualStyle() {
 		return myView.getVisualStyle();
 	}
-	
+
 	/**
 	 * 
 	 * @return
@@ -1089,7 +1084,7 @@ public class PMBView implements CyNetworkView {
 	public VisualMappingManager getVizMapManager() {
 		return myView.getVizMapManager();
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1098,7 +1093,7 @@ public class PMBView implements CyNetworkView {
 	public void putClientData(String arg0, Object arg1) {
 		myView.putClientData(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1107,7 +1102,7 @@ public class PMBView implements CyNetworkView {
 	public void redrawGraph(boolean arg0, boolean arg1) {
 		myView.redrawGraph(arg0, arg1);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1115,7 +1110,7 @@ public class PMBView implements CyNetworkView {
 	public void removeEdgeContextMenuListener(EdgeContextMenuListener arg0) {
 		myView.removeEdgeContextMenuListener(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1123,7 +1118,7 @@ public class PMBView implements CyNetworkView {
 	public void removeNodeContextMenuListener(NodeContextMenuListener arg0) {
 		myView.removeNodeContextMenuListener(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1133,7 +1128,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setSelected(CyNode[] arg0) {
 		return myView.setSelected(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1143,7 +1138,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setSelected(NodeView[] arg0) {
 		return myView.setSelected(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1153,7 +1148,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setSelected(CyEdge[] arg0) {
 		return myView.setSelected(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1163,7 +1158,7 @@ public class PMBView implements CyNetworkView {
 	public boolean setSelected(EdgeView[] arg0) {
 		return myView.setSelected(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1171,7 +1166,7 @@ public class PMBView implements CyNetworkView {
 	public void setTitle(String arg0) {
 		myView.setTitle(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1179,7 +1174,7 @@ public class PMBView implements CyNetworkView {
 	public void setVisualMapperEnabled(boolean arg0) {
 		myView.setVisualMapperEnabled(arg0);
 	}
-	
+
 	/**
 	 * 
 	 * @param arg0
@@ -1187,7 +1182,7 @@ public class PMBView implements CyNetworkView {
 	public void setVisualStyle(String arg0) {
 		myView.setVisualStyle(arg0);
 	}
-	
+
 	/**
 	 * 
 	 */
