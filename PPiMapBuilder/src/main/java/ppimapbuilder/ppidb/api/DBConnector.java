@@ -70,20 +70,23 @@ public class DBConnector {
                 + "    interaction.id as \"id\", "
                 + "    p1.uniprot_id as \"uniprotidA\", "
                 + "    p1.gene_name as \"interactorA\", "
+                + "    p1.organism_id as \"taxidA\", "
+                + "    org1.name as \"orgaA\", "
                 + "    p2.uniprot_id as \"uniprotidB\", "
                 + "    p2.gene_name as \"interactorB\", "
-                + "    p1.orga_tax_id as \"taxidA\", "
-                + "    p2.orga_tax_id as \"taxidB\", "                
+                + "    p2.organism_id as \"taxidB\", "
+                + "    org2.name as \"orgaB\", "
                 + "    db.name as \"srcdb\", "
                 + "    expsys.name as \"expsys\", "
                 + "    pub.pubmed_id as \"pubmed\" "
                 + "from interaction "
                 + "    join protein as \"p1\" on interaction.protein_id1 = p1.id "
                 + "    join protein as \"p2\" on interaction.protein_id2 = p2.id "
+                + "    join organism as \"org1\" on p1.organism_id = org1.tax_id "
+                + "    join organism as \"org2\" on p2.organism_id = org2.tax_id "
                 + "    join link_data_interaction as \"lnk\" on lnk.interaction_id = interaction.id "
                 + "    join interaction_data as \"intdata\" on lnk.interaction_data_id = intdata.id "
                 + "    join source_database as \"db\" on intdata.db_source_name = db.name "
-                + "    join organism as \"org\" on intdata.organism_tax_id = org.tax_id "
                 + "    join experimental_system as \"expsys\" on expsys.name = intdata.experimental_system "
                 + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id ";
 
@@ -97,10 +100,12 @@ public class DBConnector {
      * @throws IOException
      */
     private void getServerConfig() throws IOException {
-    	BufferedReader br = null;
-    	try{
+        BufferedReader br = null;
+        try {
             br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/server.cfg")));
-    	} catch(Exception e) {throw new IOException();}
+        } catch (Exception e) {
+            throw new IOException();
+        }
 
         this.url = br.readLine();
         this.user = br.readLine();
