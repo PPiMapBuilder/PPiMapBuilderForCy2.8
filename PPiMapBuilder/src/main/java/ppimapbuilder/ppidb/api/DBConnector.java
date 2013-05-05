@@ -57,7 +57,7 @@ public class DBConnector {
      * SQL query for selecting every data. .getAllData() methodes add WHERE
      * clause to this String and execute the query.
      */
-    private String query;
+    private final String query;
 
     /**
      * Default constructor
@@ -185,27 +185,76 @@ public class DBConnector {
      */
     public SQLResult getAllData(String uniprot) throws SQLException {
 
-        this.query += " where "
+        return new SQLResult(st.executeQuery(this.query + " where "
                 + "    ( p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "' )"
                 + " AND org1.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
                 + " AND org2.tax_id IN (3702, 6239, 7227, 9606, 10090, 4932, 4896)"
-                + " AND db.name IN ('hprd','biogrid', 'intact', 'dip', 'bind', 'mint')";
-
-        return new SQLResult(st.executeQuery(this.query));
+                + " AND db.name IN ('hprd','biogrid', 'intact', 'dip', 'bind', 'mint')"));
     }
 
     /**
      * Get data about a protein identified by its UniprotID from a list of
      * source databases and a list of organisms
      *
-     * @param uniprot UniprotID
-     * @return SQLResult
-     * @throws SQLExeception
+     * @param uniprot
+     * @param taxIdRef
+     * @param dbs
+     * @param orgs
+     * @return
+     * @throws SQLException
      */
-    public SQLResult getAllData(String uniprot, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
-        String q = this.query + " where"
-                + " (p1.uniprot_id = '" + uniprot + "' or p2.uniprot_id = '" + uniprot + "')"
-                + " AND org1.tax_id IN ("
+    public SQLResult getAllData(String uniprot, int taxIdRef, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
+        String q = ""
+                + "	select\n"
+                + "		p1.id as \"p1_id\",\n"
+                + "		p1.gene_name as \"p1_gene_name\",\n"
+                + "		p1.uniprot_id as \"p1_uniprot_id\",\n"
+                + "		p1.organism_id as \"p1_taxid\",\n"
+                + "		p2.id as \"p2_id\",\n"
+                + "		p2.gene_name as \"p2_gene_name\",\n"
+                + "		p2.uniprot_id as \"p2_uniprot_id\",\n"
+                + "		p2.organism_id as \"p2_taxid\",\n"
+                + "	from interaction\n"
+                + "	join protein as \"p1\" on interaction.protein_id1 = p1.id\n"
+                + "	join protein as \"p2\" on interaction.protein_id2 = p2.id\n"
+                + "	join organism as \"org1\" on p1.organism_id = org1.tax_id\n"
+                + "	join organism as \"org2\" on p2.organism_id = org2.tax_id\n"
+                + "	where interaction.protein_id1 IN (\n"
+                + "		select protein.id\n"
+                + "		from homology\n"
+                + "		full join protein on protein.id = homology.ptn_id\n"
+                + "		where homology.h_id in (\n"
+                + "			select h.h_id\n"
+                + "			from protein as \"p\"\n"
+                + "			join homology as \"h\" on p.id = h.ptn_id\n"
+                + "			where p.uniprot_id = " + uniprot + "\n"
+                + "		)\n"
+                + "		UNION\n"
+                + "		select protein.id\n"
+                + "		from protein\n"
+                + "		where protein.uniprot_id = " + uniprot + "\n"
+                + "	) \n"
+                + "	OR interaction.protein_id2\n"
+                + "	 IN (\n"
+                + "		select protein.id\n"
+                + "		from homology\n"
+                + "		full join protein on protein.id = homology.ptn_id\n"
+                + "		where homology.h_id in (\n"
+                + "			select h.h_id\n"
+                + "			from protein as \"p\"\n"
+                + "			join homology as \"h\" on p.id = h.ptn_id\n"
+                + "			where p.uniprot_id = " + uniprot + "\n"
+                + "		)\n"
+                + "		UNION\n"
+                + "		select protein.id\n"
+                + "		from protein\n"
+                + "		where protein.uniprot_id = " + uniprot + "\n"
+                + "	) \n"
+                + "	and ( (p1.organism_id = " + taxIdRef + ") or (p2.organism_id = " + taxIdRef + ") )";
+
+
+/*
+        q += " AND org1.tax_id IN ("
                 + this.formatInClause(orgs)
                 + ") "
                 + " AND org2.tax_id IN ("
@@ -214,6 +263,8 @@ public class DBConnector {
                 + "AND db.name IN ("
                 + this.formatInClause(dbs)
                 + ") ";
+*/
+        
         System.out.println(q);
         return new SQLResult(st.executeQuery(q));
     }
