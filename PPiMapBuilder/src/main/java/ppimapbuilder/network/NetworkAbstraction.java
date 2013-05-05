@@ -1,7 +1,5 @@
 package ppimapbuilder.network;
 
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import javax.swing.JOptionPane;
@@ -19,6 +17,7 @@ public class NetworkAbstraction {
 			if(res.isEmpty()) 
 				JOptionPane.showMessageDialog(null, id+" not found");
 		} catch (Exception e1) {
+			e1.printStackTrace();
 			//JOptionPane.showMessageDialog(null, "Error SQL : "+e1.getLocalizedMessage());
 			return null;
 		}

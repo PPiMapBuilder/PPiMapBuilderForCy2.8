@@ -1,6 +1,8 @@
 package ppimapbuilder.networkcreationframe;
 
+import java.io.IOException;
 import java.rmi.ServerError;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import ppimapbuilder.network.NetworkControl;
@@ -15,9 +17,11 @@ public class NetworkCreationFrameControl {
 	
 	/**
 	 * 
+	 * @throws IOException 
+	 * @throws SQLException 
 	 * @throws ServerError
 	 */
-	public static void open() {
+	public static void open() throws SQLException, IOException {
 		
 		myFrame = NetworkCreationFrame.Instance();
 		myAbstraction = new NetworkCreationFrameAbstraction();

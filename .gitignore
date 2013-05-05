@@ -11,4 +11,4 @@ target
 
 # Other unecessary files #
 .DS_Store
-server.cfg
+server.cfg*

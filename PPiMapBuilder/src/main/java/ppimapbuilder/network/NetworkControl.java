@@ -3,10 +3,10 @@ package ppimapbuilder.network;
 import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
-
 import javax.swing.JOptionPane;
 import ppimapbuilder.LoadingWindow;
 import ppimapbuilder.network.presentation.PMBNode;
@@ -128,6 +128,7 @@ public class NetworkControl implements PropertyChangeListener {
 				
 				// Creation of the network
 				myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
+				addNetwork(myNetwork);
 								
 				Cytoscape.getEdgeAttributes().setUserEditable("Source database", false);
 				Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
@@ -155,8 +156,8 @@ public class NetworkControl implements PropertyChangeListener {
 							//Create Nodes
 							try {
 
-								A = new PMBNode(Cytoscape.getCyNode(fields.get("interactorA"), true), fields.get("uniprotidA"), fields.get("taxidA"));
-								B = new PMBNode(Cytoscape.getCyNode(fields.get("interactorB"), true), fields.get("uniprotidB"), fields.get("taxidB"));
+								A = new PMBNode(Cytoscape.getCyNode(fields.get("p1_gene_name"), true), fields.get("p1_uniprot_id"), fields.get("p1_taxid"));
+								B = new PMBNode(Cytoscape.getCyNode(fields.get("p2_gene_name"), true), fields.get("p2_uniprot_id"), fields.get("p2_taxid"));
 								myNetwork.addNode(A);
 								myNetwork.addNode(B);
 
@@ -166,45 +167,50 @@ public class NetworkControl implements PropertyChangeListener {
 								//Create Edges
 								interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
 
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
-
-								String organismA = (String) fields.get("orgaA");
-								String organismB = (String) fields.get("orgaB");							
-
-								if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
-									if (Integer.parseInt(fields.get("taxidA")) == refOrganism ) { // If this organism is the reference one
-										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
-										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
-									}
-									else { // If this organism is another organism
-										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
-										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
-									}
-								}
-								else {
-									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
-									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
-								}
+//								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
+//								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
+//								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
+//
+//								String organismA = (String) fields.get("orgaA");
+//								String organismB = (String) fields.get("orgaB");							
+//
+//								if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
+//									if (Integer.parseInt(fields.get("taxidA")) == refOrganism ) { // If this organism is the reference one
+//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
+//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
+//									}
+//									else { // If this organism is another organism
+//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
+//									}
+//								}
+//								else {
+//									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+//									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
+//								}
 
 								myNetwork.addEdge(interaction);
 
-							} catch (Exception e1) {
+							} catch (UnknownHostException e) {
+								JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Connection error!", "Connection to Uniprot database failed", JOptionPane.ERROR_MESSAGE);
+								myNetworks.remove(myNetwork);
+								Cytoscape.destroyNetwork(myNetwork);
+								return;
+							} /*catch (Exception e1) {
 								JOptionPane.showMessageDialog(null, "Error : "+e1.getLocalizedMessage());
 								e1.printStackTrace();
 								return;
-							}
+							}*/
 						}
 
 					}
 				}
 				
 				if (myNetwork.getNodeCount() == 0) {
+					myNetworks.remove(myNetwork);
 					Cytoscape.destroyNetwork(myNetwork);
 				}
 				else {
-					addNetwork(myNetwork);
 					// Add a view to the network
 					addViewToNetwork(myNetwork);
 				}

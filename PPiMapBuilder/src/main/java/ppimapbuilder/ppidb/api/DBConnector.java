@@ -214,8 +214,8 @@ public class DBConnector {
     /**
      * Get data about a protein identified by its UniprotID from a list of
      * source databases and a list of organisms. Available fiels: p1_id,
-     * p1_gene_name, p1_uniprot_id, p1_organism_id, p2_id, p2_gene_name,
-     * p2_uniprot_id, p2_organism_id
+     * p1_gene_name, p1_uniprot_id, p1_taxid, p2_id, p2_gene_name,
+     * p2_uniprot_id, p2_taxid
      *
      * @param uniprot
      * @param taxIdRef
@@ -227,6 +227,7 @@ public class DBConnector {
     public SQLResult getAllData(String uniprot, int taxIdRef, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
         String q = ""
                 + "	select\n"
+                + "		interaction.id as \"id\",\n"
                 + "		p1.id as \"p1_id\",\n"
                 + "		p1.gene_name as \"p1_gene_name\",\n"
                 + "		p1.uniprot_id as \"p1_uniprot_id\",\n"
