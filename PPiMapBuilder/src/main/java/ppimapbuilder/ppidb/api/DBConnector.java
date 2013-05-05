@@ -5,10 +5,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -56,6 +58,7 @@ public class DBConnector {
      * clause to this String and execute the query.
      */
     private final String query;
+    private final PreparedStatement pstmt;
 
     /**
      * Default constructor
@@ -89,6 +92,24 @@ public class DBConnector {
                 + "    join publication as \"pub\" on pub.pubmed_id = intdata.pubmed_id ";
 
         st = con.createStatement();
+
+        this.pstmt = this.con.prepareStatement(""
+                + "select\n"
+                + "	protein.id as \"ptn_id\",\n"
+                + "	protein.uniprot_id as \"ptn_uniprot_id\",\n"
+                + "	protein.gene_name as \"ptn_gene_name\",\n"
+                + "	protein.organism_id as \"ptn_tax_id\" \n"
+                + "from homology\n"
+                + "join protein on protein.id = homology.ptn_id\n"
+                + "where homology.h_id in (\n"
+                + "	select h.h_id\n"
+                + "	from protein as \"p\"\n"
+                + "	join homology as \"h\" on p.id = h.ptn_id\n"
+                + "	where p.id = ?\n"
+                + ")\n"
+                + "AND protein.organism_id = ?");
+
+
     }
 
     /**
@@ -151,9 +172,9 @@ public class DBConnector {
      */
     public LinkedHashMap<String, Integer> getOrganisms() throws SQLException {
         LinkedHashMap<String, Integer> orga = new LinkedHashMap<String, Integer>();
-        ResultSet rs = this.con.createStatement().executeQuery("SELECT tax_id AS \"id\", name AS \"organism\" FROM organism");
-        while (rs.next()) {
-            orga.put(rs.getString("organism"), rs.getInt("id"));
+        ResultSet res = this.con.createStatement().executeQuery("SELECT tax_id AS \"id\", name AS \"organism\" FROM organism");
+        while (res.next()) {
+            orga.put(res.getString("organism"), res.getInt("id"));
         }
         return orga;
     }
@@ -167,9 +188,9 @@ public class DBConnector {
      */
     public ArrayList<String> getDatabases() throws SQLException {
         ArrayList<String> db = new ArrayList<String>();
-        ResultSet rs = this.con.createStatement().executeQuery("SELECT initcap(name) as \"db\" FROM source_database");
-        while (rs.next()) {
-            db.add(rs.getString("db"));
+        ResultSet res = this.con.createStatement().executeQuery("SELECT initcap(name) as \"db\" FROM source_database");
+        while (res.next()) {
+            db.add(res.getString("db"));
         }
         return db;
     }
@@ -267,6 +288,39 @@ public class DBConnector {
 
         System.out.println(q);
         return new SQLResult(st.executeQuery(q));
+    }
+
+    /**
+     * Get the homologous proteins for a list of protein (described with their
+     * database internal ID) and a reference organism (described with its Tax
+     * ID). Available column name : "ptn_id", "ptn_uniprot_id", "ptn_gene_name",
+     * "ptn_tax_id".
+     *
+     *
+     * @param proteinId
+     * @param taxIdRef
+     * @return ProteinID -> { column -> value }
+     * @throws SQLException
+     */
+    private HashMap<Integer, HashMap<String, String>> getHomologous(ArrayList<Integer> proteinId, int taxIdRef) throws SQLException {
+
+        HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
+        ResultSet res = null;
+
+        for (Integer inte : proteinId) {
+            pstmt.setInt(1, inte);
+            pstmt.setInt(2, taxIdRef);
+            res = pstmt.executeQuery();
+
+            while (res.next()) {
+                LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
+                for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
+                    tmpMap.put(res.getMetaData().getColumnName(i), res.getString(i));
+                }
+                ret.put(Integer.valueOf(res.getInt("ptn_id")), tmpMap);
+            }
+        }
+        return ret;
     }
 
     /**
