@@ -310,6 +310,8 @@ public class DBConnector {
         HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
         ResultSet res = null;
 
+        System.out.println(this.pstmt.toString());
+        
         for (Integer inte : proteinId) {
             pstmt.setInt(1, inte);
             pstmt.setInt(2, taxIdRef);
