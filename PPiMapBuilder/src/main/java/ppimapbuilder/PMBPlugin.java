@@ -22,7 +22,7 @@ public class PMBPlugin extends CytoscapePlugin {
 		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(myMenu); // Add the menu to the plugins menu
 		PMBPanelControl.createPanel(); // Creates the PPiMapBuilder panel
 	
-		/*try {
+		try {
 			Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
 
 			CyNetwork myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
@@ -40,14 +40,14 @@ public class PMBPlugin extends CytoscapePlugin {
 			
 			VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 			CalculatorCatalog catalog = manager.getCalculatorCatalog();
-			VisualStyle vs = catalog.getVisualStyle("PPiMapBuilder");
+			VisualStyle vs = catalog.getVisualStyle("PPiMapBuilderStyle");
 			if (vs == null) {
 				vs = myView.createVisualStyle(myNetwork);
 				catalog.addVisualStyle(vs);
 			}			
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
-		}*/
+		}
 		
 	
 	}
