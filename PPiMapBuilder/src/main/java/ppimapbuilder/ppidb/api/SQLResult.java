@@ -31,6 +31,11 @@ public class SQLResult {
         this.convert(rs);
     }
 
+    public SQLResult(String idFieldName, LinkedHashMap<String, LinkedHashMap<String, String>> hash) {
+        this.idFieldName = idFieldName;
+        this.ret = hash;
+    }
+
     private void convert(ResultSet rs) throws SQLException {
         while (rs.next()) {
             LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
@@ -48,7 +53,7 @@ public class SQLResult {
      * @param id protein ID
      * @return HashMap<String,String>
      */
-    public LinkedHashMap<String, LinkedHashMap<String, String>> getAllData() {
+    public LinkedHashMap<String, LinkedHashMap<String, String>> getDataSet() {
         return this.ret;
     }
 
