@@ -2,12 +2,16 @@ package ppimapbuilder.network.presentation;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import javax.swing.JOptionPane;
+
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.interfaces.uniprot.dbx.go.Go;
 import uk.ac.ebi.kraken.uuw.services.remoting.EntryRetrievalService;
 import uk.ac.ebi.kraken.uuw.services.remoting.UniProtJAPI;
 import giny.model.RootGraph;
 import cytoscape.CyNode;
+import cytoscape.Cytoscape;
 
 /**
  * 
@@ -38,8 +42,17 @@ public class PMBNode extends CyNode {
 	 * Constructor which creates a ppimapbuilder node directly from a CyNode
 	 * @param myNode
 	 */
-	public PMBNode(CyNode myNode, String uniprotId) throws UnknownHostException {
+	public PMBNode(CyNode myNode, String uniprotId, String taxid) throws UnknownHostException {
 		this(myNode.getRootGraph(), myNode.getRootGraphIndex());
+		
+		Cytoscape.getNodeAttributes().setUserEditable("Gene name", false);
+		Cytoscape.getNodeAttributes().setUserEditable("Uniprot id", false);
+		Cytoscape.getNodeAttributes().setUserEditable("Taxonomy id", false);
+		Cytoscape.getNodeAttributes().setUserEditable("canonicalName", false);
+		
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Gene name", myNode.getIdentifier()); // Add the gene name as node attribute
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Uniprot id", uniprotId);
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Taxonomy id", taxid);
 		
 		this.geneName = myNode.getIdentifier(); // The identifier and the gene name are the same information
 		this.uniprotId = uniprotId; // Uniprot Id which is used to retrieve the uniprot entry
@@ -73,7 +86,7 @@ public class PMBNode extends CyNode {
 	 * @return gene name
 	 */
 	public String getGeneName() {
-		return geneName;
+		return Cytoscape.getNodeAttributes().getStringAttribute(this.getIdentifier(), "Gene name");
 	}
 	
 	/**
@@ -81,7 +94,7 @@ public class PMBNode extends CyNode {
 	 * @return uniprot id
 	 */
 	public String getUniprotId() {
-		return uniprotId;
+		return Cytoscape.getNodeAttributes().getStringAttribute(this.getIdentifier(), "Uniprot id");
 	}
 	
 	/**
@@ -164,6 +177,10 @@ public class PMBNode extends CyNode {
 		this.functionList = functionList;
 	}
 	
+	@Override
+	public String getIdentifier() {
+		return this.geneName;
+	}
 	
 
 }

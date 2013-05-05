@@ -2,8 +2,11 @@ package ppimapbuilder.panel;
 
 import javax.swing.SwingConstants;
 
+import ppimapbuilder.network.NetworkControl;
+import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.panel.presentation.PMBPanel;
 
+import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.view.cytopanels.CytoPanelImp;
 
@@ -30,6 +33,10 @@ public class PMBPanelControl {
 	 */
 	public static void updatePanel() {
 		PMBPanel.Instance().update();
+	}
+	
+	public static PMBNode getNode(CyNetwork myNetwork, String identifier) {
+		return NetworkControl.Instance().getNode(myNetwork, identifier);
 	}
 
 }

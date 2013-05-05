@@ -2,19 +2,14 @@ package ppimapbuilder.network;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-
 import javax.swing.JOptionPane;
-
 import ppimapbuilder.LoadingWindow;
 import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.network.presentation.PMBView;
-import ppimapbuilder.networkcreationframe.NetworkCreationFrameAbstraction;
 import ppimapbuilder.networkcreationframe.NetworkCreationFrameControl;
 import ppimapbuilder.panel.PMBPanelControl;
-import ppimapbuilder.panel.presentation.PMBPanel;
 import ppimapbuilder.ppidb.api.SQLResult;
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;
@@ -32,13 +27,7 @@ public class NetworkControl implements PropertyChangeListener {
 	
 	private static NetworkControl _instance = null; // Instance for singleton pattern
 	
-	//private ArrayList<CyNetwork> myNetworks = new ArrayList<CyNetwork>(); // List of networks created by the plugin
-	//private ArrayList<PMBNode> myNodes = new ArrayList<PMBNode>();
-	
 	private LinkedHashMap<CyNetwork, ArrayList<PMBNode>> myNetworks;
-	
-	//private PMBPanel myPanel;
-	//private PMBView myView; // View for a network (for creation or update)
 	
 	private CyNetwork myNetwork; // Result network
 	
@@ -69,7 +58,6 @@ public class NetworkControl implements PropertyChangeListener {
 		// If a network view is destroyed and then recreated, we have to add the link between this view and the panel :
 		if (e.getPropertyName().equalsIgnoreCase(CytoscapeDesktop.NETWORK_VIEW_CREATED)) { // If a view is created for a network
 			
-			/* check keySet...*/
 			for (CyNetwork n : myNetworks.keySet()) { // We look if this network is one of the plugin network
 				if (((CyNetworkView)e.getNewValue()).getNetwork() == n) {
 					new PMBView(((CyNetworkView)e.getNewValue()).getNetwork()); // If it is the case, we create a particular view for this network
@@ -83,14 +71,11 @@ public class NetworkControl implements PropertyChangeListener {
 	 * @param myNetwork
 	 */
 	public void addNetwork(CyNetwork myNetwork) {
-		System.out.println("#1");
 		this.myNetworks.put(myNetwork, new ArrayList<PMBNode>()); // We stock the network
-		System.out.println("#2");
 	}
 	
 	private void addViewToNetwork(CyNetwork myNetwork) {
 		new PMBView(myNetwork); // We create a view for this network
-		System.out.println("#3");
 	}
 	
 	/**
@@ -111,16 +96,12 @@ public class NetworkControl implements PropertyChangeListener {
 	}
 	
 	public ArrayList<PMBNode> getMyNodes(CyNetwork myNetwork) {
-		System.out.println("#4");
 		return myNetworks.get(myNetwork);
 	}
 	
 	public PMBNode getNode(CyNetwork myNetwork, String identifier) {
-		System.out.println("#5");
 		for (PMBNode n : this.getMyNodes(myNetwork)) {
-			System.out.println("#6");
 			if (n.getGeneName().equals(identifier)) {
-				System.out.println("#7");
 				return n;
 			}
 		}
@@ -128,7 +109,7 @@ public class NetworkControl implements PropertyChangeListener {
 	}
 	
 	// TODO : distinguish the reference organism !	
-	public void createNetwork(final ArrayList<String> poiList, final ArrayList<String> dbList, final ArrayList<Integer> orgaList) {
+	public void createNetwork(final ArrayList<String> poiList, final ArrayList<String> dbList, final ArrayList<Integer> orgaList, final int refOrganism) {
 		
 		// Will display the loading window until the treatment is done
 		new LoadingWindow("Generating network...") {
@@ -139,6 +120,13 @@ public class NetworkControl implements PropertyChangeListener {
 				// Creation of the network
 				myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
 				addNetwork(myNetwork);
+				
+				Cytoscape.getEdgeAttributes().setUserEditable("Source database", false);
+				Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
+				Cytoscape.getEdgeAttributes().setUserEditable("Experimental system", false);
+				Cytoscape.getEdgeAttributes().setUserEditable("Pubmed id", false);
+				Cytoscape.getEdgeAttributes().setUserEditable("Predictive from", false);
+				Cytoscape.getEdgeAttributes().setUserEditable("canonicalName", false);
 				
 				// Creation of the network components
 				for (String id : poiList) { // For each protein of interest
@@ -157,17 +145,39 @@ public class NetworkControl implements PropertyChangeListener {
 						//Create Nodes
 						try {
 							
-							A = new PMBNode(Cytoscape.getCyNode(fields.get("interactorA"), true), fields.get("uniprotidA"));
-							B = new PMBNode(Cytoscape.getCyNode(fields.get("interactorB"), true), fields.get("uniprotidB"));
+							A = new PMBNode(Cytoscape.getCyNode(fields.get("interactorA"), true), fields.get("uniprotidA"), fields.get("taxidA"));
+							B = new PMBNode(Cytoscape.getCyNode(fields.get("interactorB"), true), fields.get("uniprotidB"), fields.get("taxidB"));
 							myNetwork.addNode(A);
 							myNetwork.addNode(B);
-							
 							
 							addNode(myNetwork, A);
 							addNode(myNetwork, B);
 							
 							//Create Edges
 							interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
+							
+							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
+							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
+							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
+							
+							String organismA = (String) fields.get("orgaA");
+							String organismB = (String) fields.get("orgaB");							
+							
+							if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
+								if (Integer.parseInt(fields.get("taxidA")) == refOrganism ) { // If this organism is the reference one
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
+								}
+								else { // If this organism is another organism
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
+								}
+							}
+							else {
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
+							}
+							
 							myNetwork.addEdge(interaction);
 						
 						} catch (Exception e1) {
@@ -183,6 +193,8 @@ public class NetworkControl implements PropertyChangeListener {
 			}
 		};
 	}
+	
+
 
 
 }

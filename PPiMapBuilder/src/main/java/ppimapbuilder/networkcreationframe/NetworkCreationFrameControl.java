@@ -61,7 +61,8 @@ public class NetworkCreationFrameControl {
 		orgaList = myFrame.getSelectedOrganisms(); // Retrieve the organism list
 		
 		// TODO : distinguish the reference organism !
-		NetworkControl.Instance().createNetwork(poiList, dbList, orgaList);
+		NetworkControl.Instance().createNetwork(poiList, dbList, orgaList, myFrame.getSelectedReferenceOrganism());
+		
 		
 	}
 	

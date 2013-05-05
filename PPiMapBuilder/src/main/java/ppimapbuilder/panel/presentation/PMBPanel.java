@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.swing.*;
 import ppimapbuilder.network.NetworkControl;
 import ppimapbuilder.network.presentation.PMBNode;
+import ppimapbuilder.panel.PMBPanelControl;
 import cytoscape.CyNetwork;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
@@ -22,8 +23,7 @@ public class PMBPanel extends JPanel {
 	private static final long serialVersionUID = 1;
 	
 	private static PMBPanel _instance = null; // Instance of the ppimapbuilder panel to prevent several instances 
-	private NetworkControl myMediator;
-	
+
 	private JLabel lblGeneName, lblGeneNameValue, lblUniprotId, lblUniprotIdValue, lblDescription, lblDescriptionValue, lblCellularComponent, lblCcList, lblBiologicalProcesses, lblBpList, lblMolecularFunction, lblMfList;  
 	private JPanel proteinInfoPanel, geneOntologyPanel;
 	private JScrollPane proteinInfoScroll, geneOntologyScroll;
@@ -174,11 +174,8 @@ public class PMBPanel extends JPanel {
 				lblMolecularFunction.setText("");
 				lblMfList.setText("");
 								
-				//PMBNode myNode = (PMBNode) selectedNodes.iterator().next();
-				myMediator = NetworkControl.Instance();
-				
 				/* TODO : Retrieve node information from data panel (when the attributes will be done...) */
-				PMBNode myNode = myMediator.getNode(current_network, selectedNodes.iterator().next().getIdentifier());
+				PMBNode myNode = PMBPanelControl.getNode(current_network, selectedNodes.iterator().next().getIdentifier());
 				
 				lblGeneNameValue.setText(myNode.getGeneName());
 				lblUniprotIdValue.setText(myNode.getUniprotId());
