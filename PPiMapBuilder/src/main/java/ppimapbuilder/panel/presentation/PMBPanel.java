@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -244,7 +243,6 @@ public class PMBPanel extends JPanel {
 		lblGeneNameValue.setText(selectedNode.getGeneName().trim());
 		((JLinkLabel)lblUniprotIdValue).setUrl("http://uniprot.org/uniprot/"+selectedNode.getUniprotId().trim());
 		lblUniprotIdValue.setText("<html><u>"+selectedNode.getUniprotId().trim()+"</u></html>");
-		
 		if(selectedNode.getProteinDescription() != null)
 			lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
 		else
@@ -252,7 +250,6 @@ public class PMBPanel extends JPanel {
 
 		//Gene ontology
 		ArrayList<String> tmp;
-		int row = 0;
 		if (selectedNode.getComponentList() != null && !selectedNode.getComponentList().isEmpty()) {
 			tmp = selectedNode.getComponentList();
 			lblCcList.setText((String[])tmp.toArray(new String[tmp.size()]));

@@ -14,8 +14,8 @@ public class NetworkAbstraction {
 		// Get result from 
 		try {
 			res = DBConnector.Instance().getAllData(id, refOrganism, dbList, orgaList);
-			if(res.isEmpty()) 
-				JOptionPane.showMessageDialog(null, id+" not found");
+			/*if(res.isEmpty()) 
+				JOptionPane.showMessageDialog(null, id+" not found");*/
 		} catch (Exception e1) {
 			e1.printStackTrace();
 			//JOptionPane.showMessageDialog(null, "Error SQL : "+e1.getLocalizedMessage());

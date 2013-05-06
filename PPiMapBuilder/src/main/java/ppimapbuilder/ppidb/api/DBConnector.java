@@ -1,7 +1,13 @@
 package ppimapbuilder.ppidb.api;
 
-import java.awt.RenderingHints.Key;
+
 import java.io.BufferedReader;
+//import java.awt.RenderingHints.Key;
+//import java.io.File;
+//import java.io.FileNotFoundException;
+//import java.io.PrintStream;
+//import java.text.SimpleDateFormat;
+//import java.util.Date;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
@@ -14,6 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
+import javax.swing.JOptionPane;
+
+import cytoscape.Cytoscape;
+
 
 /**
  *
@@ -167,7 +178,14 @@ public class DBConnector {
      * @throws SQLException
      */
     public SQLResult getAllData(String uniprot, int taxIdRef, ArrayList<String> dbs, ArrayList<Integer> orgs) throws SQLException {
-        String q = ""
+        
+    	//SimpleDateFormat filePattern = new SimpleDateFormat("ddMMyyyy_HHmm");
+    	//String filename=filePattern.format(new Date()) + ".log";
+    	//File file = new File("test_"+filename);
+    	//try {
+    	//    PrintStream printStream = new PrintStream(file);
+    	//    System.setOut(printStream);
+    	String q = ""
                 + "	SELECT\n"
                 + "		interaction.id AS \"id\",\n"
                 + "		p1.id AS \"p1_id\",\n"
@@ -232,65 +250,138 @@ public class DBConnector {
         System.out.println(q);
         ArrayList<Integer> proteinId = new ArrayList<Integer>();
         
+        //System.out.println("#1 : "+proteinId);
+        
         SQLResult res = new SQLResult(st.executeQuery(q));
-        LinkedHashMap<String, LinkedHashMap<String, String>> resCopy = new LinkedHashMap<String, LinkedHashMap<String,String>>();
+        //System.out.println("#2 : "+res);
 
-        if (res != null) {
-        	
-        	LinkedHashMap<String, String> fields2;
+        LinkedHashMap<String, LinkedHashMap<String, String>> resCopy = new LinkedHashMap<String, LinkedHashMap<String,String>>();
+        //System.out.println("#3 : "+resCopy);
+
+        
+        if (!res.isEmpty()) {
+        	//System.out.println("#4");
+
+        	LinkedHashMap<String, String> fields2 = new LinkedHashMap<String, String>();
+        	//System.out.println("#5 : "+fields2);
+
 			for(String row: res.keySet()) {
+				//System.out.println("#6 : "+row);
 				resCopy.put(row, new LinkedHashMap<String, String>());
-				
+				//System.out.println("#7 : "+resCopy);
+
 				fields2 = res.getData(row);
-				
+				//System.out.println("#8 : "+fields2);
+
 				for (String field : fields2.keySet()) {
+					//System.out.println("#9 : "+field);
+
 					resCopy.get(row).put(field, fields2.get(field));
+					//System.out.println("#10 : "+resCopy);
+
 				}
 			}
 			
 	        SQLResult finalRes = new SQLResult(res.getIdFieldName(), resCopy);
+	        //System.out.println("#11 : "+finalRes);
         	
-        	
-        	LinkedHashMap<String, String> fields;
+        	LinkedHashMap<String, String> fields = new LinkedHashMap<String, String>();
+        	//System.out.println("#12 : "+fields);
 			for(String row: res.keySet()) {
+				//System.out.println("#13 : "+row);
+
 				fields = res.getData(row);
+				//System.out.println("#14 : "+fields);
+
+		        //System.out.println("#15 : "+fields.get("p1_taxid"));
+		        //System.out.println("#16 : "+fields.get("p2_taxid"));
+		        //System.out.println("#17 : "+String.valueOf(taxIdRef));
+
 				if (!fields.get("p1_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
-					proteinId.add(Integer.parseInt(fields.get("p1_id")));
+					Integer i = Integer.parseInt(fields.get("p1_id"));
+					if (!proteinId.contains(i))
+						proteinId.add(i);
+					//System.out.println("#18 : "+fields.get("p1_id"));
+					//System.out.println("#19 : "+proteinId);
 				}
 				if (!fields.get("p2_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
-					proteinId.add(Integer.parseInt(fields.get("p2_id")));
+					Integer i = Integer.parseInt(fields.get("p2_id"));
+					if (!proteinId.contains(i))
+						proteinId.add(i);
+					//System.out.println("#20 : "+fields.get("p2_id"));
+					//System.out.println("#21 : "+proteinId);
 				}
 			}
-
+			//System.out.println("#22");
 			if (!proteinId.isEmpty()) {
+				//System.out.println("#23 : "+proteinId);
 				HashMap<Integer, HashMap<String, String>> homologs = this.getHomologous(proteinId, taxIdRef);
+				//System.out.println("#24 : "+homologs);
 
 				for(String row: res.keySet()) {
+					//System.out.println("#25 : "+row);
 					fields2 = res.getData(row);
+					//System.out.println("#26 : "+fields2);
 
+					//System.out.println("#27 : "+fields2.get("p1_taxid"));
+					//System.out.println("#28 : "+fields2.get("p2_taxid"));
+					//System.out.println("#29 : "+String.valueOf(taxIdRef));
 					if (!fields2.get("p1_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) { // If the protein is not from the reference organism
-						if (homologs.containsKey(fields2.get("p1_id"))) { // If an homolog exists for this protein and this reference organism
-							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p1_gene_name"), homologs.get(fields2.get("p1_id")).get("ptn_gene_name"));
-							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p1_uniprot_id"), homologs.get(fields2.get("p1_id")).get("ptn_uniprot_id"));
+						if (homologs.containsKey(Integer.parseInt(fields2.get("p1_id")))) { // If an homolog exists for this protein and this reference organism
+							//System.out.println("#30 : "+finalRes.getDataSet().get(fields2.get("id")));
+							//System.out.println("#31 : "+finalRes.getDataSet().get(fields2.get("id")).get("p1_gene_name"));
+							//System.out.println("#32 : "+homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_gene_name"));
+							//System.out.println("#33 : "+finalRes.getDataSet().get(fields2.get("id")));
+							//System.out.println("#34 : "+finalRes.getDataSet().get(fields2.get("id")).get("p1_uniprot_id"));
+							//System.out.println("#35 : "+homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_uniprot_id"));
+							
+							finalRes.getDataSet().get(fields2.get("id")).put("p1_gene_name", homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_gene_name"));
+							finalRes.getDataSet().get(fields2.get("id")).put("p1_uniprot_id", homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_uniprot_id"));
+							//System.out.println("#36 : "+finalRes);
 						}
 						else { // If not, we remove the interaction
+							//System.out.println("#37 : "+finalRes);
 							finalRes.getDataSet().remove(fields2.get("id"));
+							//System.out.println("#38 : "+finalRes);
 						}
 					}
 					if (!fields2.get("p2_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
-						if (homologs.containsKey(fields2.get("p2_id"))) {
-							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p2_gene_name"), homologs.get(fields2.get("p2_id")).get("ptn_gene_name"));
-							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p2_uniprot_id"), homologs.get(fields2.get("p2_id")).get("ptn_uniprot_id"));
+						if (homologs.containsKey(Integer.parseInt(fields2.get("p2_id")))) {
+							//System.out.println("#39 : "+finalRes.getDataSet().get(fields2.get("id")));
+							//System.out.println("#40 : "+finalRes.getDataSet().get(fields2.get("id")).get("p2_gene_name"));
+							//System.out.println("#41 : "+homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_gene_name"));
+							//System.out.println("#42 : "+finalRes.getDataSet().get(fields2.get("id")));
+							//System.out.println("#43 : "+finalRes.getDataSet().get(fields2.get("id")).get("p2_uniprot_id"));
+							//System.out.println("#44 : "+homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_uniprot_id"));
+							
+							finalRes.getDataSet().get(fields2.get("id")).put("p2_gene_name", homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_gene_name"));
+							finalRes.getDataSet().get(fields2.get("id")).put("p2_uniprot_id", homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_uniprot_id"));
+							//System.out.println("#45 : "+finalRes);
 						}
 						else {
+							//System.out.println("#46 : "+finalRes);
 							finalRes.getDataSet().remove(fields2.get("id"));
+							//System.out.println("#47 : "+finalRes);
 						}
 					}
 				}			
 			}
-	        return finalRes;
+			//System.out.println("#48 : "+finalRes);
+			if (!finalRes.isEmpty()) {
+				return finalRes;
+        	} else {
+        		JOptionPane.showMessageDialog(Cytoscape.getDesktop(), uniprot+" not predicted into the reference organism you chose");
+        		return null;
+        	}
         }
-        return null;
+        else {
+        	JOptionPane.showMessageDialog(Cytoscape.getDesktop(), uniprot+" not found");
+        	return null;
+        }
+        //} catch (FileNotFoundException e) {
+        //    e.printStackTrace();
+        //    return null;
+        //}
     }
 
     /**
@@ -322,7 +413,8 @@ public class DBConnector {
                 for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
                     tmpMap.put(res.getMetaData().getColumnName(i), res.getString(i));
                 }
-                ret.put(Integer.valueOf(res.getInt("ptn_id")), tmpMap);
+                
+                ret.put(inte, tmpMap);//ret.put(Integer.valueOf(res.getInt("ptn_id")), tmpMap);
             }
         }
         return ret;
