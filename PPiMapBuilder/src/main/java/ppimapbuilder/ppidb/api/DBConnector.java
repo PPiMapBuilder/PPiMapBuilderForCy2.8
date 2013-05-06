@@ -401,6 +401,8 @@ public class DBConnector {
         HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
         ResultSet res = null;
 
+        System.out.println(this.pstmt.toString());
+        
         for (Integer inte : proteinId) {
             pstmt.setInt(1, inte);
             pstmt.setInt(2, taxIdRef);
@@ -415,6 +417,65 @@ public class DBConnector {
                 ret.put(inte, tmpMap);//ret.put(Integer.valueOf(res.getInt("ptn_id")), tmpMap);
             }
         }
+        return ret;
+    }
+
+    /**
+     * Give the list of interactions between a set of protein identified by
+     * their proteinIDs.
+     *
+     * @param ptnIDs
+     * @return
+     * @throws SQLException
+     */
+    public HashMap<Integer, HashMap<String, String>> getSecondInteractors(ArrayList<Integer> ptnIDs) throws SQLException {
+
+        HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
+        ResultSet res = null;
+        String arg = this.formatInClause(ptnIDs);
+
+        String query = "select\n"
+                + "	interaction.id as \"id\",\n"
+                + "	p1.uniprot_id as \"uniprotidA\",\n"
+                + "	p1.gene_name as \"interactorA\",\n"
+                + "	p1.organism_id as \"taxidA\",\n"
+                + "	p2.uniprot_id as \"uniprotidB\",\n"
+                + "	p2.gene_name as \"interactorB\",\n"
+                + "	p2.organism_id as \"taxidB\"\n"
+                + "from interaction\n"
+                + "	join protein as \"p1\" on interaction.protein_id1 = p1.id\n"
+                + "	join protein as \"p2\" on interaction.protein_id2 = p2.id\n"
+                + "where (\n"
+                + "	interaction.protein_id1 in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + "	or\n"
+                + "	interaction.protein_id2 in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + ")\n"
+                + "and (\n"
+                + "	p1.id in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + "	and\n"
+                + "	p2.id in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + "\n"
+                + ")";
+
+        System.out.println(query);
+
+        res = st.executeQuery(query);
+        while (res.next()) {
+            LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
+            for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
+                tmpMap.put(res.getMetaData().getColumnName(i), res.getString(i));
+            }
+            ret.put(Integer.valueOf(res.getInt("id")), tmpMap);
+        }
+
         return ret;
     }
 
