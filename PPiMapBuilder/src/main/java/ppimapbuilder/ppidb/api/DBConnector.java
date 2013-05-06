@@ -335,6 +335,7 @@ public class DBConnector {
 							//System.out.println("#34 : "+finalRes.getDataSet().get(fields2.get("id")).get("p1_uniprot_id"));
 							//System.out.println("#35 : "+homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_uniprot_id"));
 							
+							finalRes.getDataSet().get(fields2.get("id")).put("p1_id", homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_id"));
 							finalRes.getDataSet().get(fields2.get("id")).put("p1_gene_name", homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_gene_name"));
 							finalRes.getDataSet().get(fields2.get("id")).put("p1_uniprot_id", homologs.get(Integer.parseInt(fields2.get("p1_id"))).get("ptn_uniprot_id"));
 							//System.out.println("#36 : "+finalRes);
@@ -354,6 +355,7 @@ public class DBConnector {
 							//System.out.println("#43 : "+finalRes.getDataSet().get(fields2.get("id")).get("p2_uniprot_id"));
 							//System.out.println("#44 : "+homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_uniprot_id"));
 							
+							finalRes.getDataSet().get(fields2.get("id")).put("p2_id", homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_id"));
 							finalRes.getDataSet().get(fields2.get("id")).put("p2_gene_name", homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_gene_name"));
 							finalRes.getDataSet().get(fields2.get("id")).put("p2_uniprot_id", homologs.get(Integer.parseInt(fields2.get("p2_id"))).get("ptn_uniprot_id"));
 							//System.out.println("#45 : "+finalRes);
@@ -439,12 +441,24 @@ public class DBConnector {
                 + "	p1.uniprot_id as \"uniprotidA\",\n"
                 + "	p1.gene_name as \"interactorA\",\n"
                 + "	p1.organism_id as \"taxidA\",\n"
+                + "		org1.name AS \"p1_org_name\",\n"
                 + "	p2.uniprot_id as \"uniprotidB\",\n"
                 + "	p2.gene_name as \"interactorB\",\n"
-                + "	p2.organism_id as \"taxidB\"\n"
+                + "	p2.organism_id as \"taxidB\",\n"
+                + "		org2.name AS \"p2_org_name\",\n"
+                + "		db.name AS \"srcdb\",\n"
+                + "		expsys.name AS \"expsys\",\n"
+                + "		pub.pubmed_id AS \"pubmed\"\n"
                 + "from interaction\n"
                 + "	join protein as \"p1\" on interaction.protein_id1 = p1.id\n"
                 + "	join protein as \"p2\" on interaction.protein_id2 = p2.id\n"
+                + "		join organism AS \"org1\" ON p1.organism_id = org1.tax_id\n"
+                + "		join organism AS \"org2\" ON p2.organism_id = org2.tax_id\n"
+                + "		join link_data_interaction AS \"lnk\" ON lnk.interaction_id = interaction.id\n"
+                + "		join interaction_data AS \"intdata\" ON lnk.interaction_data_id = intdata.id\n"
+                + "		join source_database AS \"db\" ON intdata.db_source_name = db.name\n"
+                + "		join experimental_system AS \"expsys\" ON expsys.name = intdata.experimental_system\n"
+                + "		join publication AS \"pub\" ON pub.pubmed_id = intdata.pubmed_id\n"
                 + "where (\n"
                 + "	interaction.protein_id1 in (\n"
                 + "		" + arg + "\n"
