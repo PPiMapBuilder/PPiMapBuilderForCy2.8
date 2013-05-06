@@ -167,27 +167,27 @@ public class NetworkControl implements PropertyChangeListener {
 								//Create Edges
 								interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
 
-//								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
-//								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
-//								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
-//
-//								String organismA = (String) fields.get("orgaA");
-//								String organismB = (String) fields.get("orgaB");							
-//
-//								if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
-//									if (Integer.parseInt(fields.get("taxidA")) == refOrganism ) { // If this organism is the reference one
-//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
-//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
-//									}
-//									else { // If this organism is another organism
-//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
-//										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
-//									}
-//								}
-//								else {
-//									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
-//									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
-//								}
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
+
+								String organismA = (String) fields.get("p1_org_name");
+								String organismB = (String) fields.get("p2_org_name");							
+
+								if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
+									if (Integer.parseInt(fields.get("p1_taxid")) == refOrganism ) { // If this organism is the reference one
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
+									}
+									else { // If this organism is another organism
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+										Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
+									}
+								}
+								else {
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+									Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
+								}
 
 								myNetwork.addEdge(interaction);
 

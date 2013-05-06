@@ -1,5 +1,6 @@
 package ppimapbuilder.ppidb.api;
 
+import java.awt.RenderingHints.Key;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -229,7 +230,67 @@ public class DBConnector {
                 + "	AND db.name IN (" + this.formatInClause(dbs) + ")\n";
 
         System.out.println(q);
-        return new SQLResult(st.executeQuery(q));
+        ArrayList<Integer> proteinId = new ArrayList<Integer>();
+        
+        SQLResult res = new SQLResult(st.executeQuery(q));
+        LinkedHashMap<String, LinkedHashMap<String, String>> resCopy = new LinkedHashMap<String, LinkedHashMap<String,String>>();
+
+        if (res != null) {
+        	
+        	LinkedHashMap<String, String> fields2;
+			for(String row: res.keySet()) {
+				resCopy.put(row, new LinkedHashMap<String, String>());
+				
+				fields2 = res.getData(row);
+				
+				for (String field : fields2.keySet()) {
+					resCopy.get(row).put(field, fields2.get(field));
+				}
+			}
+			
+	        SQLResult finalRes = new SQLResult(res.getIdFieldName(), resCopy);
+        	
+        	
+        	LinkedHashMap<String, String> fields;
+			for(String row: res.keySet()) {
+				fields = res.getData(row);
+				if (!fields.get("p1_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
+					proteinId.add(Integer.parseInt(fields.get("p1_id")));
+				}
+				if (!fields.get("p2_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
+					proteinId.add(Integer.parseInt(fields.get("p2_id")));
+				}
+			}
+
+			if (!proteinId.isEmpty()) {
+				HashMap<Integer, HashMap<String, String>> homologs = this.getHomologous(proteinId, taxIdRef);
+
+				for(String row: res.keySet()) {
+					fields2 = res.getData(row);
+
+					if (!fields2.get("p1_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) { // If the protein is not from the reference organism
+						if (homologs.containsKey(fields2.get("p1_id"))) { // If an homolog exists for this protein and this reference organism
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p1_gene_name"), homologs.get(fields2.get("p1_id")).get("ptn_gene_name"));
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p1_uniprot_id"), homologs.get(fields2.get("p1_id")).get("ptn_uniprot_id"));
+						}
+						else { // If not, we remove the interaction
+							finalRes.getDataSet().remove(fields2.get("id"));
+						}
+					}
+					if (!fields2.get("p2_taxid").equalsIgnoreCase(String.valueOf(taxIdRef))) {
+						if (homologs.containsKey(fields2.get("p2_id"))) {
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p2_gene_name"), homologs.get(fields2.get("p2_id")).get("ptn_gene_name"));
+							finalRes.getDataSet().get(fields2.get("id")).put(finalRes.getDataSet().get(fields2.get("id")).get("p2_uniprot_id"), homologs.get(fields2.get("p2_id")).get("ptn_uniprot_id"));
+						}
+						else {
+							finalRes.getDataSet().remove(fields2.get("id"));
+						}
+					}
+				}			
+			}
+	        return finalRes;
+        }
+        return null;
     }
 
     /**
@@ -249,6 +310,8 @@ public class DBConnector {
         HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
         ResultSet res = null;
 
+        System.out.println(this.pstmt.toString());
+        
         for (Integer inte : proteinId) {
             pstmt.setInt(1, inte);
             pstmt.setInt(2, taxIdRef);
@@ -262,6 +325,65 @@ public class DBConnector {
                 ret.put(Integer.valueOf(res.getInt("ptn_id")), tmpMap);
             }
         }
+        return ret;
+    }
+
+    /**
+     * Give the list of interactions between a set of protein identified by
+     * their proteinIDs.
+     *
+     * @param ptnIDs
+     * @return
+     * @throws SQLException
+     */
+    public HashMap<Integer, HashMap<String, String>> getSecondInteractors(ArrayList<Integer> ptnIDs) throws SQLException {
+
+        HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
+        ResultSet res = null;
+        String arg = this.formatInClause(ptnIDs);
+
+        String query = "select\n"
+                + "	interaction.id as \"id\",\n"
+                + "	p1.uniprot_id as \"uniprotidA\",\n"
+                + "	p1.gene_name as \"interactorA\",\n"
+                + "	p1.organism_id as \"taxidA\",\n"
+                + "	p2.uniprot_id as \"uniprotidB\",\n"
+                + "	p2.gene_name as \"interactorB\",\n"
+                + "	p2.organism_id as \"taxidB\"\n"
+                + "from interaction\n"
+                + "	join protein as \"p1\" on interaction.protein_id1 = p1.id\n"
+                + "	join protein as \"p2\" on interaction.protein_id2 = p2.id\n"
+                + "where (\n"
+                + "	interaction.protein_id1 in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + "	or\n"
+                + "	interaction.protein_id2 in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + ")\n"
+                + "and (\n"
+                + "	p1.id in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + "	and\n"
+                + "	p2.id in (\n"
+                + "		" + arg + "\n"
+                + "	)\n"
+                + "\n"
+                + ")";
+
+        System.out.println(query);
+
+        res = st.executeQuery(query);
+        while (res.next()) {
+            LinkedHashMap<String, String> tmpMap = new LinkedHashMap<String, String>();
+            for (int i = 1; i <= res.getMetaData().getColumnCount(); i++) {
+                tmpMap.put(res.getMetaData().getColumnName(i), res.getString(i));
+            }
+            ret.put(Integer.valueOf(res.getInt("id")), tmpMap);
+        }
+
         return ret;
     }
 
