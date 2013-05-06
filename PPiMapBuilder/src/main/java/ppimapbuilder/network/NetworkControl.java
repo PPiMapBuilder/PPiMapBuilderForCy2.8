@@ -5,6 +5,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -151,13 +152,16 @@ public class NetworkControl implements PropertyChangeListener {
 				Cytoscape.getEdgeAttributes().setUserEditable("Predicted from", false);
 				Cytoscape.getEdgeAttributes().setUserEditable("canonicalName", false);
 				
+				// Store final protein IDs 
+				ArrayList<Integer> ptnIDs = new ArrayList<Integer>();
+				
 				// Creation of the network components
 				for (String id : poiList) { // For each protein of interest
 					
 					SQLResult res = NetworkAbstraction.getAllData(id, dbList, orgaList, refOrganism);
 					
 					if (res != null) {
-						
+												
 						PMBNode A, B;
 						CyEdge interaction;
 						LinkedHashMap<String, String> fields;
@@ -169,6 +173,11 @@ public class NetworkControl implements PropertyChangeListener {
 
 							//Create Nodes
 							try {
+								
+								if (!fields.get("p1_uniprot_id").equals(id) && !ptnIDs.contains(Integer.parseInt(fields.get("p1_id"))))
+										ptnIDs.add(Integer.parseInt(fields.get("p1_id")));
+								if (!fields.get("p2_uniprot_id").equals(id) && !ptnIDs.contains(Integer.parseInt(fields.get("p2_id"))))
+									ptnIDs.add(Integer.parseInt(fields.get("p2_id")));
 
 								A = new PMBNode(Cytoscape.getCyNode(fields.get("p1_gene_name"), true), fields.get("p1_uniprot_id"), fields.get("p1_taxid"));
 								B = new PMBNode(Cytoscape.getCyNode(fields.get("p2_gene_name"), true), fields.get("p2_uniprot_id"), fields.get("p2_taxid"));
@@ -180,8 +189,7 @@ public class NetworkControl implements PropertyChangeListener {
 
 								//Create Edges
 								interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
-								
-								//
+
 								String idInt = interaction.getIdentifier();
 								CyAttributes attrInt = Cytoscape.getEdgeAttributes();
 								String[] attrs = {"Source database", "Experimental system", "Pubmed id"};
@@ -224,7 +232,6 @@ public class NetworkControl implements PropertyChangeListener {
 								return;
 							}
 						}
-
 					}
 				}
 				
@@ -233,8 +240,68 @@ public class NetworkControl implements PropertyChangeListener {
 					Cytoscape.destroyNetwork(myNetwork);
 				}
 				else {
-					// Add a view to the network
-					addViewToNetwork(myNetwork);
+					// Add secondary interactions
+					CyNode A, B;
+					CyEdge interaction;
+					HashMap<String, String> fieldsSecond;
+					
+					HashMap<Integer, HashMap<String, String>> resSecond = NetworkAbstraction.getSecondInteractors(ptnIDs);
+					// For each line
+					for(Integer row: resSecond.keySet()) {
+						//Get fields
+						fieldsSecond =  resSecond.get(row);
+						
+						System.out.println("#1 : "+fieldsSecond);
+						
+						A = Cytoscape.getCyNode(fieldsSecond.get("interactorA"));
+						B = Cytoscape.getCyNode(fieldsSecond.get("interactorB"));
+						
+						System.out.println("#2 : "+A.getIdentifier());
+						System.out.println("#3 : "+B.getIdentifier());
+						
+						interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
+						System.out.println("#4 : "+interaction.getIdentifier());
+						
+						String idInt = interaction.getIdentifier();
+						CyAttributes attrInt = Cytoscape.getEdgeAttributes();
+						String[] attrs = {"Source database", "Experimental system", "Pubmed id"};
+						String[] fieldNames = {"srcdb", "expsys", "pubmed"};
+						
+						for(int i = 0; i < attrs.length; i++){
+							String attr = ((String)attrInt.getAttribute(idInt, attrs[i]));
+							String field = (String) fieldsSecond.get(fieldNames[i]);
+							
+							if(attr != null && !attr.isEmpty() && !attr.contains(field)) attr += "; "+field;
+							else attr = field;
+							
+							attrInt.setAttribute(idInt, attrs[i], attr);
+						}
+						
+						String organismA = (String) fieldsSecond.get("p1_org_name");
+						String organismB = (String) fieldsSecond.get("p2_org_name");							
+
+						if (organismA.equalsIgnoreCase(organismB)) { // If these proteins come from the same organism
+							if (Integer.parseInt(fieldsSecond.get("taxidA")) == refOrganism ) { // If this organism is the reference one
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", organismA);
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", "");
+							}
+							else { // If this organism is another organism
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA);
+							}
+						}
+						else {
+							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Origin", "Interolog");
+							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
+						}
+						
+						myNetwork.addEdge(interaction);
+						
+						// Add a view to the network
+						addViewToNetwork(myNetwork);
+						
+					}
+					
 					
 					(Executors.newFixedThreadPool(1)).submit(new Runnable() {
 						public void run() {
