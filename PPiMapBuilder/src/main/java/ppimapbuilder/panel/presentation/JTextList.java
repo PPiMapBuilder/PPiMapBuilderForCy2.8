@@ -28,6 +28,14 @@ public class JTextList extends JTextPane {
 		setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
 	}
 	
+	@Override
+	public void setText(String arg0) {
+		super.setText(arg0);
+		setEditable(false);
+		setBackground(null);
+		setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 5));
+	}
+	
 	/**
 	 * 
 	 * @param list

@@ -7,7 +7,10 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Set;
+import java.util.concurrent.Executors;
+
 import javax.swing.JOptionPane;
+
 import ppimapbuilder.LoadingWindow;
 import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.network.presentation.PMBView;
@@ -232,6 +235,12 @@ public class NetworkControl implements PropertyChangeListener {
 				else {
 					// Add a view to the network
 					addViewToNetwork(myNetwork);
+					
+					(Executors.newFixedThreadPool(1)).submit(new Runnable() {
+						public void run() {
+							fillGOData(myNetwork);
+						}
+					});
 				}
 			}
 		};
@@ -261,38 +270,49 @@ public class NetworkControl implements PropertyChangeListener {
 	 * 
 	 * @param network
 	 */
-	public void fillGOData(CyNetwork network) {
-		EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); //Create entry retrival service
-		ArrayList<String> componentList;
-		ArrayList<String> processList;
-		ArrayList<String> functionList;
+	public void fillGOData( CyNetwork network) {
+		System.out.println("Searching gene ontologies...");
 		
-		for(PMBNode n : myNetworks.get(network)) {
-			UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(n.getUniprotId()); //Retrieve UniProt entry by its accession number
+		try {
+			//Create entry retrieval service
+			EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); 
 			
-			if (entry != null) { // If there is an entry
-				
-			    n.setProteinDescription(entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue());
+			String proteinDescription;
+			ArrayList<String> componentList;
+			ArrayList<String> processList;
+			ArrayList<String> functionList;
 
-			    // Instantiates every gene ontology list
-			    componentList = new ArrayList<String>();
-			    processList = new ArrayList<String>();
-			    functionList = new ArrayList<String>();
-			    
-			    for (Go myGo : entry.getGoTerms()) { // For each gene ontology
-			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
-			    		componentList.add(""+myGo.getGoTerm().getValue());
-			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
-			    		processList.add(""+myGo.getGoTerm().getValue());
-			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
-			    		functionList.add(""+myGo.getGoTerm().getValue());
-			    }
-			    
-			    n.setComponentList(componentList);
-			    n.setFunctionList(functionList);
-			    n.setProcessList(processList);
+			for(PMBNode node : myNetworks.get(network)) {
+				UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(node.getUniprotId()); //Retrieve UniProt entry by its accession number
+
+				if (entry != null) { // If there is an entry
+					if(entry.getProteinDescription().getRecommendedName().getFields().size() > 0)
+						proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
+					else proteinDescription = "";
+
+					// Instantiates every gene ontology list
+					componentList = new ArrayList<String>();
+					processList = new ArrayList<String>();
+					functionList = new ArrayList<String>();
+
+					for (Go myGo : entry.getGoTerms()) { // For each gene ontology
+						if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
+							componentList.add(myGo.getGoTerm().getValue());
+						if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
+							processList.add(myGo.getGoTerm().getValue());
+						if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
+							functionList.add(myGo.getGoTerm().getValue());
+					}
+
+					node.setGeneOntologyData(proteinDescription, componentList, processList, functionList);
+				} 
+				else {
+					node.setGeneOntologyData(null, null, null, null);
+				}
 			}
-		}
+		} catch(Exception e) {System.out.println("[Error thread gene ontology]");e.printStackTrace();}
+		
+		System.out.println("GO done!");
 	}
 
 }

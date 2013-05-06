@@ -25,6 +25,8 @@ public class PMBNode extends CyNode {
 	private ArrayList<String> processList;
 	private ArrayList<String> functionList;
 	
+	private boolean goLoaded;
+	
 	/**
 	 * Constructor which inherits from the CyNode class
 	 * This class is necessary and is used by the other ppimapbuilder node constructor
@@ -33,6 +35,7 @@ public class PMBNode extends CyNode {
 	 */
 	public PMBNode(RootGraph root, int rootGraphIndex) {
 		super(root, rootGraphIndex);
+		this.goLoaded = false;
 	}
 
 	/**
@@ -54,33 +57,7 @@ public class PMBNode extends CyNode {
 		this.geneName = myNode.getIdentifier(); // The identifier and the gene name are the same information
 		this.uniprotId = uniprotId; // Uniprot Id which is used to retrieve the uniprot entry
 		
-		EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); //Create entry retrival service
-		
-		UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(this.uniprotId); //Retrieve UniProt entry by its accession number
-		
-		if (entry != null) { // If there is an entry
-			try {
-			    this.proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
-		
-			    // Instantiates every gene ontology list
-			    this.componentList = new ArrayList<String>();
-			    this.processList = new ArrayList<String>();
-			    this.functionList = new ArrayList<String>();
-
-			    for (Go myGo : entry.getGoTerms()) { // For each gene ontology
-			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
-			    		this.componentList.add(""+myGo.getGoTerm().getValue());
-			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
-			    		this.processList.add(""+myGo.getGoTerm().getValue());
-			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
-			    		this.functionList.add(""+myGo.getGoTerm().getValue());
-			    }
-		    
-			} catch (IndexOutOfBoundsException e) {
-				//e.printStackTrace();
-			}
-		}
-	    
+		this.goLoaded = false;
 	}
 
 	/**
@@ -150,35 +127,29 @@ public class PMBNode extends CyNode {
 	/**
 	 * 
 	 * @param proteinDescription
-	 */
-	public void setProteinDescription(String proteinDescription) {
-		this.proteinDescription = proteinDescription;
-	}
-
-	/**
-	 * 
 	 * @param componentList
-	 */
-	public void setComponentList(ArrayList<String> componentList) {
-		this.componentList = componentList;
-	}
-
-	/**
-	 * 
 	 * @param processList
-	 */
-	public void setProcessList(ArrayList<String> processList) {
-		this.processList = processList;
-	}
-
-	/**
-	 * 
 	 * @param functionList
 	 */
-	public void setFunctionList(ArrayList<String> functionList) {
+	public void setGeneOntologyData(String proteinDescription, ArrayList<String> componentList, ArrayList<String> processList, ArrayList<String> functionList) {
+		this.proteinDescription = proteinDescription;
+		this.componentList = componentList;
+		this.processList = processList;
 		this.functionList = functionList;
+		this.goLoaded = true;
 	}
 	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isGoLoaded() {
+		return goLoaded;
+	}
+	
+	/**
+	 * 
+	 */
 	@Override
 	public String getIdentifier() {
 		return this.geneName;

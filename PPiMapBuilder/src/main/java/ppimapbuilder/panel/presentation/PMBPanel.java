@@ -241,28 +241,35 @@ public class PMBPanel extends JPanel {
 
 		//Protein info
 		lblGeneNameValue.setText(selectedNode.getGeneName().trim());
+		
 		((JLinkLabel)lblUniprotIdValue).setUrl("http://uniprot.org/uniprot/"+selectedNode.getUniprotId().trim());
 		lblUniprotIdValue.setText("<html><u>"+selectedNode.getUniprotId().trim()+"</u></html>");
-		if(selectedNode.getProteinDescription() != null)
-			lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
-		else
-			lblDescriptionValue.setText("No gene ontology charged");
+		
+		if(selectedNode.isGoLoaded()) {
+			if(selectedNode.getProteinDescription() != null)
+				lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
+			
+			//Gene ontology
+			ArrayList<String> tmp;
+			if (selectedNode.getComponentList() != null && !selectedNode.getComponentList().isEmpty()) {
+				tmp = selectedNode.getComponentList();
+				lblCcList.setText((String[])tmp.toArray(new String[tmp.size()]));
+			} else lblCcList.setText("");
 
-		//Gene ontology
-		ArrayList<String> tmp;
-		if (selectedNode.getComponentList() != null && !selectedNode.getComponentList().isEmpty()) {
-			tmp = selectedNode.getComponentList();
-			lblCcList.setText((String[])tmp.toArray(new String[tmp.size()]));
-		}
+			if (selectedNode.getProcessList() != null && !selectedNode.getProcessList().isEmpty()) {
+				tmp = selectedNode.getProcessList();
+				lblBioList.setText((String[])tmp.toArray(new String[tmp.size()]));
+			} else lblBioList.setText("");
 
-		if (selectedNode.getProcessList() != null && !selectedNode.getProcessList().isEmpty()) {
-			tmp = selectedNode.getProcessList();
-			lblBioList.setText((String[])tmp.toArray(new String[tmp.size()]));
-		} 
-
-		if (selectedNode.getFunctionList() != null && !selectedNode.getFunctionList().isEmpty()) {
-			tmp = selectedNode.getFunctionList();
-			lblFunList.setText((String[])tmp.toArray(new String[tmp.size()]));
+			if (selectedNode.getFunctionList() != null && !selectedNode.getFunctionList().isEmpty()) {
+				tmp = selectedNode.getFunctionList();
+				lblFunList.setText((String[])tmp.toArray(new String[tmp.size()]));
+			} else lblFunList.setText("");
+		} else {
+			lblDescriptionValue.setText("Gene ontology loading...");
+			lblCcList.setText("Gene ontology loading...");
+			lblBioList.setText("Gene ontology loading...");
+			lblFunList.setText("Gene ontology loading...");
 		}
 
 		//Display the node info panel and refresh the interface
@@ -275,19 +282,22 @@ public class PMBPanel extends JPanel {
 	 * @param selectedEdge
 	 */
 	public void update(CyEdge selectedEdge) {
-		lblOriginValue.setText(Cytoscape.getEdgeAttributes().getStringAttribute(selectedEdge.getIdentifier(), "Origin"));
+		String origin = Cytoscape.getEdgeAttributes().getStringAttribute(selectedEdge.getIdentifier(), "Origin");
+		if(origin != null && !origin.isEmpty()) lblOriginValue.setText(origin);
 		
 		String sourceDb = Cytoscape.getEdgeAttributes().getStringAttribute(selectedEdge.getIdentifier(), "Source database");
-		lblSrcDbValue.setText(sourceDb.split("; "));
+		if(sourceDb != null && !sourceDb.isEmpty()) lblSrcDbValue.setText(sourceDb.split("; "));
 		
 		String exp = Cytoscape.getEdgeAttributes().getStringAttribute(selectedEdge.getIdentifier(), "Experimental system");
-		lblExpsysValue.setText(exp.split("; "));
+		if(exp != null && !exp.isEmpty()) lblExpsysValue.setText(exp.split("; "));
 		
 		String pub = Cytoscape.getEdgeAttributes().getStringAttribute(selectedEdge.getIdentifier(), "Pubmed id");
-		String[] url = pub.split("; ");
-		for(int i = 0; i < url.length; i++)
-			url[i] = "http://www.ncbi.nlm.nih.gov/pubmed/"+url[i];
-		lblPublicationValue.setText(pub.split("; "), url);
+		if(pub != null && !pub.isEmpty()){
+			String[] url = pub.split("; ");
+			for(int i = 0; i < url.length; i++)
+				url[i] = "http://www.ncbi.nlm.nih.gov/pubmed/"+url[i];
+			lblPublicationValue.setText(pub.split("; "), url);
+		}
 		
 		//Display the edge info panel and refresh the interface
 		refreshUI(edgeInfoPanel);
@@ -306,6 +316,10 @@ public class PMBPanel extends JPanel {
 		refreshUI(noSelection);
 	} 
 	
+	/**
+	 * 
+	 * @param comp
+	 */
 	private void refreshUI(JComponent comp) {
 		removeAll();
 		
