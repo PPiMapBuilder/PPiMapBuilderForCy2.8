@@ -177,7 +177,8 @@ public class PMBPanel extends JPanel {
 		lblGeneNameValue.setText(selectedNode.getGeneName().trim());
 		lblUniprotIdValue.setUrl("http://uniprot.org/uniprot/"+selectedNode.getUniprotId().trim());
 		lblUniprotIdValue.setText("<html><u>"+selectedNode.getUniprotId().trim()+"</u></html>");
-		lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
+		if (selectedNode.getProteinDescription() != null)
+			lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
 		
 		//Gene ontology
 		geneOntologyPanel.removeAll();

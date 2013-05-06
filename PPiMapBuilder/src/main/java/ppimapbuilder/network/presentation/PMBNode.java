@@ -59,21 +59,26 @@ public class PMBNode extends CyNode {
 		UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(this.uniprotId); //Retrieve UniProt entry by its accession number
 		
 		if (entry != null) { // If there is an entry
-		    this.proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
+			try {
+			    this.proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
+		
+			    // Instantiates every gene ontology list
+			    this.componentList = new ArrayList<String>();
+			    this.processList = new ArrayList<String>();
+			    this.functionList = new ArrayList<String>();
 
-		    // Instantiates every gene ontology list
-		    this.componentList = new ArrayList<String>();
-		    this.processList = new ArrayList<String>();
-		    this.functionList = new ArrayList<String>();
+			    for (Go myGo : entry.getGoTerms()) { // For each gene ontology
+			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
+			    		this.componentList.add(""+myGo.getGoTerm().getValue());
+			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
+			    		this.processList.add(""+myGo.getGoTerm().getValue());
+			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
+			    		this.functionList.add(""+myGo.getGoTerm().getValue());
+			    }
 		    
-		    for (Go myGo : entry.getGoTerms()) { // For each gene ontology
-		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
-		    		this.componentList.add(""+myGo.getGoTerm().getValue());
-		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
-		    		this.processList.add(""+myGo.getGoTerm().getValue());
-		    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
-		    		this.functionList.add(""+myGo.getGoTerm().getValue());
-		    }
+			} catch (IndexOutOfBoundsException e) {
+				//e.printStackTrace();
+			}
 		}
 	    
 	}

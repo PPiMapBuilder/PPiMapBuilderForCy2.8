@@ -196,11 +196,7 @@ public class NetworkControl implements PropertyChangeListener {
 								myNetworks.remove(myNetwork);
 								Cytoscape.destroyNetwork(myNetwork);
 								return;
-							} /*catch (Exception e1) {
-								JOptionPane.showMessageDialog(null, "Error : "+e1.getLocalizedMessage());
-								e1.printStackTrace();
-								return;
-							}*/
+							}
 						}
 
 					}
