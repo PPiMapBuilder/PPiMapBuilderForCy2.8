@@ -14,10 +14,15 @@ import ppimapbuilder.network.presentation.PMBView;
 import ppimapbuilder.networkcreationframe.NetworkCreationFrameControl;
 import ppimapbuilder.panel.PMBPanelControl;
 import ppimapbuilder.ppidb.api.SQLResult;
+import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
+import uk.ac.ebi.kraken.interfaces.uniprot.dbx.go.Go;
+import uk.ac.ebi.kraken.uuw.services.remoting.EntryRetrievalService;
+import uk.ac.ebi.kraken.uuw.services.remoting.UniProtJAPI;
 import cytoscape.CyEdge;
 import cytoscape.CyNode;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.data.CyAttributes;
 import cytoscape.data.Semantics;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CytoscapeDesktop;
@@ -118,8 +123,14 @@ public class NetworkControl implements PropertyChangeListener {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param poiList
+	 * @param dbList
+	 * @param orgaList
+	 * @param refOrganism
+	 */
 	public void createNetwork(final ArrayList<String> poiList, final ArrayList<String> dbList, final ArrayList<Integer> orgaList, final int refOrganism) {
-		
 		// Will display the loading window until the treatment is done
 		new LoadingWindow("Generating network...") {
 			public void process() {
@@ -166,10 +177,22 @@ public class NetworkControl implements PropertyChangeListener {
 
 								//Create Edges
 								interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
-
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Source database", (String) fields.get("srcdb"));
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Experimental system", (String) fields.get("expsys"));
-								Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Pubmed id", (String) fields.get("pubmed"));
+								
+								//
+								String idInt = interaction.getIdentifier();
+								CyAttributes attrInt = Cytoscape.getEdgeAttributes();
+								String[] attrs = {"Source database", "Experimental system", "Pubmed id"};
+								String[] fieldNames = {"srcdb", "expsys", "pubmed"};
+								
+								for(int i = 0; i < attrs.length; i++){
+									String attr = ((String)attrInt.getAttribute(idInt, attrs[i]));
+									String field = (String) fields.get(fieldNames[i]);
+									
+									if(attr != null && !attr.isEmpty() && !attr.contains(field)) attr += "; "+field;
+									else attr = field;
+									
+									attrInt.setAttribute(idInt, attrs[i], attr);
+								}
 
 								String organismA = (String) fields.get("p1_org_name");
 								String organismB = (String) fields.get("p2_org_name");							
@@ -222,19 +245,58 @@ public class NetworkControl implements PropertyChangeListener {
 	public void mousePressed(Point targetedPoint) {
 		CyNetwork current_network = Cytoscape.getCurrentNetwork(); // Retrieve the current network
 
-		Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
 		DGraphView graph = ((DGraphView)Cytoscape.getCurrentNetworkView());
 		
-		if(graph.getPickedEdgeView(targetedPoint) != null) {
-			PMBPanelControl.updatePanel();
-		}
-		else if (graph.getPickedNodeView(targetedPoint) != null) { // If the click is on a node
+		if (graph.getPickedNodeView(targetedPoint) != null) { // If the click is on a node
+			Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
 			PMBNode myNode = getNode(current_network, selectedNodes.iterator().next().getIdentifier());
 			PMBPanelControl.updatePanel(myNode);
+		}
+		else if(graph.getPickedEdgeView(targetedPoint) != null) {
+			Set<CyEdge> selectedEdge = current_network.getSelectedEdges(); // Retrieve selected Nodes
+			PMBPanelControl.updatePanel(selectedEdge.iterator().next());
 		}
 		else PMBPanelControl.updatePanel(); //Clear the panel
 		
 		 // We update the panel
+	}
+	
+	/**
+	 * 
+	 * @param network
+	 */
+	public void fillGOData(CyNetwork network) {
+		EntryRetrievalService entryRetrievalService = UniProtJAPI.factory.getEntryRetrievalService(); //Create entry retrival service
+		ArrayList<String> componentList;
+		ArrayList<String> processList;
+		ArrayList<String> functionList;
+		
+		for(PMBNode n : myNetworks.get(network)) {
+			UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(n.getUniprotId()); //Retrieve UniProt entry by its accession number
+			
+			if (entry != null) { // If there is an entry
+				
+			    n.setProteinDescription(entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue());
+
+			    // Instantiates every gene ontology list
+			    componentList = new ArrayList<String>();
+			    processList = new ArrayList<String>();
+			    functionList = new ArrayList<String>();
+			    
+			    for (Go myGo : entry.getGoTerms()) { // For each gene ontology
+			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
+			    		componentList.add(""+myGo.getGoTerm().getValue());
+			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
+			    		processList.add(""+myGo.getGoTerm().getValue());
+			    	if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
+			    		functionList.add(""+myGo.getGoTerm().getValue());
+			    }
+			    
+			    n.setComponentList(componentList);
+			    n.setFunctionList(functionList);
+			    n.setProcessList(processList);
+			}
+		}
 	}
 
 }
