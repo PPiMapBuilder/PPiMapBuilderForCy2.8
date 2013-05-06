@@ -12,9 +12,14 @@ public class JLinkLabel extends JLabel {
 
 	private String url;
 
-	public JLinkLabel(String text, final String webUrl) {
+	/**
+	 * Constructs a clickable label with website link
+	 * @param text the text displayed on label
+	 * @param link a url link
+	 */
+	public JLinkLabel(String text, final String link) {
 		super(text);
-		this.url = webUrl;
+		this.url = link;
 
 		addMouseListener(new MouseListener() {
 			@Override
@@ -47,10 +52,15 @@ public class JLinkLabel extends JLabel {
 		});
 	}
 
+	/** Constructs an empty JLinkLabel */
 	public JLinkLabel() {
 		this("", "");
 	}
 
+	/**
+	 * Change the url link of the label
+	 * @param url a url link
+	 */
 	public void setUrl(String url) {
 		this.url = url;
 	}

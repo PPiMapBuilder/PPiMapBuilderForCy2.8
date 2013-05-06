@@ -3,9 +3,16 @@ package ppimapbuilder.panel.presentation;
 import java.util.ArrayList;
 import javax.swing.JTextPane;
 
+/**
+ * A swing component used to display a list of String as a html list
+ */
 public class JTextList extends JTextPane {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Constructs a JTextList with an ArrayList of String 
+	 * @param list
+	 */
 	public JTextList(ArrayList<String> list) {
 		String content = "";
 		
