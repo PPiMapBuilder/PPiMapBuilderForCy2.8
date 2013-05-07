@@ -408,7 +408,7 @@ public class NetworkCreationFrame {
 	/** Clearing all fields and lists of the form displayed in the frame */
 	public void clearFormFields() {
 		// Emptying form fields
-		txaIdentifiers.setText("Q86TC9\nQ9VI74\nQ49A88\nO15264");
+		txaIdentifiers.setText("");//Q08752\nP08238");
 		cbReferenceOrganism.removeAllItems();
 		panOtherOrganims.removeAll();
 		panSourceDatabases.removeAll();

@@ -2,6 +2,9 @@ package ppimapbuilder.network.presentation;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+
+import org.apache.commons.lang.StringUtils;
+
 import uk.ac.ebi.kraken.interfaces.uniprot.UniProtEntry;
 import uk.ac.ebi.kraken.interfaces.uniprot.dbx.go.Go;
 import uk.ac.ebi.kraken.uuw.services.remoting.EntryRetrievalService;
@@ -9,6 +12,7 @@ import uk.ac.ebi.kraken.uuw.services.remoting.UniProtJAPI;
 import giny.model.RootGraph;
 import cytoscape.CyNode;
 import cytoscape.Cytoscape;
+import cytoscape.data.CyAttributes;
 
 /**
  * 
@@ -131,7 +135,43 @@ public class PMBNode extends CyNode {
 	 * @param processList
 	 * @param functionList
 	 */
-	public void setGeneOntologyData(String proteinDescription, ArrayList<String> componentList, ArrayList<String> processList, ArrayList<String> functionList) {
+	public void setGeneOntologyData(String proteinDescription, ArrayList<String> componentList, ArrayList<String> processList, ArrayList<String> functionList, ArrayList<String> componentIdList, ArrayList<String> processIdList, ArrayList<String> functionIdList) {
+		CyAttributes attr = Cytoscape.getNodeAttributes();
+		
+		if(processIdList != null & componentIdList != null & functionIdList != null & processList != null & componentList != null& functionList != null) {
+			attr.setAttribute(
+				this.getIdentifier(), 
+				"annotation.GO BIOLOGICAL_PROCESS", 
+				"["+StringUtils.join(processIdList.toArray(new String[processIdList.size()]), ", ")+"]"
+			);
+			attr.setAttribute(
+					this.getIdentifier(), 
+					"annotation.GO CELLULAR_COMPONENT", 
+					"["+StringUtils.join(componentIdList.toArray(new String[componentIdList.size()]), ", ")+"]"
+				);
+			attr.setAttribute(
+					this.getIdentifier(), 
+					"annotation.GO MOLECULAR_FUNCTION", 
+					"["+StringUtils.join(functionIdList.toArray(new String[functionIdList.size()]), ", ")+"]"
+				);
+			
+			attr.setAttribute(
+					this.getIdentifier(), 
+					"Biological process", 
+					StringUtils.join(processList.toArray(new String[processList.size()]), "; ")
+				);
+			attr.setAttribute(
+					this.getIdentifier(), 
+					"Cellular component", 
+					StringUtils.join(componentList.toArray(new String[componentList.size()]), "; ")
+				);
+			attr.setAttribute(
+					this.getIdentifier(), 
+					"Molecular function", 
+					StringUtils.join(functionList.toArray(new String[functionList.size()]), "; ")
+				);
+		}
+		
 		this.proteinDescription = proteinDescription;
 		this.componentList = componentList;
 		this.processList = processList;

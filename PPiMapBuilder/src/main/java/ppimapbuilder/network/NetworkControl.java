@@ -100,7 +100,8 @@ public class NetworkControl implements PropertyChangeListener {
 	 */
 	public void addNode(CyNetwork myNetwork, PMBNode myNode) {
 		/* check if myNetwork exists */
-		this.myNetworks.get(myNetwork).add(myNode); // We stock the node
+		if(!this.myNetworks.get(myNetwork).contains(myNode)) 
+			this.myNetworks.get(myNetwork).add(myNode); // We store the node
 	}
 	
 	/**
@@ -348,38 +349,71 @@ public class NetworkControl implements PropertyChangeListener {
 			ArrayList<String> componentList;
 			ArrayList<String> processList;
 			ArrayList<String> functionList;
+			
+			ArrayList<String> componentIdList;
+			ArrayList<String> processIdList;
+			ArrayList<String> functionIdList;
 
-			for(PMBNode node : myNetworks.get(network)) {
-				UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(node.getUniprotId()); //Retrieve UniProt entry by its accession number
+//			int[] indices = network.getNodeIndicesArray();
+//			for(int i : network.getNodeIndicesArray()) {
+//				PMBNode node = (PMBNode)network.getNode(i);
+//				PMBPanelControl.setStatus("Loading GO ("+i+"/"+indices.length+")...");
+//				
+			ArrayList<PMBNode> nodes = myNetworks.get(network);
+			for(PMBNode node : nodes) {
+				if(!node.isGoLoaded()) {
+					PMBPanelControl.setStatus("Loading GO ("+nodes.indexOf(node)+"/"+nodes.size()+")...");
+					UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(node.getUniprotId()); //Retrieve UniProt entry by its accession number
 
-				if (entry != null) { // If there is an entry
-					if(entry.getProteinDescription().getRecommendedName().getFields().size() > 0)
-						proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
-					else proteinDescription = "";
+					if (entry != null) { // If there is an entry
+						if(entry.getProteinDescription().getRecommendedName().getFields().size() > 0)
+							proteinDescription = entry.getProteinDescription().getRecommendedName().getFields().get(0).getValue();
+						else proteinDescription = "";
 
-					// Instantiates every gene ontology list
-					componentList = new ArrayList<String>();
-					processList = new ArrayList<String>();
-					functionList = new ArrayList<String>();
+						// Instantiates every gene ontology list
+						componentList = new ArrayList<String>();
+						processList = new ArrayList<String>();
+						functionList = new ArrayList<String>();
+						
+						componentIdList = new ArrayList<String>();
+						processIdList = new ArrayList<String>();
+						functionIdList = new ArrayList<String>();
 
-					for (Go myGo : entry.getGoTerms()) { // For each gene ontology
-						if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) // If it is a cellular component
-							componentList.add(myGo.getGoTerm().getValue());
-						if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) // If it is biological processes
-							processList.add(myGo.getGoTerm().getValue());
-						if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) // If it is a molecular function
-							functionList.add(myGo.getGoTerm().getValue());
-					}
+						for (Go myGo : entry.getGoTerms()) { // For each gene ontology
+							
+							if (myGo.getOntologyType().toString().equalsIgnoreCase("C")) {
+								// If it is a cellular component
 
-					node.setGeneOntologyData(proteinDescription, componentList, processList, functionList);
-				} 
-				else {
-					node.setGeneOntologyData(null, null, null, null);
+								componentList.add(myGo.getGoTerm().getValue());
+								componentIdList.add(myGo.getGoId().toString());
+							}
+							if (myGo.getOntologyType().toString().equalsIgnoreCase("P")) {
+								// If it is biological processes
+
+								processList.add(myGo.getGoTerm().getValue());
+								processIdList.add(myGo.getGoId().toString());
+							}
+							if (myGo.getOntologyType().toString().equalsIgnoreCase("F")) {
+								// If it is a molecular function
+
+								functionList.add(myGo.getGoTerm().getValue());
+								functionIdList.add(myGo.getGoId().toString());
+							}
+						}
+
+						node.setGeneOntologyData(proteinDescription, componentList, processList, functionList, componentIdList, processIdList, functionIdList);
+					} 
+					else node.setGeneOntologyData(null, null, null, null, null, null, null); 
 				}
 			}
 		} catch(Exception e) {System.out.println("[Error thread gene ontology]");e.printStackTrace();}
 		
 		System.out.println("GO done!");
+		PMBPanelControl.setStatus("Loading GO finished!");
+		try {
+			Thread.sleep(3);
+		} catch (InterruptedException e) { e.printStackTrace();	}
+		PMBPanelControl.setStatus("");
 	}
 
 }

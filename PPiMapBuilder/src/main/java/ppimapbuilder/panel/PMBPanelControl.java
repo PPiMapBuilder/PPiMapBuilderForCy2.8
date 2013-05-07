@@ -42,5 +42,10 @@ public class PMBPanelControl {
 	public static void updatePanel(CyEdge selectedEdge) {
 		PMBPanel.Instance().update(selectedEdge);
 	}
+	
+	/**  */
+	public static void setStatus(String text) {
+		PMBPanel.Instance().setStatus(text);
+	}
 
 }

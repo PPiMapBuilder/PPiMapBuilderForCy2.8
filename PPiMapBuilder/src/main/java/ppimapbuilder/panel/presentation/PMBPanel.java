@@ -48,7 +48,9 @@ public class PMBPanel extends JPanel {
 	private JLabel lblOriginValue;
 	private JTextList lblSrcDbValue, lblExpsysValue, lblPublicationValue;
 	
-
+	private JLabel status;
+	
+	private JComponent lastComp;
 
 	/**
 	 * Method to access the unique instance of PMBPanel
@@ -66,7 +68,7 @@ public class PMBPanel extends JPanel {
 	 * Creates a panel and add the different components
 	 */
 	private PMBPanel() {
-		super();
+		super(new BorderLayout());
 		this.setName("PPiMapBuilder");
 
 		initNodeInfoPanel();
@@ -77,6 +79,10 @@ public class PMBPanel extends JPanel {
 		setPreferredSize(new Dimension(300, 600));
 
 		update();
+		
+		status = new JLabel("");
+		status.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		add(status, BorderLayout.SOUTH);
 	}
 
 
@@ -273,7 +279,7 @@ public class PMBPanel extends JPanel {
 		}
 
 		//Display the node info panel and refresh the interface
-		refreshUI(nodeInfoPanel);
+		switchPanel(nodeInfoPanel);
 	}
 
 
@@ -300,31 +306,28 @@ public class PMBPanel extends JPanel {
 		}
 		
 		//Display the edge info panel and refresh the interface
-		refreshUI(edgeInfoPanel);
+		switchPanel(edgeInfoPanel);
 	}
 
 
 	/** Update the panel when nothing is selected */
 	public void update() {
 		JLabel noSelection = new JLabel("<html><center>Please select one node or one edge of a PPiMapBuilder generated network to get information about them.</center></html>");
-
+		noSelection.setOpaque(false);
+		
 		try {
 			noSelection.setIcon(new ImageIcon(getClass().getResource("/img/info.png")));
 		} catch(Exception e) {}
 
 		//Display the default panel and refresh the interface
-		refreshUI(noSelection);
+		switchPanel(noSelection);
 	} 
 	
 	/**
 	 * 
 	 * @param comp
 	 */
-	private void refreshUI(JComponent comp) {
-		removeAll();
-		
-		add(comp);
-
+	private void refreshUI() {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -333,4 +336,19 @@ public class PMBPanel extends JPanel {
 			}
 		});
 	}
+	
+	private void switchPanel(JComponent comp) {
+		if(lastComp!=null) remove(lastComp);
+		add(comp, BorderLayout.CENTER);
+		lastComp = comp;
+		refreshUI();
+	}
+
+
+	public void setStatus(String text) {
+		status.setText(text);
+		refreshUI();
+	}
+	
+	
 }

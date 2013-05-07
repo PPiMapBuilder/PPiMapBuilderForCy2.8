@@ -1,7 +1,7 @@
 # -- REQUIRED properties -- #
 pluginName=PPiMapBuilder
 pluginDescription=Generate protein-protein interaction network with data from 6 reference databases. Also generate protein-protein interaction network from multiple organisms with Homologene data.
-pluginVersion=0.1
+pluginVersion=0.9
 cytoscapeVersion=2.8.3
 pluginCategory=Network generation
 
@@ -12,4 +12,4 @@ projectURL=http://github.com/PPiMapBuilder
 pluginAuthorsInstitutions=Guillaume Cornut, Pierre Cressant, Pierre Dupuis and Kevin Gravouil:Université Poitiers
 
 # Date this plugin/plugin version was released
-#releaseDate=May 1, 2008
+releaseDate=May 7, 2013

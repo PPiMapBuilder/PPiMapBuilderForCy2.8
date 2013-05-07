@@ -5,7 +5,7 @@
 	<!-- Project identifiers -->
 	<groupId>ch.picard</groupId>
 	<artifactId>ppimapbuilder</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>0.9</version>
 	<packaging>jar</packaging>
 	<name>PPiMapBuilder</name>
 	<url>http://github.com/PPiMapBuilder</url>
