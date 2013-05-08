@@ -27,9 +27,11 @@ import cytoscape.view.CyEdgeView;
 import cytoscape.view.CyNetworkView;
 import cytoscape.view.CyNodeView;
 import cytoscape.visual.CalculatorCatalog;
+import cytoscape.visual.EdgeAppearance;
 import cytoscape.visual.EdgeAppearanceCalculator;
 import cytoscape.visual.GlobalAppearanceCalculator;
 import cytoscape.visual.LineStyle;
+import cytoscape.visual.NodeAppearance;
 import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.VisualMappingManager;
 import cytoscape.visual.VisualPropertyType;
@@ -38,6 +40,7 @@ import cytoscape.visual.calculators.BasicCalculator;
 import cytoscape.visual.calculators.Calculator;
 import cytoscape.visual.mappings.DiscreteMapping;
 import cytoscape.visual.mappings.ObjectMapping;
+import cytoscape.visual.mappings.PassThroughMapping;
 
 import ding.view.DGraphView;
 import ding.view.EdgeContextMenuListener;
@@ -105,30 +108,37 @@ public class PMBView implements CyNetworkView {
 		VisualStyle visualStyle = new VisualStyle(visualStyleName);
 
 		/* Node appearance */
-		NodeAppearanceCalculator nodeAppCalc = this.myView.getVisualStyle().getNodeAppearanceCalculator();
-		nodeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getNodeAppearanceCalculator().getDefaultAppearance());
-		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_FILL_COLOR, new Color(160, 255, 144)); // Node color
+		NodeAppearanceCalculator nodeAppCalc = visualStyle.getNodeAppearanceCalculator();
 
-		//nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_FILL_COLOR, new Color(255, 133, 133));
-		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_SHAPE, cytoscape.visual.NodeShape.ELLIPSE);
-		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_LINE_WIDTH, 1.5);
-		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_BORDER_COLOR, Color.black);
-		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_LABEL_COLOR, Color.BLACK);
-		nodeAppCalc.getDefaultAppearance().set(VisualPropertyType.NODE_FONT_SIZE, 10);
+		NodeAppearance n = new NodeAppearance();
+		n.set(VisualPropertyType.NODE_FILL_COLOR, new Color(160, 255, 144)); // Node color
+		n.set(VisualPropertyType.NODE_SHAPE, cytoscape.visual.NodeShape.ELLIPSE);
+		n.set(VisualPropertyType.NODE_LINE_WIDTH, 1.5);
+		n.set(VisualPropertyType.NODE_BORDER_COLOR, Color.black);
+		n.set(VisualPropertyType.NODE_LABEL_COLOR, Color.BLACK);
+		n.set(VisualPropertyType.NODE_FONT_SIZE, 10);
+		
+		nodeAppCalc.setDefaultAppearance(n);
+		
+		PassThroughMapping pm = new PassThroughMapping(new String(), "ID");
+		Calculator nlc = new BasicCalculator("Node label ppimabuilder", pm, VisualPropertyType.NODE_LABEL);
+		nodeAppCalc.setCalculator(nlc);
 		
 		/* Edge appearance */
-		EdgeAppearanceCalculator edgeAppCalc = this.myView.getVisualStyle().getEdgeAppearanceCalculator();
-		edgeAppCalc.setDefaultAppearance(this.myView.getVisualStyle().getEdgeAppearanceCalculator().getDefaultAppearance());
-		edgeAppCalc.getDefaultAppearance().set(VisualPropertyType.EDGE_COLOR, Color.darkGray);
+		EdgeAppearanceCalculator edgeAppCalc = visualStyle.getEdgeAppearanceCalculator();
+		
+		EdgeAppearance e = new EdgeAppearance();
+		e.set(VisualPropertyType.EDGE_COLOR, Color.darkGray);
+		
 		// Edge line style
 		DiscreteMapping arrowMapping = new DiscreteMapping(LineStyle.SOLID, ObjectMapping.EDGE_MAPPING); 
 		arrowMapping.setControllingAttributeName("Origin", network, false);
 		arrowMapping.putMapValue("Interolog", LineStyle.DASH_DOT);
-		Calculator edgeCalculator = new BasicCalculator("edge line style ppimapbuilder", arrowMapping, VisualPropertyType.EDGE_LINE_STYLE);
+		Calculator edgeCalculator = new BasicCalculator("Edge line style ppimapbuilder", arrowMapping, VisualPropertyType.EDGE_LINE_STYLE);
 		edgeAppCalc.setCalculator(edgeCalculator);
 
 		/* Global appearance */
-		GlobalAppearanceCalculator globalAppCalc = this.myView.getVisualStyle().getGlobalAppearanceCalculator();
+		GlobalAppearanceCalculator globalAppCalc = visualStyle.getGlobalAppearanceCalculator();
 		globalAppCalc.setDefaultNodeSelectionColor(new Color(130, 208, 255)); // Global node selection
 		globalAppCalc.setDefaultBackgroundColor(Color.white);
 		globalAppCalc.setDefaultEdgeSelectionColor(Color.lightGray);
