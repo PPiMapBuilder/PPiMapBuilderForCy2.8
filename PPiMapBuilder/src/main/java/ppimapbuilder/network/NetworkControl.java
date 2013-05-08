@@ -251,17 +251,11 @@ public class NetworkControl implements PropertyChangeListener {
 					for(Integer row: resSecond.keySet()) {
 						//Get fields
 						fieldsSecond =  resSecond.get(row);
-						
-						System.out.println("#1 : "+fieldsSecond);
-						
+												
 						A = Cytoscape.getCyNode(fieldsSecond.get("interactorA"));
 						B = Cytoscape.getCyNode(fieldsSecond.get("interactorB"));
 						
-						System.out.println("#2 : "+A.getIdentifier());
-						System.out.println("#3 : "+B.getIdentifier());
-						
 						interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
-						System.out.println("#4 : "+interaction.getIdentifier());
 						
 						String idInt = interaction.getIdentifier();
 						CyAttributes attrInt = Cytoscape.getEdgeAttributes();
@@ -296,13 +290,11 @@ public class NetworkControl implements PropertyChangeListener {
 							Cytoscape.getEdgeAttributes().setAttribute(interaction.getIdentifier(), "Predicted from", organismA+"/"+organismB);
 						}
 						
-						myNetwork.addEdge(interaction);
-						
-						// Add a view to the network
-						addViewToNetwork(myNetwork);
-						
+						myNetwork.addEdge(interaction);	
 					}
 					
+					// Add a view to the network
+					addViewToNetwork(myNetwork);
 					
 					(Executors.newFixedThreadPool(1)).submit(new Runnable() {
 						public void run() {
@@ -339,7 +331,7 @@ public class NetworkControl implements PropertyChangeListener {
 	 * @param network
 	 */
 	public void fillGOData( CyNetwork network) {
-		System.out.println("Searching gene ontologies...");
+		//System.out.println("Searching gene ontologies...");
 		
 		try {
 			//Create entry retrieval service

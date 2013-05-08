@@ -247,7 +247,7 @@ public class DBConnector {
                 + "	AND org2.tax_id IN (" + this.formatInClause(orgs) + ")\n"
                 + "	AND db.name IN (" + this.formatInClause(dbs) + ")\n";
 
-        System.out.println(q);
+        //System.out.println(q);
         ArrayList<Integer> proteinId = new ArrayList<Integer>();
         
         //System.out.println("#1 : "+proteinId);
@@ -403,7 +403,7 @@ public class DBConnector {
         HashMap<Integer, HashMap<String, String>> ret = new HashMap<Integer, HashMap<String, String>>();
         ResultSet res = null;
 
-        System.out.println(this.pstmt.toString());
+        //System.out.println(this.pstmt.toString());
         
         for (Integer inte : proteinId) {
             pstmt.setInt(1, inte);
@@ -479,7 +479,7 @@ public class DBConnector {
                 + "\n"
                 + ")";
 
-        System.out.println(query);
+        //System.out.println(query);
 
         res = st.executeQuery(query);
         while (res.next()) {
