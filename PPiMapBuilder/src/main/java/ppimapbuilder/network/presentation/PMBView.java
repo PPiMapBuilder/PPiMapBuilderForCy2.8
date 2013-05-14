@@ -49,14 +49,14 @@ import ding.view.NodeContextMenuListener;
 /**
  * 
  * @author CORNUT, CRESSANT, DUPUIS, GRAVOUIL
- * PMBView works as a inherited class (using the decorator pattern)
+ * PMBView works as an inherited class (using the decorator pattern)
  *
  */
 public class PMBView implements CyNetworkView {
 
 	private CyNetworkView myView; // Instance of a CyNetworkView to treat the implemented methods
 
-	public static final String visualStyleName = "PPiMapBuilderStyle";
+	public static final String visualStyleName = "PPiMapBuilder Style";
 
 	/**
 	 * Constructor
@@ -82,10 +82,10 @@ public class PMBView implements CyNetworkView {
 			public void mouseClicked(MouseEvent arg0) {}
 		});
 
-		//((DGraphView) this.myView).getCanvas(DGraphView.Canvas.BACKGROUND_CANVAS).setBackground(Color.white);
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = manager.getCalculatorCatalog();
 
+		// TODO : keep default visual style for foreign networks (during network creation and session opened)
 		VisualStyle vs = catalog.getVisualStyle(visualStyleName);
 		if (vs == null) {
 			vs = createVisualStyle(myNetwork);
@@ -97,8 +97,6 @@ public class PMBView implements CyNetworkView {
 		manager.setVisualStyle(vs);
 		this.myView.redrawGraph(true,true);
 
-
-		this.myView.setZoom(2); // Zoom the network view (because there are only two nodes)
 		this.myView.updateView(); // Update the view
 
 	}

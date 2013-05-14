@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.swing.JOptionPane;
-
 import ppimapbuilder.ppidb.api.DBConnector;
 import ppimapbuilder.ppidb.api.SQLResult;
 
@@ -17,11 +14,8 @@ public class NetworkAbstraction {
 		// Get result from 
 		try {
 			res = DBConnector.Instance().getAllData(id, refOrganism, dbList, orgaList);
-			/*if(res.isEmpty()) 
-				JOptionPane.showMessageDialog(null, id+" not found");*/
 		} catch (Exception e1) {
 			e1.printStackTrace();
-			//JOptionPane.showMessageDialog(null, "Error SQL : "+e1.getLocalizedMessage());
 			return null;
 		}
 		return res;

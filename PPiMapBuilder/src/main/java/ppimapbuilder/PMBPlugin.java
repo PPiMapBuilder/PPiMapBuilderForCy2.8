@@ -1,6 +1,7 @@
 package ppimapbuilder;
 
 import ppimapbuilder.menu.presentation.PMBMenu;
+import ppimapbuilder.network.NetworkControl;
 import ppimapbuilder.panel.PMBPanelControl;
 import cytoscape.Cytoscape;
 import cytoscape.plugin.CytoscapePlugin;
@@ -22,6 +23,11 @@ public class PMBPlugin extends CytoscapePlugin {
 		Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins").add(myMenu); // Add the menu to the plugins menu
 		PMBPanelControl.createPanel(); // Creates the PPiMapBuilder panel
 	
+		restoreInitState();
+	}
+	
+	public void restoreInitState() {
+		NetworkControl.Instance(); // Initialisation of the network control
 	}
 
 }

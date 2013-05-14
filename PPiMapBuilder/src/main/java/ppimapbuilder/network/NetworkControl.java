@@ -3,17 +3,12 @@ package ppimapbuilder.network;
 import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Set;
 import java.util.concurrent.Executors;
-
 import javax.swing.JOptionPane;
-
 import ppimapbuilder.LoadingWindow;
-import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.network.presentation.PMBView;
 import ppimapbuilder.networkcreationframe.NetworkCreationFrameControl;
 import ppimapbuilder.panel.PMBPanelControl;
@@ -39,11 +34,9 @@ import ding.view.DGraphView;
  */
 public class NetworkControl implements PropertyChangeListener {
 	
-	private static final CyNetworkView DGraphView = null;
+	//private static final CyNetworkView DGraphView = null;
 
 	private static NetworkControl _instance = null; // Instance for singleton pattern
-	
-	private LinkedHashMap<CyNetwork, ArrayList<PMBNode>> myNetworks;
 	
 	private CyNetwork myNetwork; // Result network
 	
@@ -53,7 +46,6 @@ public class NetworkControl implements PropertyChangeListener {
 	 */
 	private NetworkControl() {
 		Cytoscape.getDesktop().getSwingPropertyChangeSupport().addPropertyChangeListener(CytoscapeDesktop.NETWORK_VIEW_CREATED, this); // We add the property to handle the view creation
-		myNetworks = new LinkedHashMap<CyNetwork, ArrayList<PMBNode>>();
 	}
 	
 	/**
@@ -73,59 +65,20 @@ public class NetworkControl implements PropertyChangeListener {
 		
 		// If a network view is destroyed and then recreated, we have to add the link between this view and the panel :
 		if (e.getPropertyName().equalsIgnoreCase(CytoscapeDesktop.NETWORK_VIEW_CREATED)) { // If a view is created for a network
-			
-			for (CyNetwork n : myNetworks.keySet()) { // We look if this network is one of the plugin network
-				if (((CyNetworkView)e.getNewValue()).getNetwork() == n) {
-					new PMBView(((CyNetworkView)e.getNewValue()).getNetwork()); // If it is the case, we create a particular view for this network
+			String id = ((CyNetworkView)e.getNewValue()).getNetwork().getIdentifier();
+			Boolean isPmbNetwork = (Boolean) Cytoscape.getNetworkAttributes().getAttribute(id, "PMB");
+			if (isPmbNetwork != null) {
+				if (isPmbNetwork) {	
+					addViewToNetwork(((CyNetworkView)e.getNewValue()).getNetwork()); // If it is the case, we create a particular view for this network
 				}
 			}
 		}
+
 	}
 	
-	/**
-	 * Method which add a network to the network list
-	 * @param myNetwork
-	 */
-	public void addNetwork(CyNetwork myNetwork) {
-		this.myNetworks.put(myNetwork, new ArrayList<PMBNode>()); // We stock the network
-	}
 	
-	private void addViewToNetwork(CyNetwork myNetwork) {
+	public void addViewToNetwork(CyNetwork myNetwork) {
 		new PMBView(myNetwork); // We create a view for this network
-	}
-	
-	/**
-	 * Method which add a node to the network list
-	 * @param myNode
-	 */
-	public void addNode(CyNetwork myNetwork, PMBNode myNode) {
-		/* check if myNetwork exists */
-		if(!this.myNetworks.get(myNetwork).contains(myNode)) 
-			this.myNetworks.get(myNetwork).add(myNode); // We store the node
-	}
-	
-	/**
-	 * Get all the nodes of a network managed by the plugin
-	 * @param myNetwork
-	 * @return
-	 */
-	public ArrayList<PMBNode> getMyNodes(CyNetwork myNetwork) {
-		return myNetworks.get(myNetwork);
-	}
-	
-	/**
-	 * Get a node in a network by its identifier
-	 * @param myNetwork
-	 * @param identifier
-	 * @return
-	 */
-	public PMBNode getNode(CyNetwork myNetwork, String identifier) {
-		for (PMBNode n : this.getMyNodes(myNetwork)) {
-			if (n.getGeneName().equals(identifier)) {
-				return n;
-			}
-		}
-		return null;
 	}
 	
 	/**
@@ -143,15 +96,38 @@ public class NetworkControl implements PropertyChangeListener {
 				NetworkCreationFrameControl.closeFrame();
 				
 				// Creation of the network
-				myNetwork = Cytoscape.createNetwork("network", false); // Creation of a network // TODO : change the name
-				addNetwork(myNetwork);
-								
-				Cytoscape.getEdgeAttributes().setUserEditable("Source database", false);
-				Cytoscape.getEdgeAttributes().setUserEditable("Origin", false);
-				Cytoscape.getEdgeAttributes().setUserEditable("Experimental system", false);
-				Cytoscape.getEdgeAttributes().setUserEditable("Pubmed id", false);
-				Cytoscape.getEdgeAttributes().setUserEditable("Predicted from", false);
-				Cytoscape.getEdgeAttributes().setUserEditable("canonicalName", false);
+				myNetwork = Cytoscape.createNetwork("network"+System.currentTimeMillis(), false); // Creation of a network
+
+				CyAttributes attrNetwork = Cytoscape.getNetworkAttributes();
+				attrNetwork.setUserEditable("PMB", false);
+				attrNetwork.setUserVisible("PMB", false);
+				attrNetwork.setAttribute(myNetwork.getIdentifier(), "PMB", true);
+				
+				CyAttributes attrNode = Cytoscape.getNodeAttributes();
+				
+				attrNode.setUserEditable("Gene name", false);
+				attrNode.setUserEditable("Uniprot id", false);
+				attrNode.setUserEditable("Taxonomy id", false);
+				attrNode.setUserEditable("Protein description", false);
+				attrNode.setUserEditable("Biological process", false);
+				attrNode.setUserEditable("Cellular component", false);
+				attrNode.setUserEditable("Molecular function", false);
+				attrNode.setUserEditable("annotation.GO BIOLOGICAL_PROCESS", false);
+				attrNode.setUserEditable("annotation.GO CELLULAR_COMPONENT", false);
+				attrNode.setUserEditable("annotation.GO MOLECULAR_FUNCTION", false);
+				attrNode.setUserEditable("canonicalName", false);
+				
+				attrNode.setUserVisible("GoLoaded", false);
+				attrNode.setUserEditable("GoLoaded", false);
+				
+				CyAttributes attrEdge = Cytoscape.getEdgeAttributes();
+				
+				attrEdge.setUserEditable("Source database", false);
+				attrEdge.setUserEditable("Origin", false);
+				attrEdge.setUserEditable("Experimental system", false);
+				attrEdge.setUserEditable("Pubmed id", false);
+				attrEdge.setUserEditable("Predicted from", false);
+				attrEdge.setUserEditable("canonicalName", false);
 				
 				// Store final protein IDs 
 				ArrayList<Integer> ptnIDs = new ArrayList<Integer>();
@@ -163,7 +139,7 @@ public class NetworkControl implements PropertyChangeListener {
 					
 					if (res != null) {
 												
-						PMBNode A, B;
+						CyNode A, B;
 						CyEdge interaction;
 						LinkedHashMap<String, String> fields;
 
@@ -180,13 +156,10 @@ public class NetworkControl implements PropertyChangeListener {
 								if (!fields.get("p2_uniprot_id").equals(id) && !ptnIDs.contains(Integer.parseInt(fields.get("p2_id"))))
 									ptnIDs.add(Integer.parseInt(fields.get("p2_id")));
 
-								A = new PMBNode(Cytoscape.getCyNode(fields.get("p1_gene_name"), true), fields.get("p1_uniprot_id"), fields.get("p1_taxid"));
-								B = new PMBNode(Cytoscape.getCyNode(fields.get("p2_gene_name"), true), fields.get("p2_uniprot_id"), fields.get("p2_taxid"));
+								A = createNode(fields.get("p1_gene_name"), fields.get("p1_uniprot_id"), fields.get("p1_taxid"));
+								B = createNode(fields.get("p2_gene_name"), fields.get("p2_uniprot_id"), fields.get("p2_taxid"));
 								myNetwork.addNode(A);
 								myNetwork.addNode(B);
-
-								addNode(myNetwork, A);
-								addNode(myNetwork, B);
 
 								//Create Edges
 								interaction = Cytoscape.getCyEdge(A, B, Semantics.INTERACTION, "pp", true);
@@ -226,9 +199,8 @@ public class NetworkControl implements PropertyChangeListener {
 
 								myNetwork.addEdge(interaction);
 
-							} catch (UnknownHostException e) {
-								JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Connection error!", "Connection to Uniprot database failed", JOptionPane.ERROR_MESSAGE);
-								myNetworks.remove(myNetwork);
+							} catch (Exception e) {
+								JOptionPane.showMessageDialog(Cytoscape.getDesktop(),"Error!", "Error when network loading. Please try again later or contact the administrator", JOptionPane.ERROR_MESSAGE);
 								Cytoscape.destroyNetwork(myNetwork);
 								return;
 							}
@@ -237,7 +209,6 @@ public class NetworkControl implements PropertyChangeListener {
 				}
 				
 				if (myNetwork.getNodeCount() == 0) {
-					myNetworks.remove(myNetwork);
 					Cytoscape.destroyNetwork(myNetwork);
 				}
 				else {
@@ -306,6 +277,20 @@ public class NetworkControl implements PropertyChangeListener {
 		};
 	}
 	
+	public CyNode createNode(String geneName, String uniprotId, String taxid) {
+		//this(myNode.getRootGraph(), myNode.getRootGraphIndex());
+		
+		CyNode myNode = Cytoscape.getCyNode(geneName, true);
+		
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Gene name", geneName); // Add the gene name as node attribute
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Uniprot id", uniprotId);
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Taxonomy id", taxid);
+		
+		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "GoLoaded", false);
+		
+		return myNode;
+	}
+	
 	/** Method handling clicks on the network */
 	public void mousePressed(Point targetedPoint) {
 		CyNetwork current_network = Cytoscape.getCurrentNetwork(); // Retrieve the current network
@@ -313,17 +298,38 @@ public class NetworkControl implements PropertyChangeListener {
 		DGraphView graph = ((DGraphView)Cytoscape.getCurrentNetworkView());
 		
 		if (graph.getPickedNodeView(targetedPoint) != null) { // If the click is on a node
-			Set<CyNode> selectedNodes = current_network.getSelectedNodes(); // Retrieve selected Nodes
-			PMBNode myNode = getNode(current_network, selectedNodes.iterator().next().getIdentifier());
-			PMBPanelControl.updatePanel(myNode);
+			PMBPanelControl.updatePanel((CyNode) current_network.getSelectedNodes().iterator().next());
 		}
 		else if(graph.getPickedEdgeView(targetedPoint) != null) {
-			Set<CyEdge> selectedEdge = current_network.getSelectedEdges(); // Retrieve selected Nodes
-			PMBPanelControl.updatePanel(selectedEdge.iterator().next());
+			PMBPanelControl.updatePanel((CyEdge) current_network.getSelectedEdges().iterator().next());
 		}
 		else PMBPanelControl.updatePanel(); //Clear the panel
 		
 		 // We update the panel
+	}
+	
+	/**
+	 * 
+	 * @param proteinDescription
+	 * @param componentList
+	 * @param processList
+	 * @param functionList
+	 */
+	public void setGeneOntologyData(CyNode myNode, String proteinDescription, ArrayList<String> componentList, ArrayList<String> processList, ArrayList<String> functionList, ArrayList<String> componentIdList, ArrayList<String> processIdList, ArrayList<String> functionIdList) {
+		CyAttributes attr = Cytoscape.getNodeAttributes();
+		
+		attr.setAttribute(myNode.getIdentifier(), "Protein description", proteinDescription);
+		
+		attr.setListAttribute(myNode.getIdentifier(), "Biological process", processList);
+		attr.setListAttribute(myNode.getIdentifier(), "Cellular component", componentList);
+		attr.setListAttribute(myNode.getIdentifier(), "Molecular function", functionList);
+
+		attr.setListAttribute(myNode.getIdentifier(), "annotation.GO BIOLOGICAL_PROCESS", processIdList);
+		attr.setListAttribute(myNode.getIdentifier(), "annotation.GO CELLULAR_COMPONENT", componentIdList);
+		attr.setListAttribute(myNode.getIdentifier(), "annotation.GO MOLECULAR_FUNCTION", functionIdList);
+		
+		attr.setAttribute(myNode.getIdentifier(), "GoLoaded", true);
+		
 	}
 	
 	/**
@@ -345,17 +351,15 @@ public class NetworkControl implements PropertyChangeListener {
 			ArrayList<String> componentIdList;
 			ArrayList<String> processIdList;
 			ArrayList<String> functionIdList;
-
-//			int[] indices = network.getNodeIndicesArray();
-//			for(int i : network.getNodeIndicesArray()) {
-//				PMBNode node = (PMBNode)network.getNode(i);
-//				PMBPanelControl.setStatus("Loading GO ("+i+"/"+indices.length+")...");
-//				
-			ArrayList<PMBNode> nodes = myNetworks.get(network);
-			for(PMBNode node : nodes) {
-				if(!node.isGoLoaded()) {
-					PMBPanelControl.setStatus("Loading GO ("+nodes.indexOf(node)+"/"+nodes.size()+")...");
-					UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(node.getUniprotId()); //Retrieve UniProt entry by its accession number
+			
+			int[] indices = network.getNodeIndicesArray();
+			for(int i : indices) {
+				CyNode node = (CyNode) network.getNode(i);
+				
+				if(!Cytoscape.getNodeAttributes().getBooleanAttribute(node.getIdentifier(), "GoLoaded")) {
+					PMBPanelControl.setStatus("Loading GO ("+(indices.length-(java.lang.Math.abs(i)))+"/"+indices.length+")...");//nodes.indexOf(node)+"/"+nodes.size()+")...");
+					String uniprotId = Cytoscape.getNodeAttributes().getStringAttribute(node.getIdentifier(), "Uniprot id").trim();
+					UniProtEntry entry = (UniProtEntry) entryRetrievalService.getUniProtEntry(uniprotId); //Retrieve UniProt entry by its accession number
 
 					if (entry != null) { // If there is an entry
 						if(entry.getProteinDescription().getRecommendedName().getFields().size() > 0)
@@ -393,9 +397,9 @@ public class NetworkControl implements PropertyChangeListener {
 							}
 						}
 
-						node.setGeneOntologyData(proteinDescription, componentList, processList, functionList, componentIdList, processIdList, functionIdList);
+						setGeneOntologyData(node, proteinDescription, componentList, processList, functionList, componentIdList, processIdList, functionIdList);
 					} 
-					else node.setGeneOntologyData(null, null, null, null, null, null, null); 
+					else Cytoscape.getNodeAttributes().setAttribute(node.getIdentifier(), "GoLoaded", true); //setGeneOntologyData(node, null, null, null, null, null, null, null); 
 				}
 			}
 		} catch(Exception e) {System.out.println("[Error thread gene ontology]");e.printStackTrace();}

@@ -1,10 +1,9 @@
 package ppimapbuilder.panel;
 
 import javax.swing.SwingConstants;
-
-import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.panel.presentation.PMBPanel;
 import cytoscape.CyEdge;
+import cytoscape.CyNode;
 import cytoscape.Cytoscape;
 import cytoscape.view.cytopanels.CytoPanelImp;
 
@@ -34,8 +33,8 @@ public class PMBPanelControl {
 	}
 	
 	/** Method which update the panel */
-	public static void updatePanel(PMBNode selectedNode) {
-		PMBPanel.Instance().update(selectedNode);
+	public static void updatePanel(CyNode myNode) {
+		PMBPanel.Instance().update(myNode);
 	}
 	
 	/**  Method which update the panel with the selected edge  */

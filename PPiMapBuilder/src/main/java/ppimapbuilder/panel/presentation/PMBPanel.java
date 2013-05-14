@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Insets;
 import java.util.ArrayList;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -17,13 +16,13 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-
 import net.miginfocom.swing.MigLayout;
 import ppimapbuilder.JLinkLabel;
-import ppimapbuilder.network.presentation.PMBNode;
 import ppimapbuilder.panel.presentation.ScrollablePanel.ScrollableSizeHint;
 import cytoscape.CyEdge;
+import cytoscape.CyNode;
 import cytoscape.Cytoscape;
+import cytoscape.data.CyAttributes;
 
 import javax.swing.ScrollPaneConstants;
 
@@ -242,35 +241,41 @@ public class PMBPanel extends JPanel {
 	 * Update the panel with the selected Node
 	 * @param selectedNode
 	 */
-	public void update(PMBNode selectedNode) {
-		/* TODO : Retrieve node information from data panel (when the attributes will be done...) */
+	public void update(CyNode selectedNode) {
 
+		CyAttributes attr = Cytoscape.getNodeAttributes();
+		String id = selectedNode.getIdentifier();
+		
+		String geneName = attr.getStringAttribute(id, "Gene name").trim();
+		String uniprotId = attr.getStringAttribute(id, "Uniprot id").trim();
+		String protDescription = attr.getStringAttribute(id, "Protein description");
+		ArrayList<String> processList = (ArrayList<String>) attr.getListAttribute(id, "Biological process");
+		ArrayList<String> componentList = (ArrayList<String>) attr.getListAttribute(id, "Cellular component");
+		ArrayList<String> functionList = (ArrayList<String>) attr.getListAttribute(id, "Molecular function");
+		
 		//Protein info
-		lblGeneNameValue.setText(selectedNode.getGeneName().trim());
+		lblGeneNameValue.setText(geneName);
 		
-		((JLinkLabel)lblUniprotIdValue).setUrl("http://uniprot.org/uniprot/"+selectedNode.getUniprotId().trim());
-		lblUniprotIdValue.setText("<html><u>"+selectedNode.getUniprotId().trim()+"</u></html>");
+		((JLinkLabel)lblUniprotIdValue).setUrl("http://uniprot.org/uniprot/"+uniprotId);
+		lblUniprotIdValue.setText("<html><u>"+uniprotId+"</u></html>");
 		
-		if(selectedNode.isGoLoaded()) {
-			if(selectedNode.getProteinDescription() != null)
-				lblDescriptionValue.setText(selectedNode.getProteinDescription().trim());
+		if(Cytoscape.getNodeAttributes().getBooleanAttribute(selectedNode.getIdentifier(), "GoLoaded")) {
+			if(protDescription != null)
+				lblDescriptionValue.setText(protDescription);
 			
 			//Gene ontology
 			ArrayList<String> tmp;
-			if (selectedNode.getComponentList() != null && !selectedNode.getComponentList().isEmpty()) {
-				tmp = selectedNode.getComponentList();
-				lblCcList.setText((String[])tmp.toArray(new String[tmp.size()]));
-			} else lblCcList.setText("");
+			if (componentList != null && !componentList.isEmpty())
+				lblCcList.setText((String[])componentList.toArray(new String[componentList.size()]));
+			else lblCcList.setText("");
 
-			if (selectedNode.getProcessList() != null && !selectedNode.getProcessList().isEmpty()) {
-				tmp = selectedNode.getProcessList();
-				lblBioList.setText((String[])tmp.toArray(new String[tmp.size()]));
-			} else lblBioList.setText("");
+			if (processList != null && !processList.isEmpty())
+				lblBioList.setText((String[])processList.toArray(new String[processList.size()]));
+			else lblBioList.setText("");
 
-			if (selectedNode.getFunctionList() != null && !selectedNode.getFunctionList().isEmpty()) {
-				tmp = selectedNode.getFunctionList();
-				lblFunList.setText((String[])tmp.toArray(new String[tmp.size()]));
-			} else lblFunList.setText("");
+			if (functionList != null && !functionList.isEmpty())
+				lblFunList.setText((String[])functionList.toArray(new String[functionList.size()]));
+			else lblFunList.setText("");
 		} else {
 			lblDescriptionValue.setText("Gene ontology loading...");
 			lblCcList.setText("Gene ontology loading...");

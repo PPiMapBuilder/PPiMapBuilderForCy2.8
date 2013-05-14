@@ -362,7 +362,6 @@ public class NetworkCreationFrame {
 	 * @return the reference organism taxid
 	 */
 	public Integer getSelectedReferenceOrganism() {
-		//TODO: Test this method
 		String refOrganism = (String)this.cbReferenceOrganism.getSelectedItem();
 
 		// For each entry of the organism linkedHashmap
