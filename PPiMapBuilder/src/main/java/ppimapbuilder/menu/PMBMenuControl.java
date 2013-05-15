@@ -8,6 +8,7 @@ import javax.swing.JOptionPane;
 import cytoscape.Cytoscape;
 
 import ppimapbuilder.LoadingWindow;
+import ppimapbuilder.changelog.ChangelogFrameControl;
 import ppimapbuilder.creditframe.CreditFrameControl;
 import ppimapbuilder.networkcreationframe.NetworkCreationFrameControl;
 import ppimapbuilder.panel.PMBPanelControl;
@@ -37,5 +38,11 @@ public class PMBMenuControl {
 		CreditFrameControl.open();
 	}
 	
+        /*
+         * Open the changelog frame
+         */
+  	public static void openChangelogFrame() {
+            ChangelogFrameControl.open();
+	}      
 	
 }
