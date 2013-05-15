@@ -34,8 +34,6 @@ import ding.view.DGraphView;
  */
 public class NetworkControl implements PropertyChangeListener {
 	
-	//private static final CyNetworkView DGraphView = null;
-
 	private static NetworkControl _instance = null; // Instance for singleton pattern
 	
 	private CyNetwork myNetwork; // Result network
@@ -71,9 +69,14 @@ public class NetworkControl implements PropertyChangeListener {
 				if (isPmbNetwork) {	
 					addViewToNetwork(((CyNetworkView)e.getNewValue()).getNetwork()); // If it is the case, we create a particular view for this network
 				}
+				else {
+					Cytoscape.getVisualMappingManager().setVisualStyle("default"); // By default, we put the default visual style
+				}
+			}
+			else {
+				Cytoscape.getVisualMappingManager().setVisualStyle("default"); // By default, we put the default visual style
 			}
 		}
-
 	}
 	
 	
@@ -404,7 +407,7 @@ public class NetworkControl implements PropertyChangeListener {
 			}
 		} catch(Exception e) {System.out.println("[Error thread gene ontology]");e.printStackTrace();}
 		
-		System.out.println("GO done!");
+		//System.out.println("GO done!");
 		PMBPanelControl.setStatus("Loading GO finished!");
 		try {
 			Thread.sleep(3);

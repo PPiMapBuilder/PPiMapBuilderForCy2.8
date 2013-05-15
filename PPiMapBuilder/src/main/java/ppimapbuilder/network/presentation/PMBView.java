@@ -85,7 +85,6 @@ public class PMBView implements CyNetworkView {
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = manager.getCalculatorCatalog();
 
-		// TODO : keep default visual style for foreign networks (during network creation and session opened)
 		VisualStyle vs = catalog.getVisualStyle(visualStyleName);
 		if (vs == null) {
 			vs = createVisualStyle(myNetwork);
@@ -95,6 +94,7 @@ public class PMBView implements CyNetworkView {
 		this.myView.setVisualStyle(vs.getName());
 
 		manager.setVisualStyle(vs);
+		
 		this.myView.redrawGraph(true,true);
 
 		this.myView.updateView(); // Update the view
