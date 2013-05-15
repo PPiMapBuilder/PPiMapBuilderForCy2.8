@@ -64,7 +64,7 @@ public class NetworkControl implements PropertyChangeListener {
 		// If a network view is destroyed and then recreated, we have to add the link between this view and the panel :
 		if (e.getPropertyName().equalsIgnoreCase(CytoscapeDesktop.NETWORK_VIEW_CREATED)) { // If a view is created for a network
 			String id = ((CyNetworkView)e.getNewValue()).getNetwork().getIdentifier();
-			Boolean isPmbNetwork = (Boolean) Cytoscape.getNetworkAttributes().getAttribute(id, "PMB");
+			Boolean isPmbNetwork = Cytoscape.getNetworkAttributes().getBooleanAttribute(id, "PMB");
 			if (isPmbNetwork != null) {
 				if (isPmbNetwork) {	
 					addViewToNetwork(((CyNetworkView)e.getNewValue()).getNetwork()); // If it is the case, we create a particular view for this network
@@ -281,8 +281,6 @@ public class NetworkControl implements PropertyChangeListener {
 	}
 	
 	public CyNode createNode(String geneName, String uniprotId, String taxid) {
-		//this(myNode.getRootGraph(), myNode.getRootGraphIndex());
-		
 		CyNode myNode = Cytoscape.getCyNode(geneName, true);
 		
 		Cytoscape.getNodeAttributes().setAttribute(myNode.getIdentifier(), "Gene name", geneName); // Add the gene name as node attribute
@@ -307,8 +305,6 @@ public class NetworkControl implements PropertyChangeListener {
 			PMBPanelControl.updatePanel((CyEdge) current_network.getSelectedEdges().iterator().next());
 		}
 		else PMBPanelControl.updatePanel(); //Clear the panel
-		
-		 // We update the panel
 	}
 	
 	/**
