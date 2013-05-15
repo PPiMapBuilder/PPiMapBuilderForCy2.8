@@ -154,6 +154,7 @@ public class ChangelogFrame extends javax.swing.JFrame {
         txtareaChnglog.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
         txtareaChnglog.setLineWrap(true);
         txtareaChnglog.setRows(5);
+        txtareaChnglog.setTabSize(4);
         txtareaChnglog.setWrapStyleWord(true);
         txtareaChnglog.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         txtareaChnglog.setMargin(new java.awt.Insets(5, 5, 5, 5));
